@@ -8,14 +8,14 @@ const Users = {
     })
   },
   async statuses ({ config, params, queries }) {
-    return await utils.request({
+    return utils.request({
       config,
       url: `/api/v1/accounts/${params.id}/statuses`,
       queries
     })
   },
   async verifyCredentials ({ config }) {
-    return await utils.request({
+    return utils.request({
       config,
       url: '/api/v1/accounts/verify_credentials'
     })

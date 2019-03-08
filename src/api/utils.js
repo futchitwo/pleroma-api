@@ -7,7 +7,7 @@ const queryParams = (params) => {
     .join('&')
 }
 
-const authHeaders = ({accessToken}) => {
+const authHeaders = ({ accessToken }) => {
   if (accessToken) {
     return { 'Authorization': `Bearer ${accessToken}` }
   } else {
@@ -15,7 +15,7 @@ const authHeaders = ({accessToken}) => {
   }
 }
 
-const request = async ({ method = 'GET', url, params, queries, config, fullUrl = undefined, body = undefined, headers = {}}) => {
+const request = async ({ method = 'GET', url, params, queries, config, fullUrl = undefined, body = undefined, headers = {} }) => {
   const instance = config.instance
   fullUrl = fullUrl || `${instance}${url}`
 
@@ -26,12 +26,12 @@ const request = async ({ method = 'GET', url, params, queries, config, fullUrl =
   try {
     const result = await fetch(fullUrl, {
       method,
-      headers: {...headers, ...authHeaders(config)},
+      headers: { ...headers, ...authHeaders(config) },
       credentials: 'same-origin',
       body
     })
 
-    if(result.ok){
+    if (result.ok) {
       return {
         state: 'ok',
         data: await result.json(),

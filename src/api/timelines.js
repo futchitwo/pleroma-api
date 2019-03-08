@@ -8,7 +8,7 @@ const Timelines = {
       queries
     })
   },
-  async home ({ config, queries}) {
+  async home ({ config, queries }) {
     return utils.request({
       config,
       url: '/api/v1/timelines/home',
