@@ -1,7 +1,9 @@
 import users from './api/users'
-import timelines from './api/timelines.js'
+import timelines from './api/timelines'
+import statuses from './api/statuses'
 
 export default {
   users,
-  timelines
+  timelines,
+  statuses
 }
