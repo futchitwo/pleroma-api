@@ -19,12 +19,11 @@ const Users = {
 
     return { statuses, links }
   },
-  async verifyCredentials ({ config, params: { accessToken } }) {
-    const data = await utils.request({
+  async verifyCredentials ({ config }) {
+    return await utils.request({
       config,
       url: '/api/v1/accounts/verify_credentials'
     })
-    return data.json()
   }
 }
 
