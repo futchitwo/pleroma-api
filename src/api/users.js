@@ -7,17 +7,12 @@ const Users = {
       url: `/api/v1/accounts/${id}`
     })
   },
-  async statuses ({ config, params }) {
-    const data = await utils.request({
+  async statuses ({ config, params, queries }) {
+    return await utils.request({
       config,
       url: `/api/v1/accounts/${params.id}/statuses`,
-      params
+      queries
     })
-
-    const statuses = await data.json()
-    const links = parseLinkHeader(data.headers.get('link'))
-
-    return { statuses, links }
   },
   async verifyCredentials ({ config }) {
     return await utils.request({

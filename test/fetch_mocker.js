@@ -1,4 +1,4 @@
-const fetchMocker = (result, {expectedUrl, ok = true, expectedToken}) => {
+const fetchMocker = (result, {expectedUrl, ok = true, expectedToken, headers = {}}) => {
   return async (url, options) => {
     if(expectedUrl && (expectedUrl != url)) {
       throw `fetchMocker: Unexpected url, expected '${expectedUrl}', got '${url}'`
@@ -13,7 +13,7 @@ const fetchMocker = (result, {expectedUrl, ok = true, expectedToken}) => {
       ok,
       json: () => result,
       headers: {
-        get: () => ""
+        get: (header) => headers[header]
       }
     }
   }

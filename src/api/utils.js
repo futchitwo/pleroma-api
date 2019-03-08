@@ -15,12 +15,12 @@ const authHeaders = ({accessToken}) => {
   }
 }
 
-const request = async ({ method = 'GET', url, params, config, fullUrl = undefined, body = undefined, headers = {} }) => {
+const request = async ({ method = 'GET', url, params, queries, config, fullUrl = undefined, body = undefined, headers = {}}) => {
   const instance = config.instance
   fullUrl = fullUrl || `${instance}${url}`
 
-  if (method === 'GET' && params) {
-    fullUrl = fullUrl + `?${queryParams(params)}`
+  if (method === 'GET' && queries) {
+    fullUrl = fullUrl + `?${queryParams(queries)}`
   }
 
   try {

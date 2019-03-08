@@ -56,4 +56,24 @@ describe('User api', () => {
       expect(res.data.id).toBe('1')
     })
   })
+
+  describe('/api/v1/accounts/:id/status', () => {
+    it('returns the statuses and the links', async () => {
+      const id = 1
+
+      fetch.mockImplementationOnce(fetchMocker(
+        [{id: 1}, {id: 2}],
+        {
+          expectedUrl: `https://pleroma.soykaf.com/api/v1/accounts/${id}/statuses`,
+          headers: {
+            link: '<https://pleroma.soykaf.com/api/v1/timelines/home?max_id=9gZ5VYhDG8GeCL8Vay>; rel="next", <https://pleroma.soykaf.com/api/v1/timelines/home?since_id=9gZ5g5Q6RlaAaN9Z5M>; rel="prev"' 
+          }
+        }))
+      const res = await api.users.statuses({config, params: {id}})
+
+      expect(res.state).toBe('ok')
+      expect(res.data).toEqual([{id: 1}, {id: 2}])
+      expect(res.links).not.toBe(null)
+    })
+  })
 })
