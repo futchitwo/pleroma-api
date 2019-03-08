@@ -64,12 +64,12 @@ describe('User api', () => {
       fetch.mockImplementationOnce(fetchMocker(
         [{id: 1}, {id: 2}],
         {
-          expectedUrl: `https://pleroma.soykaf.com/api/v1/accounts/${id}/statuses`,
+          expectedUrl: `https://pleroma.soykaf.com/api/v1/accounts/${id}/statuses?since_id=1`,
           headers: {
-            link: '<https://pleroma.soykaf.com/api/v1/timelines/home?max_id=9gZ5VYhDG8GeCL8Vay>; rel="next", <https://pleroma.soykaf.com/api/v1/timelines/home?since_id=9gZ5g5Q6RlaAaN9Z5M>; rel="prev"' 
+            link: '<https://pleroma.soykaf.com/api/v1/accounts/1/statuses?max_id=9gZ5VYhDG8GeCL8Vay>; rel="next", <https://pleroma.soykaf.com/api/v1/accounts/1/statuses?since_id=9gZ5g5Q6RlaAaN9Z5M>; rel="prev"' 
           }
         }))
-      const res = await api.users.statuses({config, params: {id}})
+      const res = await api.users.statuses({config, params: {id}, queries: {since_id: 1}})
 
       expect(res.state).toBe('ok')
       expect(res.data).toEqual([{id: 1}, {id: 2}])
