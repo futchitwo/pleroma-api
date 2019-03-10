@@ -1,7 +1,7 @@
 {
   "name": "pleroma-api",
   "version": "1.0.0",
-  "main": "index.js",
+  "main": "build/index.js",
   "license": "MIT",
   "scripts": {
     "build": "neutrino build",

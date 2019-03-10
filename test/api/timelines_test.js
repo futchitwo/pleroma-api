@@ -1,4 +1,4 @@
-import api from '../src/api.js'
+import api from '../../src/api.js'
 import fetch from 'cross-fetch'
 import fetchMocker from './fetch_mocker.js'
 
