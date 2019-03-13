@@ -88,9 +88,9 @@ const actions = {
 }
 
 const thunks = {
-  fetchAndAddTimeline: ({ config, timelineName, type }) => {
+  fetchAndAddTimeline: ({ config, timelineName, type, queries }) => {
     return async (dispatch, getState) => {
-      const result = await timelinesApi.public({ config })
+      const result = await timelinesApi.public({ config, queries })
       if (result.state === 'ok') {
         return dispatch(actions.addStatusesToTimeline({ statuses: result.data, timelineName }))
       } else {
