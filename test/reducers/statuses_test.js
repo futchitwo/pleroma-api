@@ -50,26 +50,3 @@ describe('Status reducers', () => {
     })
   })
 })
-
-describe('Status thunks', () => {
-  const config = {
-    instance: 'https://pleroma.soykaf.com'
-  }
-
-  it('fetches the public timeline and adds it to the', async () => {
-    const store = { state: undefined }
-    const timelineName = 'public'
-    const type = 'public'
-
-    const dispatch = (action) => {
-      store.state = Statuses.reducer(store.state, action)
-      return store.state
-    }
-    const getState = () => store.state
-
-    // TODO: Mock the api request
-    let state = await Statuses.thunks.fetchAndAddTimeline({ config, timelineName, type })(dispatch, getState)
-
-    expect(state.statusesById).not.toBe({})
-  })
-})

@@ -2,8 +2,6 @@ import uniq from 'lodash/uniq'
 import reduce from 'lodash/reduce'
 import map from 'lodash/map'
 
-import timelinesApi from '../api/timelines.js'
-
 const initialState = {
   statusesByIds: {},
   timelines: {
@@ -87,19 +85,6 @@ const actions = {
   }
 }
 
-const thunks = {
-  fetchAndAddTimeline: ({ config, timelineName, type, queries }) => {
-    return async (dispatch, getState) => {
-      const result = await timelinesApi.public({ config, queries })
-      if (result.state === 'ok') {
-        return dispatch(actions.addStatusesToTimeline({ statuses: result.data, timelineName }))
-      } else {
-        return getState()
-      }
-    }
-  }
-}
-
 const reducer = (state = initialState, action) => {
   const fn = reducers[action.type] || ((state) => state)
   return fn(state, action.payload)
@@ -107,6 +92,5 @@ const reducer = (state = initialState, action) => {
 
 export default {
   reducer,
-  actions,
-  thunks
+  actions
 }
