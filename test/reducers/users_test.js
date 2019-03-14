@@ -31,7 +31,6 @@ describe('User reducers', () => {
         bio: 'oof'
       }
 
-
       const updatedState = Users.reducer(
         resultState,
         Users.actions.addUsers({ users: [updatedUser] })
