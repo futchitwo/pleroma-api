@@ -27,7 +27,8 @@ const request = async ({ method = 'GET', url, params, queries, config, fullUrl =
     const result = await fetch(fullUrl, {
       method,
       headers: { ...headers, ...authHeaders(config) },
-      credentials: 'same-origin',
+      mode: 'cors',
+      credentials: 'omit',
       body
     })
 
