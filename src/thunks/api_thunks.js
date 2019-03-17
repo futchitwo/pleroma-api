@@ -1,5 +1,39 @@
-const apiThunks = {
+import statusesThunks from './statuses_thunks.js'
+import Api from '../reducers/api.js'
 
+const makeFetcher = ({ dispatch, getState, timelineName, type, queries }) => {
+  const fetcher = window.setInterval(() => {
+    const config = getState().api.config
+    dispatch(statusesThunks.fetchAndAddTimeline({
+      config,
+      timelineName,
+      type,
+      queries
+    }))
+  }, 5000)
+  const stop = () => {
+    window.clearInterval(fetcher)
+  }
+  return {
+    stop: stop
+  }
+}
+
+const apiThunks = {
+  startFetchingTimeline: ({ timelineName, type, queries }) => {
+    return async (dispatch, getState) => {
+      const timeline = getState().api.timelines[timelineName] || {}
+
+      // Don't start two fetchers at once
+      if (timeline.fetcher) {
+        return getState()
+      } else {
+        const fetcher = makeFetcher({ dispatch, getState, timelineName, type, queries })
+        dispatch(Api.actions.setFetcher({ timelineName, fetcher }))
+        return getState()
+      }
+    }
+  }
 }
 
 export default apiThunks

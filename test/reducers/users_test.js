@@ -3,7 +3,7 @@ import Users from '../../src/reducers/users.js'
 describe('User reducers', () => {
   describe('adding Users', () => {
     it('adds new users by id', () => {
-      const users = [{id: "1"}, {id: "2"}]
+      const users = [{ id: '1' }, { id: '2' }]
 
       const resultState = Users.reducer(
         undefined,
@@ -12,14 +12,14 @@ describe('User reducers', () => {
 
       expect(resultState.usersByIds).toEqual(
         {
-          '1': {id: '1'},
-          '2': {id: '2'}
+          '1': { id: '1' },
+          '2': { id: '2' }
         }
       )
     })
 
     it('merges new information in', () => {
-      const users = [{id: "1", name: 'lain', bio: 'hi'}, {id: "2"}]
+      const users = [{ id: '1', name: 'lain', bio: 'hi' }, { id: '2' }]
 
       const resultState = Users.reducer(
         undefined,
@@ -47,7 +47,7 @@ describe('User reducers', () => {
 
   describe('setting a current user', () => {
     it('sets a current user', () => {
-      const user = {id: '1'}
+      const user = { id: '1' }
 
       const resultState = Users.reducer(
         undefined,
