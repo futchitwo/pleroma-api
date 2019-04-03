@@ -8,7 +8,8 @@ jest.mock('cross-fetch')
 
 const reducer = combineReducers({
   statuses: reducers.statuses.reducer,
-  users: reducers.users.reducer
+  users: reducers.users.reducer,
+  api: reducers.api.reducer
 })
 
 describe('Status thunks', () => {
@@ -16,7 +17,60 @@ describe('Status thunks', () => {
     instance: 'https://pleroma.soykaf.com'
   }
 
-  it('fetches the public timeline and adds it to the', async () => {
+  it('fetches the home timeline and adds the statuses', async () => {
+    const store = { state: undefined }
+    const timelineName = 'home'
+    const type = 'home'
+
+    const dispatch = (action) => {
+      store.state = reducer(store.state, action)
+      return store.state
+    }
+
+    const getState = () => store.state
+
+    const user = {
+      id: '1'
+    }
+
+    const statuses = [
+      { id: '1', account: user },
+      { id: '2', account: user }
+    ]
+
+    fetch.mockReset()
+    fetch.mockImplementationOnce(fetchMocker(
+      statuses,
+      {
+        expectedUrl: `https://pleroma.soykaf.com/api/v1/timelines/home`,
+        headers: {
+          link: '<https://pleroma.soykaf.com/api/v1/timelines/home?max_id=9gZ5VYhDG8GeCL8Vay>; rel="next", <https://pleroma.soykaf.com/api/v1/timelines/home?since_id=9gZ5g5Q6RlaAaN9Z5M>; rel="prev"'
+        }
+      }))
+
+    let state = await statusesThunks.fetchAndAddTimeline({ config, timelineName, type })(dispatch, getState)
+
+    expect(state.statuses.statusesByIds)
+      .toEqual({ 1: statuses[0], 2: statuses[1] })
+
+    expect(state.statuses.timelines.home.statusIds)
+      .toEqual(['1', '2'])
+
+    expect(state.api.timelines.home.prev)
+      .toEqual({
+        "rel": "prev",
+        "since_id": "9gZ5g5Q6RlaAaN9Z5M",
+        "url": "https://pleroma.soykaf.com/api/v1/timelines/home?since_id=9gZ5g5Q6RlaAaN9Z5M"
+      })
+
+
+    expect(state.users.usersByIds)
+      .toEqual({
+        [user.id]: user
+      })
+  })
+
+  it('fetches the public timeline and adds the statuses', async () => {
     const store = { state: undefined }
     const timelineName = 'public'
     const type = 'public'
@@ -37,6 +91,7 @@ describe('Status thunks', () => {
       { id: '2', account: user }
     ]
 
+    fetch.mockReset()
     fetch.mockImplementationOnce(fetchMocker(
       statuses,
       {
@@ -53,6 +108,66 @@ describe('Status thunks', () => {
 
     expect(state.statuses.timelines.public.statusIds)
       .toEqual(['1', '2'])
+
+    expect(state.api.timelines.public.prev)
+      .toEqual({
+        "rel": "prev",
+        "since_id": "9gZ5g5Q6RlaAaN9Z5M",
+        "url": "https://pleroma.soykaf.com/api/v1/timelines/home?since_id=9gZ5g5Q6RlaAaN9Z5M"
+      })
+
+    expect(state.users.usersByIds)
+      .toEqual({
+        [user.id]: user
+      })
+  })
+
+  it('fetches a timeline by a full url and adds the statuses', async () => {
+    const store = { state: undefined }
+    const timelineName = 'public'
+    const type = 'public'
+
+    const dispatch = (action) => {
+      store.state = reducer(store.state, action)
+      return store.state
+    }
+
+    const getState = () => store.state
+
+    const user = {
+      id: '1'
+    }
+
+    const statuses = [
+      { id: '1', account: user },
+      { id: '2', account: user }
+    ]
+
+    fetch.mockReset()
+    fetch.mockImplementationOnce(fetchMocker(
+      statuses,
+      {
+        expectedUrl: `https://pleroma.soykaf.com/api/v1/timelines/doesntexist`,
+        headers: {
+          link: '<https://pleroma.soykaf.com/api/v1/timelines/public?max_id=9gZ5VYhDG8GeCL8Vay>; rel="next", <https://pleroma.soykaf.com/api/v1/timelines/home?since_id=9gZ5g5Q6RlaAaN9Z5M>; rel="prev"'
+        }
+      }))
+
+    const fullUrl = 'https://pleroma.soykaf.com/api/v1/timelines/doesntexist'
+    let state = await statusesThunks.fetchAndAddTimeline({ config, timelineName, type, fullUrl })(dispatch, getState)
+
+    expect(state.statuses.statusesByIds)
+      .toEqual({ 1: statuses[0], 2: statuses[1] })
+
+    expect(state.statuses.timelines.public.statusIds)
+      .toEqual(['1', '2'])
+
+    expect(state.api.timelines.public.prev)
+      .toEqual({
+        "rel": "prev",
+        "since_id": "9gZ5g5Q6RlaAaN9Z5M",
+        "url": "https://pleroma.soykaf.com/api/v1/timelines/home?since_id=9gZ5g5Q6RlaAaN9Z5M"
+      })
 
     expect(state.users.usersByIds)
       .toEqual({

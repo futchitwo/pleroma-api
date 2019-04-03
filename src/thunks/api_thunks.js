@@ -4,11 +4,13 @@ import Api from '../reducers/api.js'
 const makeFetcher = ({ dispatch, getState, timelineName, type, queries }) => {
   const fetcher = window.setInterval(() => {
     const config = getState().api.config
+    const fullUrl = (getState().api.timelines[timelineName].prev || {}).url
     dispatch(statusesThunks.fetchAndAddTimeline({
       config,
       timelineName,
       type,
-      queries
+      queries,
+      fullUrl
     }))
   }, 5000)
   const stop = () => {
