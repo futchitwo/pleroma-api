@@ -24,9 +24,35 @@ describe('OAuth api', () => {
       expect(res.state).toBe('ok')
       expect(res.data.id).toEqual('1')
     })
-  }),
+  })
 
   describe('POST /oauth/token', () => {
+    it('works for the authorization code flow', async () => {
+      fetch.mockImplementationOnce(fetchMocker({ access_token: 'sometoken' }, {
+        expectedUrl: 'https://pleroma.soykaf.com/oauth/token',
+        expectedJSON: {
+          client_id: 'someid',
+          client_secret: 'somesecret',
+          grant_type: 'authorization_code',
+          code: 'somecode',
+          redirect_uri: 'someuri'
+        }
+      }))
+
+      const res = await api.oauth.getTokenWithCode({
+        config,
+        params: {
+          client_id: 'someid',
+          client_secret: 'somesecret',
+          code: 'somecode',
+          redirect_uri: 'someuri'
+        }
+      })
+
+      expect(res.state).toBe('ok')
+      expect(res.data.access_token).toEqual('sometoken')
+    })
+
     it('works for the password flow', async () => {
       fetch.mockImplementationOnce(fetchMocker({ access_token: 'sometoken' }, {
         expectedUrl: 'https://pleroma.soykaf.com/oauth/token',
