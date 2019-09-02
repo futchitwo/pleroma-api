@@ -34,7 +34,8 @@ describe('Statuses api', () => {
       expect(res.data.ancestors).toEqual([{ id: 2 }])
       expect(res.data.descendants).toEqual([{ id: 3 }])
     })
-  }),
+  })
+
   describe('/api/v1/statuses/:id/favourite', () => {
     it('favourite for a status', async () => {
       const id = 1
@@ -46,7 +47,8 @@ describe('Statuses api', () => {
       expect(res.state).toBe('ok')
       expect(res.data.id).toBe(id)
     })
-  }),
+  })
+
   describe('/api/v1/statuses/:id/unfavourite', () => {
     it('unfavourite for a status', async () => {
       const id = 1
@@ -58,7 +60,8 @@ describe('Statuses api', () => {
       expect(res.state).toBe('ok')
       expect(res.data.id).toBe(id)
     })
-  }),
+  })
+
   describe('/api/v1/statuses/:id/reblog', () => {
     it('reblog for a status', async () => {
       const id = 1
@@ -70,7 +73,8 @@ describe('Statuses api', () => {
       expect(res.state).toBe('ok')
       expect(res.data.id).toBe(id)
     })
-  }),
+  })
+
   describe('/api/v1/statuses/:id/unreblog', () => {
     it('unreblog for a status', async () => {
       const id = 1
@@ -82,7 +86,8 @@ describe('Statuses api', () => {
       expect(res.state).toBe('ok')
       expect(res.data.id).toBe(id)
     })
-  }),
+  })
+
   describe('POST /api/v1/statuses', () => {
     it('posts a status', async () => {
       const id = 1

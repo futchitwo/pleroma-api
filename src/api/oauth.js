@@ -23,6 +23,27 @@ const createApp = async ({ config, params = {} }) => {
   })
 }
 
+const getTokenWithCode = async ({ config, params }) => {
+  const defaultRedirectUri = `${window.location.origin}/oauth-callback`
+  params = {
+    client_id: params.client_id,
+    client_secret: params.client_secret,
+    grant_type: 'authorization_code',
+    code: params.code,
+    redirect_uri: params.redirect_uri || defaultRedirectUri
+  }
+
+  return utils.request({
+    method: 'POST',
+    config,
+    url: '/oauth/token',
+    body: JSON.stringify(params),
+    headers: {
+      'Content-Type': 'application/json'
+    }
+  })
+}
+
 const getTokenWithPassword = async ({ config, params }) => {
   params = {
     client_id: params.client_id,
@@ -45,6 +66,7 @@ const getTokenWithPassword = async ({ config, params }) => {
 
 const oauth = {
   createApp,
+  getTokenWithCode,
   getTokenWithPassword
 }
 
