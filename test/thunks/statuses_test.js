@@ -58,11 +58,10 @@ describe('Status thunks', () => {
 
     expect(state.api.timelines.home.prev)
       .toEqual({
-        "rel": "prev",
-        "since_id": "9gZ5g5Q6RlaAaN9Z5M",
-        "url": "https://pleroma.soykaf.com/api/v1/timelines/home?since_id=9gZ5g5Q6RlaAaN9Z5M"
+        'rel': 'prev',
+        'since_id': '9gZ5g5Q6RlaAaN9Z5M',
+        'url': 'https://pleroma.soykaf.com/api/v1/timelines/home?since_id=9gZ5g5Q6RlaAaN9Z5M'
       })
-
 
     expect(state.users.usersByIds)
       .toEqual({
@@ -111,9 +110,9 @@ describe('Status thunks', () => {
 
     expect(state.api.timelines.public.prev)
       .toEqual({
-        "rel": "prev",
-        "since_id": "9gZ5g5Q6RlaAaN9Z5M",
-        "url": "https://pleroma.soykaf.com/api/v1/timelines/home?since_id=9gZ5g5Q6RlaAaN9Z5M"
+        'rel': 'prev',
+        'since_id': '9gZ5g5Q6RlaAaN9Z5M',
+        'url': 'https://pleroma.soykaf.com/api/v1/timelines/home?since_id=9gZ5g5Q6RlaAaN9Z5M'
       })
 
     expect(state.users.usersByIds)
@@ -164,9 +163,9 @@ describe('Status thunks', () => {
 
     expect(state.api.timelines.public.prev)
       .toEqual({
-        "rel": "prev",
-        "since_id": "9gZ5g5Q6RlaAaN9Z5M",
-        "url": "https://pleroma.soykaf.com/api/v1/timelines/home?since_id=9gZ5g5Q6RlaAaN9Z5M"
+        'rel': 'prev',
+        'since_id': '9gZ5g5Q6RlaAaN9Z5M',
+        'url': 'https://pleroma.soykaf.com/api/v1/timelines/home?since_id=9gZ5g5Q6RlaAaN9Z5M'
       })
 
     expect(state.users.usersByIds)
