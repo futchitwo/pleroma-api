@@ -1,4 +1,5 @@
 import reduce from 'lodash/reduce'
+import { emojify } from '../utils/parse_utils'
 
 const initialState = {
   usersByIds: {},
@@ -6,8 +7,10 @@ const initialState = {
 }
 
 const addUsers = (state, { users }) => {
-  const newUsers = reduce(users, (result, users) => {
-    result[users.id] = { ...(state.usersByIds[users.id] || {}), ...users }
+  const newUsers = reduce(users, (result, user) => {
+    user.display_name = emojify(user.display_name, user.emojis)
+    user.note = emojify(user.note, user.emojis)
+    result[user.id] = { ...(state.usersByIds[user.id] || {}), ...user }
     return result
   }, {})
 
