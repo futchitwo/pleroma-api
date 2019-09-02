@@ -1,6 +1,7 @@
 import uniq from 'lodash/uniq'
 import reduce from 'lodash/reduce'
 import map from 'lodash/map'
+import { emojify } from '../utils/parse_utils'
 
 const initialState = {
   statusesByIds: {},
@@ -14,6 +15,8 @@ const initialTimeline = {
 
 const addStatuses = (state, { statuses }) => {
   const newStatuses = reduce(statuses, (result, status) => {
+    status.content = emojify(status.content, status.emojis)
+    status.spoiler_text = emojify(status.spoiler_text, status.emojis)
     result[status.id] = { ...(state.statusesByIds[status.id] || {}), ...status }
     return result
   }, {})
