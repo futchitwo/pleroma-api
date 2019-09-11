@@ -35,6 +35,17 @@ const apiThunks = {
         return getState()
       }
     }
+  },
+
+  stopFetchingTimeline: ({ timelineName }) => {
+    return async (dispatch, getState) => {
+      const timeline = getState().api.timelines[timelineName] || {}
+
+      if (timeline.fetcher) {
+        timeline.fetcher.stop()
+      }
+      return getState()
+    }
   }
 }
 
