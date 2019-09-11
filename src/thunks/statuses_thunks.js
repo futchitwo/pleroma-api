@@ -36,7 +36,7 @@ const statusesThunks = {
         const users = map(result.data, 'account')
         await dispatch(Users.actions.addUsers({ users }))
 
-        if (result.links.prev) {
+        if (result.links && result.links.prev) {
           await dispatch(Api.actions.setPrev({ timelineName, prev: result.links.prev }))
         }
         return getState()

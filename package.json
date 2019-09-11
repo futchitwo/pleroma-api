@@ -6,7 +6,8 @@
   "scripts": {
     "build": "neutrino build",
     "lint": "neutrino lint",
-    "test": "neutrino test"
+    "test": "neutrino test",
+    "tdd": "neutrino test --watchAll"
   },
   "devDependencies": {
     "@neutrinojs/jest": "^8.3.0",
