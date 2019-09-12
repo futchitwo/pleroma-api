@@ -34,10 +34,18 @@ const setCurrentUser = (state, { user }) => {
   }
 }
 
+const updateCurrentUser = (state, { user }) => {
+  return {
+    ...state,
+    currentUser: { ...state.currentUser, ...user }
+  }
+}
+
 const reducers = {
   addUsers,
   addUser,
-  setCurrentUser
+  setCurrentUser,
+  updateCurrentUser
 }
 
 const actions = {
@@ -56,6 +64,12 @@ const actions = {
   setCurrentUser: ({ user }) => {
     return {
       type: 'setCurrentUser',
+      payload: { user }
+    }
+  },
+  updateCurrentUser: (user) => {
+    return {
+      type: 'updateCurrentUser',
       payload: { user }
     }
   }

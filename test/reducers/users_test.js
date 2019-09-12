@@ -56,5 +56,17 @@ describe('User reducers', () => {
 
       expect(resultState.currentUser).toEqual(user)
     })
+
+    it('update a current user', () => {
+      const user = { id: '1' }
+      const resultUser = { id: '1', name: 'user' }
+
+      const resultState = Users.reducer(
+        { currentUser: user },
+        Users.actions.updateCurrentUser({ name: 'user' })
+      )
+
+      expect(resultState.currentUser).toEqual(resultUser)
+    })
   })
 })

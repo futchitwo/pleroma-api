@@ -173,4 +173,45 @@ describe('Status thunks', () => {
         [user.id]: user
       })
   })
+
+  it('post a new status', async () => {
+    const store = {
+      state: undefined
+    }
+
+    const dispatch = (action) => {
+      store.state = reducer(store.state, action)
+      return store.state
+    }
+
+    const getState = () => store.state
+
+    const status = {
+      status: 'test text',
+      id: '1'
+    }
+
+    const statuses = [
+      {
+        ...status,
+        content: undefined,
+        spoiler_text: undefined
+      }
+    ]
+
+    fetch.mockReset()
+    fetch.mockImplementationOnce(fetchMocker(
+      status,
+      {
+        expectedUrl: `https://pleroma.soykaf.com/api/v1/statuses`
+      }))
+
+    let state = await statusesThunks.postStatus({ config, params: status })(dispatch, getState)
+
+    expect(state.statuses.statusesByIds)
+      .toEqual({ 1: statuses[0] })
+
+    expect(state.statuses.timelines.local)
+      .toEqual({ statusIds: ['1'] })
+  })
 })
