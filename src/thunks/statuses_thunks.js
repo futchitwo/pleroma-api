@@ -1,5 +1,6 @@
 import timelinesApi from '../api/timelines.js'
 import utils from '../api/utils.js'
+import statusesApi from '../api/statuses.js'
 import Statuses from '../reducers/statuses.js'
 import Users from '../reducers/users.js'
 import Api from '../reducers/api.js'
@@ -43,6 +44,18 @@ const statusesThunks = {
       } else {
         return getState()
       }
+    }
+  },
+
+  postStatus: ({ config, params }) => {
+    return async (dispatch, getState) => {
+      const result = await statusesApi.post({ config, params })
+      if (result.state === 'ok') {
+        await dispatch(Statuses.actions.addStatusesToTimeline({ statuses: [result.data], timelineName: 'local' }))
+      } else {
+        throw Error(result.data.error || result.state)
+      }
+      return getState()
     }
   }
 }
