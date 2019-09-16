@@ -43,6 +43,7 @@ const apiThunks = {
 
       if (timeline.fetcher) {
         timeline.fetcher.stop()
+        timeline.fetcher = null
       }
       return getState()
     }
