@@ -12,6 +12,19 @@ describe('Api reducer', () => {
 
       expect(resultState.timelines[timelineName].fetcher).toEqual(fetcher)
     })
+
+    it('sets a fetcher for a notifications', () => {
+      const fetcher = 'fetcher'
+      const notifications = true
+
+      const resultState = Api.reducer(
+        undefined,
+        Api.actions.setFetcher({ notifications, fetcher })
+      )
+
+      expect(resultState.notifications.fetcher).toEqual(fetcher)
+    })
+
     it('sets prev and next for a  timeline', () => {
       const prev = 'prev'
       const next = 'next'
@@ -33,6 +46,29 @@ describe('Api reducer', () => {
 
       expect(resultState.timelines[timelineName].prev).toEqual(prev)
       expect(resultState.timelines[timelineName].next).toEqual(next)
+    })
+
+    it('sets prev and next for notifications', () => {
+      const prev = 'prev'
+      const next = 'next'
+      const notifications = true
+
+      let resultState
+
+      resultState = Api.reducer(
+        undefined,
+        Api.actions.setPrev({ notifications, prev })
+      )
+
+      expect(resultState.notifications.prev).toEqual(prev)
+
+      resultState = Api.reducer(
+        resultState,
+        Api.actions.setNext({ notifications, next })
+      )
+
+      expect(resultState.notifications.prev).toEqual(prev)
+      expect(resultState.notifications.next).toEqual(next)
     })
   })
 

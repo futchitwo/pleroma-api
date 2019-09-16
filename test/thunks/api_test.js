@@ -17,7 +17,8 @@ describe('Api thunks', () => {
     api: {
       timelines: {
         home: {}
-      }
+      },
+      notifications: {}
     }
   })
 
@@ -72,6 +73,56 @@ describe('Api thunks', () => {
       await apiThunks.stopFetchingTimeline({ timelineName })(dispatch, getState)
 
       expect(getState().api.timelines[timelineName].fetcher).toBeNull()
+    })
+  })
+
+  describe('startFetchingNotifications', () => {
+    it('create a notifications fetcher', async () => {
+      const store = { state: defaultState() }
+
+      const dispatch = (action) => {
+        store.state = reducer(store.state, action)
+        return store.state
+      }
+
+      const getState = () => store.state
+
+      fetch.mockReset()
+      fetch.mockImplementationOnce(fetchMocker([], {}))
+
+      await apiThunks.startFetchingNotifications({})(dispatch, getState)
+
+      expect(getState().api.notifications.fetcher).toBeDefined()
+
+      expect(typeof getState().api.notifications.fetcher.stop)
+        .toEqual('function')
+
+      // stop interval to clean up just in case
+      getState().api.notifications.fetcher.stop()
+    })
+  })
+
+  describe('stopFetchingNotifications', () => {
+    it('stops and removes the notifications fetcher', async () => {
+      const store = { state: defaultState() }
+
+      const dispatch = (action) => {
+        store.state = reducer(store.state, action)
+        return store.state
+      }
+
+      const getState = () => store.state
+
+      fetch.mockReset()
+      fetch.mockImplementationOnce(fetchMocker([], {}))
+
+      await apiThunks.startFetchingNotifications({})(dispatch, getState)
+
+      expect(getState().api.notifications.fetcher).toBeDefined()
+
+      await apiThunks.stopFetchingNotifications()(dispatch, getState)
+
+      expect(getState().api.notifications.fetcher).toBeNull()
     })
   })
 })
