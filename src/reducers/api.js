@@ -1,6 +1,17 @@
 const initialState = {
   config: {},
-  timelines: {}
+  timelines: {},
+  notifications: {}
+}
+
+const setProperty = ({ state, timelineName, notifications, key, value }) => {
+  if (timelineName) {
+    return setTimelineProperty({ state, timelineName, key, value })
+  } else if (notifications) {
+    return setNotificationsProperty({ state, key, value })
+  } else {
+    return state
+  }
 }
 
 const setTimelineProperty = ({ state, timelineName, key, value }) => {
@@ -17,15 +28,25 @@ const setTimelineProperty = ({ state, timelineName, key, value }) => {
   }
 }
 
+const setNotificationsProperty = ({ state, key, value }) => {
+  return {
+    ...state,
+    notifications: {
+      ...state.notifications,
+      [key]: value
+    }
+  }
+}
+
 const reducers = {
-  setFetcher: (state, { timelineName, fetcher }) => {
-    return setTimelineProperty({ state, timelineName, key: 'fetcher', value: fetcher })
+  setFetcher: (state, { timelineName, notifications, fetcher }) => {
+    return setProperty({ state, timelineName, notifications, key: 'fetcher', value: fetcher })
   },
-  setNext: (state, { timelineName, next }) => {
-    return setTimelineProperty({ state, timelineName, key: 'next', value: next })
+  setNext: (state, { timelineName, notifications, next }) => {
+    return setProperty({ state, timelineName, notifications, key: 'next', value: next })
   },
-  setPrev: (state, { timelineName, prev }) => {
-    return setTimelineProperty({ state, timelineName, key: 'prev', value: prev })
+  setPrev: (state, { timelineName, notifications, prev }) => {
+    return setProperty({ state, timelineName, notifications, key: 'prev', value: prev })
   },
   addConfig: (state, { config }) => {
     return {
@@ -45,22 +66,22 @@ const actions = {
       payload: { config }
     }
   },
-  setFetcher: ({ timelineName, fetcher }) => {
+  setFetcher: ({ timelineName, notifications, fetcher }) => {
     return {
       type: 'setFetcher',
-      payload: { timelineName, fetcher }
+      payload: { timelineName, notifications, fetcher }
     }
   },
-  setPrev: ({ timelineName, prev }) => {
+  setPrev: ({ timelineName, notifications, prev }) => {
     return {
       type: 'setPrev',
-      payload: { timelineName, prev }
+      payload: { timelineName, notifications, prev }
     }
   },
-  setNext: ({ timelineName, next }) => {
+  setNext: ({ timelineName, notifications, next }) => {
     return {
       type: 'setNext',
-      payload: { timelineName, next }
+      payload: { timelineName, notifications, next }
     }
   }
 }
