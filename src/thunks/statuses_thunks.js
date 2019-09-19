@@ -6,6 +6,7 @@ import Users from '../reducers/users.js'
 import Api from '../reducers/api.js'
 
 import map from 'lodash/map'
+import find from 'lodash/find'
 
 const fetchTimeline = async ({ type, config, queries, fullUrl }) => {
   if (fullUrl) {
@@ -54,6 +55,26 @@ const statusesThunks = {
         await dispatch(Statuses.actions.addStatusesToTimeline({ statuses: [result.data], timelineName: 'local' }))
       } else {
         throw Error(result.data.error || result.state)
+      }
+      return getState()
+    }
+  },
+
+  getStatusWithContext: ({ config, params }) => {
+    return async (dispatch, getState) => {
+      const result = await Promise.all([
+        statusesApi.get({ config, params }),
+        statusesApi.context({ config, params })
+      ])
+
+      if (result.every(({ state }) => state === 'ok')) {
+        const status = { ...result[0].data, context: { ...result[1].data } }
+
+        await dispatch(Statuses.actions.addStatus({ status }))
+      } else {
+        const errorRes = find(result, ({ state }) => state !== 'ok')
+
+        throw Error((errorRes.data && errorRes.data.error) || errorRes.state)
       }
       return getState()
     }
