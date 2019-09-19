@@ -214,4 +214,53 @@ describe('Status thunks', () => {
     expect(state.statuses.timelines.local)
       .toEqual({ statusIds: ['1'] })
   })
+
+  it('fetches a status with its context', async () => {
+    const store = { state: undefined }
+
+    const dispatch = (action) => {
+      store.state = reducer(store.state, action)
+      return store.state
+    }
+
+    const getState = () => store.state
+
+    const status = {
+      id: '1',
+      content: 'Status content'
+    }
+    const context = { ancestors: [], descendants: [] }
+
+    fetch.mockReset()
+    fetch
+      .mockImplementationOnce(
+        fetchMocker(
+          status,
+          {
+            expectedUrl: `https://pleroma.soykaf.com/api/v1/statuses/1`
+          })
+      )
+      .mockImplementationOnce(
+        fetchMocker(
+          context,
+          {
+            expectedUrl: `https://pleroma.soykaf.com/api/v1/statuses/1/context`
+          })
+      )
+
+    let state = await statusesThunks.getStatusWithContext({ config, params: { id: '1' } })(dispatch, getState)
+
+    const result = {
+      id: '1',
+      content: 'Status content',
+      spoiler_text: undefined,
+      context: {
+        ancestors: [],
+        descendants: []
+      }
+    }
+
+    expect(state.statuses.statusesByIds)
+      .toEqual({ 1: result })
+  })
 })
