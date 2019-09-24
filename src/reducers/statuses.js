@@ -1,7 +1,7 @@
-import uniq from 'lodash/uniq'
 import reduce from 'lodash/reduce'
 import map from 'lodash/map'
 import { emojify } from '../utils/parse_utils'
+import { addStatusIds } from '../utils/status_utils'
 
 const initialState = {
   statusesByIds: {},
@@ -36,7 +36,10 @@ const addStatus = (state, { status }) => {
 
 const addStatusIdsToTimeline = (state, { statusIds, timelineName }) => {
   let timeline = state.timelines[timelineName] || { ...initialTimeline }
-  timeline = { ...timeline, statusIds: uniq([...statusIds, ...timeline.statusIds]) }
+  timeline = {
+    ...timeline,
+    statusIds: addStatusIds(timeline.statusIds, statusIds)
+  }
   return {
     ...state,
     timelines: {

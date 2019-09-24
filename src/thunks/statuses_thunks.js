@@ -28,24 +28,41 @@ const fetchTimeline = async ({ type, config, queries, fullUrl }) => {
   }
 }
 
+const updateLinks = async (dispatch, timelineName, timeline, links, older) => {
+  if (!timeline.prev && links.prev) {
+    await dispatch(Api.actions.setPrev({ timelineName, prev: links.prev }))
+  }
+  if (!timeline.next && links.next) {
+    await dispatch(Api.actions.setNext({ timelineName, next: links.next }))
+  }
+  if (!older && links.prev) {
+    await dispatch(Api.actions.setPrev({ timelineName, prev: links.prev }))
+  }
+  if (older && links.next) {
+    await dispatch(Api.actions.setNext({ timelineName, next: links.next }))
+  }
+}
+
 const statusesThunks = {
-  fetchAndAddTimeline: ({ config, timelineName, type, queries, fullUrl }) => {
-    return async (dispatch, getState) => {
+  fetchAndAddTimeline: ({ config, timelineName, type, older, queries, fullUrl }) =>
+    async (dispatch, getState) => {
+      dispatch(Api.actions.setLoading({ timelineName, older, loading: true }))
       const result = await fetchTimeline({ type, config, queries, fullUrl })
+      dispatch(Api.actions.setLoading({ timelineName, older, loading: false }))
       if (result.state === 'ok') {
         await dispatch(Statuses.actions.addStatusesToTimeline({ statuses: result.data, timelineName }))
         const users = map(result.data, 'account')
         await dispatch(Users.actions.addUsers({ users }))
 
-        if (result.links && result.links.prev) {
-          await dispatch(Api.actions.setPrev({ timelineName, prev: result.links.prev }))
+        if (result.links) {
+          const timeline = getState().api.timelines[timelineName] || {}
+          await updateLinks(dispatch, timelineName, timeline, result.links, older)
         }
         return getState()
       } else {
         return getState()
       }
-    }
-  },
+    },
 
   postStatus: ({ config, params }) => {
     return async (dispatch, getState) => {

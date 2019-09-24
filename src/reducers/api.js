@@ -1,6 +1,14 @@
+const emptyTimeline = () => ({
+  loadingOlder: false
+})
+
 const initialState = {
   config: {},
-  timelines: {},
+  timelines: {
+    public: emptyTimeline(),
+    local: emptyTimeline(),
+    home: emptyTimeline()
+  },
   notifications: {}
 }
 
@@ -48,6 +56,13 @@ const reducers = {
   setPrev: (state, { timelineName, notifications, prev }) => {
     return setProperty({ state, timelineName, notifications, key: 'prev', value: prev })
   },
+  setLoading: (state, { timelineName, notifications, loading, older }) => {
+    if (older) {
+      return setProperty({ state, timelineName, notifications, key: 'loadingOlder', value: loading })
+    } else {
+      return state
+    }
+  },
   addConfig: (state, { config }) => {
     return {
       ...state,
@@ -82,6 +97,12 @@ const actions = {
     return {
       type: 'setNext',
       payload: { timelineName, notifications, next }
+    }
+  },
+  setLoading: ({ timelineName, older, loading }) => {
+    return {
+      type: 'setLoading',
+      payload: { timelineName, older, loading }
     }
   }
 }

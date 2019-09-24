@@ -64,6 +64,22 @@ const apiThunks = {
     }
   },
 
+  loadOlderOnTimeline: ({ timelineName, type, queries }) => {
+    return async (dispatch, getState) => {
+      const timeline = getState().api.timelines[timelineName] || {}
+      const config = getState().api.config
+      const fullUrl = (timeline.next || {}).url
+      return dispatch(statusesThunks.fetchAndAddTimeline({
+        older: true,
+        config,
+        timelineName,
+        type,
+        fullUrl,
+        queries
+      }))
+    }
+  },
+
   startFetchingNotifications: ({ queries }) => {
     return async (dispatch, getState) => {
       const notifications = getState().api.notifications || {}
