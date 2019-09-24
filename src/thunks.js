@@ -1,9 +1,11 @@
-import statuses from './thunks/statuses_thunks.js'
-import notifications from './thunks/notifications_thunks.js'
-import api from './thunks/api_thunks.js'
+import statuses from './thunks/statuses_thunks'
+import notifications from './thunks/notifications_thunks'
+import api from './thunks/api_thunks'
+import users from './thunks/users_thunks'
 
 export default {
   statuses,
   notifications,
-  api
+  api,
+  users
 }

@@ -8,9 +8,11 @@ const initialState = {
 
 const addUsers = (state, { users }) => {
   const newUsers = reduce(users, (result, user) => {
-    user.display_name = emojify(user.display_name, user.emojis)
-    user.note = emojify(user.note, user.emojis)
-    result[user.id] = { ...(state.usersByIds[user.id] || {}), ...user }
+    const newUser = { ...(state.usersByIds[user.id] || {}), ...user }
+
+    newUser.display_name = emojify(newUser.display_name, newUser.emojis)
+    newUser.note = emojify(newUser.note, newUser.emojis)
+    result[newUser.id] = newUser
     return result
   }, {})
 
@@ -24,7 +26,7 @@ const addUsers = (state, { users }) => {
 }
 
 const addUser = (state, { user }) => {
-  addUsers(state, { users: [user] })
+  return addUsers(state, { users: [user] })
 }
 
 const setCurrentUser = (state, { user }) => {

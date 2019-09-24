@@ -57,7 +57,7 @@ describe('User api', () => {
     })
   })
 
-  describe('/api/v1/accounts/:id/status', () => {
+  describe('/api/v1/accounts/:id/statuses', () => {
     it('returns the statuses and the links', async () => {
       const id = 1
 
@@ -74,6 +74,20 @@ describe('User api', () => {
       expect(res.state).toBe('ok')
       expect(res.data).toEqual([{ id: 1 }, { id: 2 }])
       expect(res.links).not.toBe(null)
+    })
+  })
+
+  describe('/api/v1/accounts/relationships', () => {
+    it('returns array of relationships', async () => {
+      const id = 1
+
+      fetch.mockImplementationOnce(fetchMocker(
+        [{ id: '1', blocked_by: false, followed_by: true }],
+        { expectedUrl: `https://pleroma.soykaf.com/api/v1/accounts/relationships?id=1` }
+      ))
+      const res = await api.users.relationships({ config, queries: { id } })
+      expect(res.state).toBe('ok')
+      expect(res.data).toEqual([{ id: '1', blocked_by: false, followed_by: true }])
     })
   })
 })

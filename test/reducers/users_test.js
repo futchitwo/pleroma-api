@@ -2,6 +2,33 @@ import Users from '../../src/reducers/users.js'
 
 describe('User reducers', () => {
   describe('adding Users', () => {
+    it('add new user', () => {
+      const user = { id: '1', username: 'user' }
+
+      const resultState = Users.reducer(
+        undefined,
+        Users.actions.addUser({ user })
+      )
+
+      expect(resultState.usersByIds).toEqual({ '1': user })
+    })
+
+    it('update user', () => {
+      const user = { id: '1', username: 'user', note: 'note' }
+
+      const defaultState = {
+        usersByIds: {
+          1: { id: '1', username: 'user' }
+        }
+      }
+      const resultState = Users.reducer(
+        defaultState,
+        Users.actions.addUser({ user })
+      )
+
+      expect(resultState.usersByIds).toEqual({ '1': user })
+    })
+
     it('adds new users by id', () => {
       const users = [{ id: '1' }, { id: '2' }]
 
