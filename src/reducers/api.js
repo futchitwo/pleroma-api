@@ -56,12 +56,8 @@ const reducers = {
   setPrev: (state, { timelineName, notifications, prev }) => {
     return setProperty({ state, timelineName, notifications, key: 'prev', value: prev })
   },
-  setLoading: (state, { timelineName, notifications, loading, older }) => {
-    if (older) {
-      return setProperty({ state, timelineName, notifications, key: 'loadingOlder', value: loading })
-    } else {
-      return state
-    }
+  setLoadingOlder: (state, { timelineName, notifications, loading }) => {
+    return setProperty({ state, timelineName, notifications, key: 'loadingOlder', value: loading })
   },
   addConfig: (state, { config }) => {
     return {
@@ -99,10 +95,10 @@ const actions = {
       payload: { timelineName, notifications, next }
     }
   },
-  setLoading: ({ timelineName, older, loading }) => {
+  setLoadingOlder: ({ timelineName, loading }) => {
     return {
-      type: 'setLoading',
-      payload: { timelineName, older, loading }
+      type: 'setLoadingOlder',
+      payload: { timelineName, loading }
     }
   }
 }

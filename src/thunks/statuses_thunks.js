@@ -43,12 +43,25 @@ const updateLinks = async (dispatch, timelineName, timeline, links, older) => {
   }
 }
 
+const startLoading = (dispatch, timelineName, older) => {
+  if (older) {
+    dispatch(Api.actions.setLoadingOlder({ timelineName, loading: true }))
+  }
+}
+
+const stopLoading = (dispatch, timelineName, older) => {
+  if (older) {
+    dispatch(Api.actions.setLoadingOlder({ timelineName, loading: false }))
+  }
+}
+
 const statusesThunks = {
   fetchAndAddTimeline: ({ config, timelineName, type, older, queries, fullUrl }) =>
     async (dispatch, getState) => {
-      dispatch(Api.actions.setLoading({ timelineName, older, loading: true }))
+      startLoading(dispatch, timelineName, older)
       const result = await fetchTimeline({ type, config, queries, fullUrl })
-      dispatch(Api.actions.setLoading({ timelineName, older, loading: false }))
+      stopLoading(dispatch, timelineName, older)
+
       if (result.state === 'ok') {
         await dispatch(Statuses.actions.addStatusesToTimeline({ statuses: result.data, timelineName }))
         const users = map(result.data, 'account')
