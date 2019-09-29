@@ -24,10 +24,10 @@ describe('Status reducers', () => {
 
       const resultState = Statuses.reducer(undefined, Statuses.actions.addStatusIdsToTimeline({ statusIds, timelineName }))
 
-      expect(resultState.timelines[timelineName].statusIds).toEqual(statusIds)
+      expect(resultState.timelines[timelineName].statusIds).toEqual(['3', '2', '1'])
     })
 
-    it('adds in the front, keeps it unique', async () => {
+    it('sorts by id, keeps it unique', async () => {
       const statusIds = ['1', '2', '3']
       const timelineName = 'test'
 
@@ -37,7 +37,7 @@ describe('Status reducers', () => {
 
       resultState = Statuses.reducer(resultState, Statuses.actions.addStatusIdsToTimeline({ statusIds: moreStatusIds, timelineName }))
 
-      expect(resultState.timelines[timelineName].statusIds).toEqual(['4', '2', '3', '1'])
+      expect(resultState.timelines[timelineName].statusIds).toEqual(['4', '3', '2', '1'])
     })
 
     it('adds both Statuses and Ids to a timeline', async () => {

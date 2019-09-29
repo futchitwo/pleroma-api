@@ -54,7 +54,7 @@ describe('Status thunks', () => {
       .toEqual({ 1: statuses[0], 2: statuses[1] })
 
     expect(state.statuses.timelines.home.statusIds)
-      .toEqual(['1', '2'])
+      .toEqual(['2', '1'])
 
     expect(state.api.timelines.home.prev)
       .toEqual({
@@ -106,7 +106,7 @@ describe('Status thunks', () => {
       .toEqual({ 1: statuses[0], 2: statuses[1] })
 
     expect(state.statuses.timelines.public.statusIds)
-      .toEqual(['1', '2'])
+      .toEqual(['2', '1'])
 
     expect(state.api.timelines.public.prev)
       .toEqual({
@@ -159,7 +159,7 @@ describe('Status thunks', () => {
       .toEqual({ 1: statuses[0], 2: statuses[1] })
 
     expect(state.statuses.timelines.public.statusIds)
-      .toEqual(['1', '2'])
+      .toEqual(['2', '1'])
 
     expect(state.api.timelines.public.prev)
       .toEqual({
@@ -172,6 +172,58 @@ describe('Status thunks', () => {
       .toEqual({
         [user.id]: user
       })
+  })
+
+  it('sets next link when getting older statuses', async () => {
+    const store = {
+      state: {
+        api: {
+          timelines: {
+            public: {
+              prev: {},
+              next: {}
+            }
+          }
+        }
+      }
+    }
+    const timelineName = 'public'
+    const type = 'public'
+
+    const dispatch = (action) => {
+      store.state = reducer(store.state, action)
+      return store.state
+    }
+
+    const getState = () => store.state
+
+    const user = {
+      id: '1'
+    }
+
+    const statuses = [
+      { id: '1', account: user }
+    ]
+
+    fetch.mockReset()
+    fetch.mockImplementationOnce(fetchMocker(
+      statuses,
+      {
+        expectedUrl: `https://pleroma.soykaf.com/api/v1/timelines/doesntexist`,
+        headers: {
+          link: '<https://pleroma.soykaf.com/api/v1/timelines/public?max_id=9gZ5VYhDG8GeCL8Vay>; rel="next", <https://pleroma.soykaf.com/api/v1/timelines/home?since_id=9gZ5g5Q6RlaAaN9Z5M>; rel="prev"'
+        }
+      }))
+
+    const fullUrl = 'https://pleroma.soykaf.com/api/v1/timelines/doesntexist'
+    let state = await statusesThunks.fetchAndAddTimeline({ config, timelineName, type, fullUrl, older: true })(dispatch, getState)
+
+    expect(state.api.timelines.public.prev).toEqual({})
+    expect(state.api.timelines.public.next).toEqual({
+      'rel': 'next',
+      'max_id': '9gZ5VYhDG8GeCL8Vay',
+      'url': 'https://pleroma.soykaf.com/api/v1/timelines/public?max_id=9gZ5VYhDG8GeCL8Vay'
+    })
   })
 
   it('post a new status', async () => {
