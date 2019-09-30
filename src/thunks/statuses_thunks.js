@@ -7,6 +7,7 @@ import Api from '../reducers/api.js'
 
 import map from 'lodash/map'
 import find from 'lodash/find'
+import { getConfig } from '../utils/api_utils'
 
 const fetchTimeline = async ({ type, config, queries, fullUrl }) => {
   if (fullUrl) {
@@ -80,7 +81,7 @@ const statusesThunks = {
 
   postStatus: ({ config, params }) => {
     return async (dispatch, getState) => {
-      const result = await statusesApi.post({ config, params })
+      const result = await statusesApi.post({ config: getConfig(getState, config), params })
       if (result.state === 'ok') {
         await dispatch(Statuses.actions.addStatusesToTimeline({ statuses: [result.data], timelineName: 'local' }))
       } else {
