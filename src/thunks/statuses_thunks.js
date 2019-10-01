@@ -4,10 +4,12 @@ import statusesApi from '../api/statuses.js'
 import Statuses from '../reducers/statuses.js'
 import Users from '../reducers/users.js'
 import Api from '../reducers/api.js'
+import { getConfig } from '../utils/api_utils'
 
 import map from 'lodash/map'
 import find from 'lodash/find'
-import { getConfig } from '../utils/api_utils'
+import last from 'lodash/last'
+import has from 'lodash/has'
 
 const fetchTimeline = async ({ type, config, queries, fullUrl }) => {
   if (fullUrl) {
@@ -31,11 +33,8 @@ const fetchTimeline = async ({ type, config, queries, fullUrl }) => {
 }
 
 const updateLinks = async (dispatch, timelineName, timeline, links, older) => {
-  if (!timeline.prev && links.prev) {
+  if (!has(timeline, 'prev') && links.prev) {
     await dispatch(Api.actions.setPrev({ timelineName, prev: links.prev }))
-  }
-  if (!timeline.next && links.next) {
-    await dispatch(Api.actions.setNext({ timelineName, next: links.next }))
   }
   if (!older && links.prev) {
     await dispatch(Api.actions.setPrev({ timelineName, prev: links.prev }))
@@ -60,6 +59,12 @@ const stopLoading = (dispatch, timelineName, older) => {
 const statusesThunks = {
   fetchAndAddTimeline: ({ config, timelineName, type, older, queries, fullUrl }) =>
     async (dispatch, getState) => {
+      // If there's no "next" url, use the oldest status as max_id in query
+      if (older && !fullUrl && (!queries || !queries['max_id'])) {
+        const timelineStatusIds = (getState().statuses.timelines[timelineName] || {}).statusIds || []
+        queries = queries || {}
+        queries['max_id'] = last(timelineStatusIds)
+      }
       startLoading(dispatch, timelineName, older)
       const result = await fetchTimeline({ type, config, queries, fullUrl })
       stopLoading(dispatch, timelineName, older)
@@ -77,6 +82,13 @@ const statusesThunks = {
       } else {
         return getState()
       }
+    },
+
+  cropOlderStatusesFromTimeline: ({ timelineName, length }) =>
+    async (dispatch, getState) => {
+      await dispatch(Statuses.actions.cropOlderStatusesFromTimeline({ timelineName, length }))
+      await dispatch(Api.actions.setNext({ timelineName, next: null }))
+      return getState()
     },
 
   postStatus: ({ config, params }) => {
