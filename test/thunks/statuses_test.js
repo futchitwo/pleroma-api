@@ -226,10 +226,86 @@ describe('Status thunks', () => {
     })
   })
 
-  it('post a new status', async () => {
+  it('shortens the length of timeline and removes next', async () => {
     const store = {
-      state: undefined
+      state: {
+        api: {
+          timelines: {
+            public: {
+              prev: {},
+              next: 'test'
+            }
+          }
+        },
+        statuses: {
+          timelines: {
+            public: {
+              statusIds: [
+                '4',
+                '3',
+                '2',
+                '1',
+                '0'
+              ]
+            }
+          }
+        }
+      }
     }
+    const timelineName = 'public'
+
+    const dispatch = (action) => {
+      store.state = reducer(store.state, action)
+      return store.state
+    }
+
+    const getState = () => store.state
+
+    let state = await statusesThunks.cropOlderStatusesFromTimeline({ timelineName, length: 3 })(dispatch, getState)
+
+    expect(state.statuses.timelines.public.statusIds).toEqual(['4', '3', '2'])
+    expect(state.api.timelines.public.next).toEqual(null)
+  })
+
+  it('keeps timeline the same when less statuses than length', async () => {
+    const store = {
+      state: {
+        api: {
+          timelines: {
+            public: {
+              prev: {},
+              next: 'test'
+            }
+          }
+        },
+        statuses: {
+          timelines: {
+            public: {
+              statusIds: [
+                '4'
+              ]
+            }
+          }
+        }
+      }
+    }
+    const timelineName = 'public'
+
+    const dispatch = (action) => {
+      store.state = reducer(store.state, action)
+      return store.state
+    }
+
+    const getState = () => store.state
+
+    let state = await statusesThunks.cropOlderStatusesFromTimeline({ timelineName, length: 3 })(dispatch, getState)
+
+    expect(state.statuses.timelines.public.statusIds).toEqual(['4'])
+    expect(state.api.timelines.public.next).toEqual(null)
+  })
+
+  it('post a new status', async () => {
+    const store = { state: undefined }
 
     const dispatch = (action) => {
       store.state = reducer(store.state, action)

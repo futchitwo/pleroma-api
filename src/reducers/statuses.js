@@ -1,5 +1,6 @@
 import reduce from 'lodash/reduce'
 import map from 'lodash/map'
+import slice from 'lodash/slice'
 import { emojify } from '../utils/parse_utils'
 import { addStatusIds } from '../utils/status_utils'
 
@@ -57,11 +58,27 @@ const addStatusesToTimeline = (state, { statuses, timelineName }) => {
   return newState
 }
 
+const cropOlderStatusesFromTimeline = (state, { timelineName, length }) => {
+  const timeline = state.timelines[timelineName] || { ...initialTimeline }
+  const statusIds = slice(timeline.statusIds, 0, length || 50)
+  return {
+    ...state,
+    timelines: {
+      ...state.timelines,
+      [timelineName]: {
+        ...timeline,
+        statusIds
+      }
+    }
+  }
+}
+
 const reducers = {
   addStatus,
   addStatuses,
   addStatusIdsToTimeline,
-  addStatusesToTimeline
+  addStatusesToTimeline,
+  cropOlderStatusesFromTimeline
 }
 
 const actions = {
@@ -87,6 +104,12 @@ const actions = {
     return {
       type: 'addStatusesToTimeline',
       payload: { statuses, timelineName }
+    }
+  },
+  cropOlderStatusesFromTimeline: ({ timelineName, length }) => {
+    return {
+      type: 'cropOlderStatusesFromTimeline',
+      payload: { timelineName, length }
     }
   }
 }
