@@ -1,31 +1,32 @@
 import utils from './utils.js'
 
-const baseUrl = '/api/v1/accounts'
+const ACCOUNTS_URL = '/api/v1/accounts'
+
 const Users = {
   async get ({ config, params: { id } }) {
     return utils.request({
       config,
-      url: `${baseUrl}/${id}`
+      url: `${ACCOUNTS_URL}/${id}`
     })
   },
   async statuses ({ config, params, queries }) {
     return utils.request({
       config,
-      url: `${baseUrl}/${params.id}/statuses`,
+      url: `${ACCOUNTS_URL}/${params.id}/statuses`,
       queries
     })
   },
   async relationships ({ config, queries }) {
     return utils.request({
       config,
-      url: `${baseUrl}/relationships`,
+      url: `${ACCOUNTS_URL}/relationships`,
       queries
     })
   },
   async verifyCredentials ({ config }) {
     return utils.request({
       config,
-      url: '/api/v1/accounts/verify_credentials'
+      url: `${ACCOUNTS_URL}/verify_credentials`
     })
   }
 }

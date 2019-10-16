@@ -96,8 +96,59 @@ const statusesThunks = {
       const result = await statusesApi.post({ config: getConfig(getState, config), params })
       if (result.state === 'ok') {
         await dispatch(Statuses.actions.addStatusesToTimeline({ statuses: [result.data], timelineName: 'local' }))
+
+        if (params.in_reply_to_id) {
+          const replyedStatus = await statusesApi.get({ config, params: { id: params.in_reply_to_id } })
+          if (replyedStatus.state === 'ok') {
+            await dispatch(Statuses.actions.addStatus({ status: replyedStatus.data }))
+          } else {
+            throw Error(replyedStatus.data.error || replyedStatus.state)
+          }
+        }
       } else {
         throw Error(result.data.error || result.state)
+      }
+      return getState()
+    }
+  },
+
+  toggleFavouritedStatus: ({ config, params, favourited }) => {
+    return async (dispatch, getState) => {
+      const result = favourited
+        ? await statusesApi.unfavourite({ config: getConfig(getState, config), params })
+        : await statusesApi.favourite({ config: getConfig(getState, config), params })
+      if (result.state === 'ok') {
+        await dispatch(Statuses.actions.addStatus({ status: result.data }))
+      } else {
+        throw Error((result.data && result.data.error) || result.state)
+      }
+      return getState()
+    }
+  },
+
+  toggleRebloggedStatus: ({ config, params, reblogged }) => {
+    return async (dispatch, getState) => {
+      const result = reblogged
+        ? await statusesApi.unreblog({ config: getConfig(getState, config), params })
+        : await statusesApi.reblog({ config: getConfig(getState, config), params })
+      if (result.state === 'ok') {
+        await dispatch(Statuses.actions.addStatus({ status: result.data }))
+      } else {
+        throw Error((result.data && result.data.error) || result.state)
+      }
+      return getState()
+    }
+  },
+
+  toggleMutedStatus: ({ config, params, muted }) => {
+    return async (dispatch, getState) => {
+      const result = muted
+        ? await statusesApi.unmute({ config: getConfig(getState, config), params })
+        : await statusesApi.mute({ config: getConfig(getState, config), params })
+      if (result.state === 'ok') {
+        await dispatch(Statuses.actions.addStatus({ status: result.data }))
+      } else {
+        throw Error((result.data && result.data.error) || result.state)
       }
       return getState()
     }
@@ -118,6 +169,18 @@ const statusesThunks = {
         const errorRes = find(result, ({ state }) => state !== 'ok')
 
         throw Error((errorRes.data && errorRes.data.error) || errorRes.state)
+      }
+      return getState()
+    }
+  },
+
+  deleteStatus: ({ config, params }) => {
+    return async (dispatch, getState) => {
+      const result = await statusesApi.delete({ config: getConfig(getState, config), params })
+      if (result.state === 'ok') {
+        dispatch(Statuses.actions.deleteStatus({ statusId: params.id }))
+      } else {
+        throw Error((result.data && result.data.error) || result.state)
       }
       return getState()
     }
