@@ -1,6 +1,7 @@
 import reduce from 'lodash/reduce'
 import map from 'lodash/map'
 import slice from 'lodash/slice'
+import forEach from 'lodash/forEach'
 import { emojify } from '../utils/parse_utils'
 import { addStatusIds } from '../utils/status_utils'
 
@@ -73,12 +74,22 @@ const cropOlderStatusesFromTimeline = (state, { timelineName, length }) => {
   }
 }
 
+const deleteStatus = (state, { statusId }) => {
+  const newState = { ...state }
+  delete newState.statusesByIds[statusId]
+  forEach(newState.timelines, (value, key) => {
+    newState.timelines[key].statusIds = newState.timelines[key].statusIds.filter(id => id !== statusId)
+  })
+  return newState
+}
+
 const reducers = {
   addStatus,
   addStatuses,
   addStatusIdsToTimeline,
   addStatusesToTimeline,
-  cropOlderStatusesFromTimeline
+  cropOlderStatusesFromTimeline,
+  deleteStatus
 }
 
 const actions = {
@@ -110,6 +121,12 @@ const actions = {
     return {
       type: 'cropOlderStatusesFromTimeline',
       payload: { timelineName, length }
+    }
+  },
+  deleteStatus: ({ statusId }) => {
+    return {
+      type: 'deleteStatus',
+      payload: { statusId }
     }
   }
 }

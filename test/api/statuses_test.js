@@ -88,6 +88,32 @@ describe('Statuses api', () => {
     })
   })
 
+  describe('/api/v1/statuses/:id/mute', () => {
+    it('mute conversation', async () => {
+      const id = 1
+      fetch.mockImplementationOnce(fetchMocker({ id, muted: true }, {
+        expectedUrl: 'https://pleroma.soykaf.com/api/v1/statuses/1/mute'
+      }))
+      const res = await api.statuses.mute({ config, params: { id } })
+
+      expect(res.state).toBe('ok')
+      expect(res.data.id).toBe(id)
+    })
+  })
+
+  describe('/api/v1/statuses/:id/unmute', () => {
+    it('mute conversation', async () => {
+      const id = 1
+      fetch.mockImplementationOnce(fetchMocker({ id, muted: false }, {
+        expectedUrl: 'https://pleroma.soykaf.com/api/v1/statuses/1/mute'
+      }))
+      const res = await api.statuses.mute({ config, params: { id } })
+
+      expect(res.state).toBe('ok')
+      expect(res.data).toEqual({ id, muted: false })
+    })
+  })
+
   describe('POST /api/v1/statuses', () => {
     it('posts a status', async () => {
       const id = 1
@@ -102,6 +128,18 @@ describe('Statuses api', () => {
 
       expect(res.state).toBe('ok')
       expect(res.data.id).toBe(id)
+    })
+  })
+
+  describe('DELETE /api/v1/statuses/:id', () => {
+    it('mute conversation', async () => {
+      const id = 1
+      fetch.mockImplementationOnce(fetchMocker({ id }, {
+        expectedUrl: 'https://pleroma.soykaf.com/api/v1/statuses/1'
+      }))
+      const res = await api.statuses.delete({ config, params: { id } })
+
+      expect(res.state).toBe('ok')
     })
   })
 })

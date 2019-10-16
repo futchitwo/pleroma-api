@@ -1,6 +1,6 @@
 import utils from './utils'
 
-const baseUrl = '/api/v1/notifications'
+const NOTIFICATIONS_URL = '/api/v1/notifications'
 
 const Notifications = {
   async list ({ config, fullUrl, queries }) {
@@ -12,7 +12,7 @@ const Notifications = {
     }
     return utils.request({
       config,
-      url: baseUrl,
+      url: NOTIFICATIONS_URL,
       queries
     })
   },
@@ -20,14 +20,14 @@ const Notifications = {
   async get ({ config, params: { id } }) {
     return utils.request({
       config,
-      url: `${baseUrl}/${id}`
+      url: `${NOTIFICATIONS_URL}/${id}`
     })
   },
 
   async clear ({ config }) {
     return utils.request({
       config,
-      url: `${baseUrl}/clear`,
+      url: `${NOTIFICATIONS_URL}/clear`,
       method: 'POST'
     })
   },
@@ -35,7 +35,7 @@ const Notifications = {
   async dismiss ({ config, params }) {
     return utils.request({
       config,
-      url: `${baseUrl}/dismiss`,
+      url: `${NOTIFICATIONS_URL}/dismiss`,
       method: 'POST',
       body: JSON.stringify(params)
     })
