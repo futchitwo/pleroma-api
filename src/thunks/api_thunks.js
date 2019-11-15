@@ -3,9 +3,10 @@ import Api from '../reducers/api.js'
 import notificationsThunks from './notifications_thunks'
 
 const makeTimelineFetcher = ({ dispatch, getState, timelineName, type, queries }) => {
-  const fetcher = window.setInterval(() => {
+  const fetch = () => {
     const config = getState().api.config
     const fullUrl = (getState().api.timelines[timelineName].prev || {}).url
+
     dispatch(statusesThunks.fetchAndAddTimeline({
       config,
       timelineName,
@@ -13,13 +14,13 @@ const makeTimelineFetcher = ({ dispatch, getState, timelineName, type, queries }
       queries,
       fullUrl
     }))
-  }, 5000)
+  }
+  fetch()
+  const fetcher = window.setInterval(fetch, 5000)
   const stop = () => {
     window.clearInterval(fetcher)
   }
-  return {
-    stop: stop
-  }
+  return { stop }
 }
 
 const makeNotificationsFetcher = ({ dispatch, getState, queries }) => {
