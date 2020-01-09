@@ -40,12 +40,12 @@ describe('Notifications thunks', () => {
       {
         expectedUrl: `https://pleroma.soykaf.com/api/v1/notifications`,
         headers: {
-          link: `<https://pleroma.strizhakov.dev/api/v1/notifications?max_id=15>; rel="next", <https://pleroma.strizhakov.dev/api/v1/notifications?min_id=16>; rel="prev"`
+          link: `<https://pleroma.soykaf.com/api/v1/notifications?max_id=15>; rel="next", <https://pleroma.soykaf.com/api/v1/notifications?min_id=16>; rel="prev"`
         }
       }
     ))
 
-    let state = await notificationsThunks.fetchNotifications({ config })(dispatch, getState)
+    let state = await notificationsThunks.fetch({ config })(dispatch, getState)
 
     expect(state.notifications.notificationsByIds)
       .toEqual({ 16: notifications[0], 18: notifications[1] })
@@ -57,7 +57,7 @@ describe('Notifications thunks', () => {
       .toEqual({
         rel: 'prev',
         min_id: '16',
-        url: 'https://pleroma.strizhakov.dev/api/v1/notifications?min_id=16'
+        url: 'https://pleroma.soykaf.com/api/v1/notifications?min_id=16'
       })
   })
 
@@ -86,14 +86,14 @@ describe('Notifications thunks', () => {
       {
         expectedUrl: `https://pleroma.soykaf.com/api/v1/notifications`,
         headers: {
-          link: `<https://pleroma.strizhakov.dev/api/v1/notifications?max_id=15>; rel="next", <https://pleroma.strizhakov.dev/api/v1/notifications?min_id=16>; rel="prev"`
+          link: `<https://pleroma.soykaf.com/api/v1/notifications?max_id=15>; rel="next", <https://pleroma.soykaf.com/api/v1/notifications?min_id=16>; rel="prev"`
         }
       }
     ))
 
     const fullUrl = 'https://pleroma.soykaf.com/api/v1/notifications'
 
-    let state = await notificationsThunks.fetchNotifications({ config, fullUrl })(dispatch, getState)
+    let state = await notificationsThunks.fetch({ config, fullUrl })(dispatch, getState)
     expect(state.notifications.notificationsByIds)
       .toEqual({ 16: notifications[0], 18: notifications[1] })
 
@@ -104,7 +104,7 @@ describe('Notifications thunks', () => {
       .toEqual({
         rel: 'prev',
         min_id: '16',
-        url: 'https://pleroma.strizhakov.dev/api/v1/notifications?min_id=16'
+        url: 'https://pleroma.soykaf.com/api/v1/notifications?min_id=16'
       })
   })
 })

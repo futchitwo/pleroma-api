@@ -15,11 +15,11 @@ describe('Api reducer', () => {
 
     it('sets a fetcher for a notifications', () => {
       const fetcher = 'fetcher'
-      const notifications = true
+      const entity = 'notifications'
 
       const resultState = Api.reducer(
         undefined,
-        Api.actions.setFetcher({ notifications, fetcher })
+        Api.actions.setFetcher({ entity, fetcher })
       )
 
       expect(resultState.notifications.fetcher).toEqual(fetcher)
@@ -51,20 +51,20 @@ describe('Api reducer', () => {
     it('sets prev and next for notifications', () => {
       const prev = 'prev'
       const next = 'next'
-      const notifications = true
+      const entity = 'notifications'
 
       let resultState
 
       resultState = Api.reducer(
         undefined,
-        Api.actions.setPrev({ notifications, prev })
+        Api.actions.setPrev({ entity, prev })
       )
 
       expect(resultState.notifications.prev).toEqual(prev)
 
       resultState = Api.reducer(
         resultState,
-        Api.actions.setNext({ notifications, next })
+        Api.actions.setNext({ entity, next })
       )
 
       expect(resultState.notifications.prev).toEqual(prev)
