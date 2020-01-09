@@ -1,6 +1,6 @@
 import statusesThunks from './statuses_thunks.js'
 import Api from '../reducers/api.js'
-import notificationsThunks from './notifications_thunks'
+import thunks from '../thunks.js'
 
 const makeTimelineFetcher = ({ dispatch, getState, timelineName, type, queries }) => {
   const fetch = () => {
@@ -23,11 +23,12 @@ const makeTimelineFetcher = ({ dispatch, getState, timelineName, type, queries }
   return { stop }
 }
 
-const makeNotificationsFetcher = ({ dispatch, getState, queries }) => {
+const makeFetcher = ({ entity, dispatch, getState, queries }) => {
   const fetch = () => {
-    const { config, notifications } = getState().api
-    const fullUrl = (notifications.prev || {}).url
-    dispatch(notificationsThunks.fetchNotifications({ config, fullUrl, queries }))
+    const state = getState().api
+    const fullUrl = ((state[entity] && state[entity].prev) || {}).url
+
+    dispatch(thunks[entity].fetch({ config: state.config, fullUrl, queries }))
   }
 
   fetch()
@@ -84,14 +85,14 @@ const apiThunks = {
   startFetchingNotifications: ({ queries }) => {
     return async (dispatch, getState) => {
       const notifications = getState().api.notifications || {}
+      const entity = 'notifications'
 
-      if (notifications.fetcher) {
-        return getState()
-      } else {
-        const fetcher = makeNotificationsFetcher({ dispatch, getState, queries })
-        dispatch(Api.actions.setFetcher({ notifications: true, fetcher }))
-        return getState()
+      if (!notifications.fetcher) {
+        const fetcher = makeFetcher({ entity, dispatch, getState, queries })
+
+        dispatch(Api.actions.setFetcher({ entity, fetcher }))
       }
+      return getState()
     }
   },
 
@@ -101,6 +102,30 @@ const apiThunks = {
       if (notifications.fetcher) {
         notifications.fetcher.stop()
         notifications.fetcher = null
+      }
+      return getState()
+    }
+  },
+
+  startFetchingConversations: ({ queries }) => {
+    return async (dispatch, getState) => {
+      const conversations = getState().api.conversations || {}
+      const entity = 'conversations'
+
+      if (!conversations.fetcher) {
+        const fetcher = makeFetcher({ entity, dispatch, getState, queries })
+
+        dispatch(Api.actions.setFetcher({ entity, fetcher }))
+      }
+      return getState()
+    }
+  },
+  stopFetchingConversations: () => {
+    return async (dispatch, getState) => {
+      const conversations = getState().api.conversations || {}
+      if (conversations.fetcher) {
+        conversations.fetcher.stop()
+        conversations.fetcher = null
       }
       return getState()
     }

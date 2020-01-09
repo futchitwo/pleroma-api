@@ -125,4 +125,54 @@ describe('Api thunks', () => {
       expect(getState().api.notifications.fetcher).toBeNull()
     })
   })
+
+  describe('startFetchingConversations', () => {
+    it('create a conversations fetcher', async () => {
+      const store = { state: defaultState() }
+
+      const dispatch = (action) => {
+        store.state = reducer(store.state, action)
+        return store.state
+      }
+
+      const getState = () => store.state
+
+      fetch.mockReset()
+      fetch.mockImplementationOnce(fetchMocker([], {}))
+
+      await apiThunks.startFetchingConversations({})(dispatch, getState)
+
+      expect(getState().api.conversations.fetcher).toBeDefined()
+
+      expect(typeof getState().api.conversations.fetcher.stop)
+        .toEqual('function')
+
+      // stop interval to clean up just in case
+      getState().api.conversations.fetcher.stop()
+    })
+  })
+
+  describe('stopFetchingConversations', () => {
+    it('stops and removes the conversations fetcher', async () => {
+      const store = { state: defaultState() }
+
+      const dispatch = (action) => {
+        store.state = reducer(store.state, action)
+        return store.state
+      }
+
+      const getState = () => store.state
+
+      fetch.mockReset()
+      fetch.mockImplementationOnce(fetchMocker([], {}))
+
+      await apiThunks.startFetchingConversations({})(dispatch, getState)
+
+      expect(getState().api.conversations.fetcher).toBeDefined()
+
+      await apiThunks.stopFetchingConversations()(dispatch, getState)
+
+      expect(getState().api.conversations.fetcher).toBeNull()
+    })
+  })
 })

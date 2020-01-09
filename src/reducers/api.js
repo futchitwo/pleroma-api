@@ -9,55 +9,48 @@ const initialState = {
     local: emptyTimeline(),
     home: emptyTimeline()
   },
-  notifications: {}
+  notifications: {},
+  conversations: {}
 }
 
-const setProperty = ({ state, timelineName, notifications, key, value }) => {
+const setProperty = ({ state, timelineName, entity, key, value }) => {
   if (timelineName) {
-    return setTimelineProperty({ state, timelineName, key, value })
-  } else if (notifications) {
-    return setNotificationsProperty({ state, key, value })
+    const timeline = state.timelines[timelineName] || {}
+    return {
+      ...state,
+      timelines: {
+        ...state.timelines,
+        [timelineName]: {
+          ...timeline,
+          [key]: value
+        }
+      }
+    }
+  } else if (entity) {
+    return {
+      ...state,
+      [entity]: {
+        ...state[entity],
+        [key]: value
+      }
+    }
   } else {
     return state
   }
 }
 
-const setTimelineProperty = ({ state, timelineName, key, value }) => {
-  const timeline = state.timelines[timelineName] || {}
-  return {
-    ...state,
-    timelines: {
-      ...state.timelines,
-      [timelineName]: {
-        ...timeline,
-        [key]: value
-      }
-    }
-  }
-}
-
-const setNotificationsProperty = ({ state, key, value }) => {
-  return {
-    ...state,
-    notifications: {
-      ...state.notifications,
-      [key]: value
-    }
-  }
-}
-
 const reducers = {
-  setFetcher: (state, { timelineName, notifications, fetcher }) => {
-    return setProperty({ state, timelineName, notifications, key: 'fetcher', value: fetcher })
+  setFetcher: (state, { timelineName, entity, fetcher }) => {
+    return setProperty({ state, timelineName, entity, key: 'fetcher', value: fetcher })
   },
-  setNext: (state, { timelineName, notifications, next }) => {
-    return setProperty({ state, timelineName, notifications, key: 'next', value: next })
+  setNext: (state, { timelineName, entity, next }) => {
+    return setProperty({ state, timelineName, entity, key: 'next', value: next })
   },
-  setPrev: (state, { timelineName, notifications, prev }) => {
-    return setProperty({ state, timelineName, notifications, key: 'prev', value: prev })
+  setPrev: (state, { timelineName, entity, prev }) => {
+    return setProperty({ state, timelineName, entity, key: 'prev', value: prev })
   },
-  setLoadingOlder: (state, { timelineName, notifications, loading }) => {
-    return setProperty({ state, timelineName, notifications, key: 'loadingOlder', value: loading })
+  setLoadingOlder: (state, { timelineName, entity, loading }) => {
+    return setProperty({ state, timelineName, entity, key: 'loadingOlder', value: loading })
   },
   addConfig: (state, { config }) => {
     return {
@@ -77,22 +70,22 @@ const actions = {
       payload: { config }
     }
   },
-  setFetcher: ({ timelineName, notifications, fetcher }) => {
+  setFetcher: ({ timelineName, entity, fetcher }) => {
     return {
       type: 'setFetcher',
-      payload: { timelineName, notifications, fetcher }
+      payload: { timelineName, entity, fetcher }
     }
   },
-  setPrev: ({ timelineName, notifications, prev }) => {
+  setPrev: ({ timelineName, entity, prev }) => {
     return {
       type: 'setPrev',
-      payload: { timelineName, notifications, prev }
+      payload: { timelineName, entity, prev }
     }
   },
-  setNext: ({ timelineName, notifications, next }) => {
+  setNext: ({ timelineName, entity, next }) => {
     return {
       type: 'setNext',
-      payload: { timelineName, notifications, next }
+      payload: { timelineName, entity, next }
     }
   },
   setLoadingOlder: ({ timelineName, loading }) => {
