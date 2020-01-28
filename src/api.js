@@ -5,6 +5,7 @@ import notifications from './api/notifications'
 import oauth from './api/oauth'
 import media from './api/media'
 import conversations from './api/conversations'
+import polls from './api/polls'
 
 export default {
   users,
@@ -13,5 +14,6 @@ export default {
   notifications,
   oauth,
   media,
-  conversations
+  conversations,
+  polls
 }
