@@ -25,3 +25,30 @@ export const apiErrorCatcher = (result) => {
     }
   }
 }
+
+const buildFormData = (formData, data, parentKey) => {
+  if (data && typeof data === 'object' && !(data instanceof Date) && !(data instanceof File)) {
+    // prevent adding array [indexes] in nested object
+    if (Array.isArray(data) && !data.filter(item => typeof item === 'object').length) {
+      data.forEach(item => {
+        formData.append(`${parentKey}[]`, item)
+      })
+    } else {
+      Object.entries(data).forEach(([key, value]) => {
+        buildFormData(formData, value, parentKey ? `${parentKey}[${key}]` : key)
+      })
+    }
+  } else {
+    const value = data == null ? '' : data
+
+    formData.append(parentKey, value)
+  }
+}
+
+export const createFormData = (params) => {
+  const formData = new FormData()
+
+  buildFormData(formData, params)
+
+  return formData
+}
