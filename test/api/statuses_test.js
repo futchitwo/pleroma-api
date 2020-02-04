@@ -121,7 +121,6 @@ describe('Statuses api', () => {
 
       fetch.mockImplementationOnce(fetchMocker({ id }, {
         expectedUrl: 'https://pleroma.soykaf.com/api/v1/statuses',
-        expectedBody: '{"status":"yeah"}',
         expectedToken: 'Bearer mytoken'
       }))
       const res = await api.statuses.post({ config: { ...config, accessToken }, params: { status: 'yeah' } })

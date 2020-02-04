@@ -10,11 +10,15 @@ const Polls = {
       url: `${POLLS_URL}/${id}`
     })
   },
-  async vote ({ config, params: { id } }) {
+  async vote ({ config, params: { id, choices } }) {
     return utils.request({
       config,
-      method: 'GET',
-      url: `${POLLS_URL}/${id}/votes`
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      url: `${POLLS_URL}/${id}/votes`,
+      body: JSON.stringify({ choices })
     })
   }
 }
