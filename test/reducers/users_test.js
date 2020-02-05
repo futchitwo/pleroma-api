@@ -96,4 +96,30 @@ describe('User reducers', () => {
       expect(resultState.currentUser).toEqual(resultUser)
     })
   })
+
+  
+  describe(`adding a user's statuses`, () => {
+    it('add statuses no a new user', () => {
+      const user = { id: '1' }
+      const statuses = [{ id: 2, content: 'b' }, { id: 1, content: 'a' }]
+      const resultState = Users.reducer(
+        undefined,
+        Users.actions.addUserStatuses({ userId: user.id, statuses })
+      )
+
+      expect(resultState.usersByIds['1']).toEqual({ statuses })
+    })
+
+    it('update user statuses', () => {
+      const user = { id: '1' }
+      const statuses = [{ id: 2, content: 'b' }, { id: 1, content: 'a' }]
+
+      const resultState = Users.reducer(
+        { usersByIds: { 1: user } },
+        Users.actions.addUserStatuses({ userId: user.id, statuses })
+      )
+
+      expect(resultState.usersByIds['1']).toEqual({ ...user, statuses })
+    })
+  })
 })

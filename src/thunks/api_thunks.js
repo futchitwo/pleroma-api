@@ -1,6 +1,14 @@
 import statusesThunks from './statuses_thunks.js'
 import Api from '../reducers/api.js'
 import thunks from '../thunks.js'
+import usersThunks from './users_thunks.js'
+import has from 'lodash/has'
+
+const ENTITIES = {
+  conversations: { name: 'conversations', thunk: 'fetch' },
+  notifications: { name: 'notifications', thunk: 'fetch' },
+  userStatuses: { name: 'users', thunk: 'fetchUserStatuses' }
+}
 
 const makeTimelineFetcher = ({ dispatch, getState, timelineName, type, queries }) => {
   const fetch = () => {
@@ -17,119 +25,139 @@ const makeTimelineFetcher = ({ dispatch, getState, timelineName, type, queries }
   }
   fetch()
   const fetcher = window.setInterval(fetch, 5000)
-  const stop = () => {
-    window.clearInterval(fetcher)
-  }
+  const stop = () => window.clearInterval(fetcher)
   return { stop }
 }
 
-const makeFetcher = ({ entity, dispatch, getState, queries }) => {
+const makeFetcher = ({ entity, dispatch, getState, params, queries, clearLinksOnStop }) => {
   const fetch = () => {
     const state = getState().api
     const fullUrl = ((state[entity] && state[entity].prev) || {}).url
+    const { name, thunk } = ENTITIES[entity]
 
-    dispatch(thunks[entity].fetch({ config: state.config, fullUrl, queries }))
+    dispatch(thunks[name][thunk]({ config: state.config, fullUrl, params, queries }))
   }
 
   fetch()
   const fetcher = window.setInterval(fetch, 5000)
-  const stop = () => window.clearInterval(fetcher)
-
+  const stop = () => {
+    window.clearInterval(fetcher)
+    if (clearLinksOnStop) {
+      clearLinks({ dispatch, entity })
+    }
+  }
   return { stop }
 }
 
-const apiThunks = {
-  startFetchingTimeline: ({ timelineName, type, queries }) => {
-    return async (dispatch, getState) => {
-      const timeline = getState().api.timelines[timelineName] || {}
-
-      // Don't start two fetchers at once
-      if (timeline.fetcher) {
-        return getState()
-      } else {
-        const fetcher = makeTimelineFetcher({ dispatch, getState, timelineName, type, queries })
-        dispatch(Api.actions.setFetcher({ timelineName, fetcher }))
-        return getState()
-      }
-    }
-  },
-
-  stopFetchingTimeline: ({ timelineName }) => {
-    return async (dispatch, getState) => {
-      const timeline = getState().api.timelines[timelineName] || {}
-
-      if (timeline.fetcher) {
-        timeline.fetcher.stop()
-        timeline.fetcher = null
-      }
-      return getState()
-    }
-  },
-
-  loadOlderOnTimeline: ({ timelineName, type, queries }) => {
-    return async (dispatch, getState) => {
-      const timeline = getState().api.timelines[timelineName] || {}
-      const config = getState().api.config
-      const fullUrl = (timeline.next || {}).url
-      return dispatch(statusesThunks.fetchAndAddTimeline({
-        older: true,
-        config,
-        timelineName,
-        type,
-        fullUrl,
-        queries
-      }))
-    }
-  },
-
-  startFetchingNotifications: ({ queries }) => {
-    return async (dispatch, getState) => {
-      const notifications = getState().api.notifications || {}
-      const entity = 'notifications'
-
-      if (!notifications.fetcher) {
-        const fetcher = makeFetcher({ entity, dispatch, getState, queries })
-
-        dispatch(Api.actions.setFetcher({ entity, fetcher }))
-      }
-      return getState()
-    }
-  },
-
-  stopFetchingNotifications: () => {
-    return async (dispatch, getState) => {
-      const notifications = getState().api.notifications || {}
-      if (notifications.fetcher) {
-        notifications.fetcher.stop()
-        notifications.fetcher = null
-      }
-      return getState()
-    }
-  },
-
-  startFetchingConversations: ({ queries }) => {
-    return async (dispatch, getState) => {
-      const conversations = getState().api.conversations || {}
-      const entity = 'conversations'
-
-      if (!conversations.fetcher) {
-        const fetcher = makeFetcher({ entity, dispatch, getState, queries })
-
-        dispatch(Api.actions.setFetcher({ entity, fetcher }))
-      }
-      return getState()
-    }
-  },
-  stopFetchingConversations: () => {
-    return async (dispatch, getState) => {
-      const conversations = getState().api.conversations || {}
-      if (conversations.fetcher) {
-        conversations.fetcher.stop()
-        conversations.fetcher = null
-      }
-      return getState()
-    }
+export const updateLinks = async ({ dispatch, entity, statuses, links, older }) => {
+  if (!has(statuses, 'prev') && links.prev) {
+    await dispatch(Api.actions.setPrev({ entity, prev: links.prev }))
+  }
+  if (!older && links.prev) {
+    await dispatch(Api.actions.setPrev({ entity, prev: links.prev }))
+  }
+  if (older && links.next) {
+    await dispatch(Api.actions.setNext({ entity, next: links.next }))
   }
 }
 
-export default apiThunks
+export const clearLinks = async ({ dispatch, entity }) => {
+  await dispatch(Api.actions.setFetcher({ entity, fetcher: null }))
+  await dispatch(Api.actions.setPrev({ entity, prev: null }))
+  await dispatch(Api.actions.setNext({ entity, next: null }))
+}
+
+const generateApiThunks = () => {
+  const apiThunks = {
+    startFetchingTimeline: ({ timelineName, type, queries }) => {
+      return async (dispatch, getState) => {
+        const timeline = getState().api.timelines[timelineName] || {}
+
+        // Don't start two fetchers at once
+        if (timeline.fetcher) {
+          return getState()
+        } else {
+          const fetcher = makeTimelineFetcher({ dispatch, getState, timelineName, type, queries })
+          dispatch(Api.actions.setFetcher({ timelineName, fetcher }))
+          return getState()
+        }
+      }
+    },
+    stopFetchingTimeline: ({ timelineName }) => {
+      return async (dispatch, getState) => {
+        const timeline = getState().api.timelines[timelineName] || {}
+
+        if (timeline.fetcher) {
+          timeline.fetcher.stop()
+          timeline.fetcher = null
+        }
+        return getState()
+      }
+    },
+    loadOlderOnTimeline: ({ timelineName, type, queries }) => {
+      return async (dispatch, getState) => {
+        const timeline = getState().api.timelines[timelineName] || {}
+        const config = getState().api.config
+        const fullUrl = (timeline.next || {}).url
+
+        return dispatch(statusesThunks.fetchAndAddTimeline({
+          older: true,
+          config,
+          timelineName,
+          type,
+          fullUrl,
+          queries
+        }))
+      }
+    },
+    loadOlderUserStatuses: ({ params, queries }) => {
+      return async (dispatch, getState) => {
+        const userStatuses = getState().api.userStatuses || {}
+        const config = getState().api.config
+        const fullUrl = (userStatuses.next || {}).url
+
+        return dispatch(usersThunks.fetchUserStatuses({
+          older: true,
+          config,
+          fullUrl,
+          queries,
+          params
+        }))
+      }
+    }
+  }
+
+  Object.keys(ENTITIES).forEach(entity => {
+    apiThunks[`startFetching${entity[0].toUpperCase()}${entity.slice(1)}`] = ({ queries, params }) => {
+      return async (dispatch, getState) => {
+        const state = getState().api[entity] || {}
+
+        if (!state.fetcher) {
+          const fetcher = makeFetcher({
+            entity,
+            dispatch,
+            getState,
+            params,
+            queries,
+            clearLinksOnStop: entity === 'userStatuses'
+          })
+
+          dispatch(Api.actions.setFetcher({ entity, fetcher }))
+        }
+        return getState()
+      }
+    }
+    apiThunks[`stopFetching${entity[0].toUpperCase()}${entity.slice(1)}`] = () => {
+      return async (dispatch, getState) => {
+        const state = getState().api[entity] || {}
+        if (state.fetcher) {
+          state.fetcher.stop()
+          state.fetcher = null
+        }
+        return getState()
+      }
+    }
+  })
+  return apiThunks
+}
+export default generateApiThunks()

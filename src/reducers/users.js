@@ -1,5 +1,6 @@
 import reduce from 'lodash/reduce'
 import { emojify } from '../utils/parse_utils'
+import { addStatuses } from '../utils/status_utils'
 
 const initialState = {
   usersByIds: {},
@@ -43,11 +44,32 @@ const updateCurrentUser = (state, { user }) => {
   }
 }
 
+const addUserStatuses = (state, { userId, statuses }) => {
+  const oldUser = state.usersByIds[userId] || {}
+  const user = {
+    ...oldUser,
+    statuses: addStatuses(oldUser.statuses || [],
+      statuses ? statuses.map(status => ({
+        ...status,
+        content: emojify(status.content, status.emojis),
+        spoiler_text: emojify(status.spoiler_text, status.emojis)
+      })) : [])
+  }
+  return {
+    ...state,
+    usersByIds: {
+      ...state.usersByIds,
+      [userId]: user
+    }
+  }
+}
+
 const reducers = {
   addUsers,
   addUser,
   setCurrentUser,
-  updateCurrentUser
+  updateCurrentUser,
+  addUserStatuses
 }
 
 const actions = {
@@ -73,6 +95,12 @@ const actions = {
     return {
       type: 'updateCurrentUser',
       payload: { user }
+    }
+  },
+  addUserStatuses: ({ userId, statuses }) => {
+    return {
+      type: 'addUserStatuses',
+      payload: { userId, statuses }
     }
   }
 }
