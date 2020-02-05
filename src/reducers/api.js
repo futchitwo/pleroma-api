@@ -10,7 +10,8 @@ const initialState = {
     home: emptyTimeline()
   },
   notifications: {},
-  conversations: {}
+  conversations: {},
+  userStatuses: {}
 }
 
 const setProperty = ({ state, timelineName, entity, key, value }) => {
@@ -88,10 +89,10 @@ const actions = {
       payload: { timelineName, entity, next }
     }
   },
-  setLoadingOlder: ({ timelineName, loading }) => {
+  setLoadingOlder: ({ entity, timelineName, loading }) => {
     return {
       type: 'setLoadingOlder',
-      payload: { timelineName, loading }
+      payload: { entity, timelineName, loading }
     }
   }
 }

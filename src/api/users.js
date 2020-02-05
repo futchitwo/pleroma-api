@@ -9,7 +9,14 @@ const Users = {
       url: `${ACCOUNTS_URL}/${id}`
     })
   },
-  async statuses ({ config, params, queries }) {
+  async statuses ({ config, fullUrl, params, queries }) {
+    if (fullUrl) {
+      return utils.request({
+        config,
+        params,
+        fullUrl
+      })
+    }
     return utils.request({
       config,
       url: `${ACCOUNTS_URL}/${params.id}/statuses`,
