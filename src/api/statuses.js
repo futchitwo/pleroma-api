@@ -1,4 +1,5 @@
 import utils from './utils.js'
+import { createFormData } from '../utils/api_utils.js'
 
 const STATUSES_URL = '/api/v1/statuses'
 
@@ -58,14 +59,13 @@ const Statuses = {
     })
   },
   async post ({ config, params }) {
+    const body = createFormData(params)
+
     return utils.request({
       config,
       url: STATUSES_URL,
       method: 'POST',
-      body: JSON.stringify(params),
-      headers: {
-        'Content-Type': 'application/json'
-      }
+      body
     })
   },
   async delete ({ config, params: { id } }) {
