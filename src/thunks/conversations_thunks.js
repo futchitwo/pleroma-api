@@ -2,6 +2,7 @@ import conversationsApi from '../api/conversations.js'
 import Conversations from '../reducers/conversations.js'
 import Api from '../reducers/api'
 import { apiErrorCatcher, getConfig } from '../utils/api_utils'
+import { updateLinks } from './api_thunks'
 
 const conversationsThunks = {
   fetch: ({ config, fullUrl, queries }) => {
@@ -15,16 +16,30 @@ const conversationsThunks = {
       return getState()
     }
   },
-  fetchConversationTimeline: ({ config, params }) => {
+  fetchConversation: ({ config, params }) => {
     return async (dispatch, getState) => {
       const computedConfig = getConfig(getState, config)
-      const result = await Promise.all([
-        conversationsApi.get({ config: computedConfig, params }),
-        conversationsApi.getTimeline({ config: computedConfig, params })
-      ]).then(res => apiErrorCatcher(res))
-      const conversation = { ...result[0].data, timeline: result[1].data }
+      const result = await conversationsApi.get({ config: computedConfig, params })
+        .then(res => apiErrorCatcher(res))
 
-      await dispatch(Conversations.actions.updateConversation({ conversation }))
+      await dispatch(Conversations.actions.updateConversation({ conversation: result.data }))
+      return getState()
+    }
+  },
+  fetchConversationTimeline: ({ config, params, fullUrl, queries, older }) => {
+    return async (dispatch, getState) => {
+      const result = await conversationsApi.getTimeline({ config: getConfig(getState, config), params, fullUrl, queries })
+        .then(res => apiErrorCatcher(res))
+
+      await dispatch(Conversations.actions.updateConversation({ conversation: {
+        id: params.id,
+        last_status: result.data[result.data.length - 1],
+        timeline: result.data
+      } }))
+      if (result.links) {
+        const statuses = getState().api.conversation
+        await updateLinks({ dispatch, statuses, entity: 'conversation', links: result.links, older })
+      }
       return getState()
     }
   },

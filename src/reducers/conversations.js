@@ -35,11 +35,13 @@ const addConversation = (state, { conversation }) => {
 }
 
 const updateConversation = (state, { conversation }) => {
+  const currentConversationState = state.conversationsByIds[conversation.id] || {}
+
   return {
     ...state,
     conversationsByIds: {
       ...state.conversationsByIds,
-      [conversation.id]: conversation
+      [conversation.id]: { ...currentConversationState, ...conversation }
     }
   }
 }

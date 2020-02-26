@@ -20,7 +20,8 @@ describe('Api thunks', () => {
       },
       notifications: {},
       conversations: {},
-      userStatuses: {}
+      userStatuses: {},
+      conversation: {}
     }
   })
 
@@ -213,6 +214,51 @@ describe('Api thunks', () => {
       await apiThunks.stopFetchingUserStatuses({})(dispatch, getState)
 
       expect(getState().api.userStatuses.fetcher).toBeNull()
+    })
+  })
+
+  describe('startFetchingConversationTimeline', () => {
+    it('creates a conversationTimeline fetcher', async () => {
+      const store = { state: defaultState() }
+      const dispatch = (action) => {
+        store.state = reducer(store.state, action)
+        return store.state
+      }      
+      const getState = () => store.state
+
+      fetch.mockReset()
+      fetch.mockImplementationOnce(fetchMocker([], {}))
+
+      await apiThunks.startFetchingConversation({ })(dispatch, getState)
+
+      expect(getState().api.conversation.fetcher).toBeDefined()
+
+      expect(typeof getState().api.conversation.fetcher.stop)
+        .toEqual('function')
+
+      getState().api.conversation.fetcher.stop()
+    })
+  })
+
+  describe('stopFetchingConversationTimeline', () => {
+    it('stops and removes the conversation fetcher', async () => {
+      const store = { state: defaultState() }
+      const dispatch = (action) => {
+        store.state = reducer(store.state, action)
+        return store.state
+      }
+      const getState = () => store.state
+
+      fetch.mockReset()
+      fetch.mockImplementationOnce(fetchMocker([], {}))
+
+      await apiThunks.startFetchingConversation({})(dispatch, getState)
+
+      expect(getState().api.conversation.fetcher).toBeDefined()
+
+      await apiThunks.stopFetchingConversation({})(dispatch, getState)
+
+      expect(getState().api.conversation.fetcher).toBeNull()
     })
   })
 })

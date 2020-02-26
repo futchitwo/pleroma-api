@@ -4,6 +4,7 @@ import statusesApi from '../api/statuses.js'
 import Statuses from '../reducers/statuses.js'
 import Users from '../reducers/users.js'
 import Api from '../reducers/api.js'
+import Conversations from '../thunks/conversations_thunks'
 import { apiErrorCatcher, getConfig } from '../utils/api_utils'
 
 import map from 'lodash/map'
@@ -87,19 +88,20 @@ const statusesThunks = {
       return getState()
     },
 
-  postStatus: ({ config, params }) => {
+  postStatus: ({ config, params, conversationId }) => {
     return async (dispatch, getState) => {
       const result = await statusesApi.post({ config: getConfig(getState, config), params })
         .then(res => apiErrorCatcher(res))
-      await dispatch(Statuses.actions.addStatusesToTimeline({ statuses: [result.data], timelineName: 'local' }))
+      if (conversationId) {
+        await Conversations.fetchConversationTimeline({ config, params: { id: conversationId } })(dispatch, getState)
+      } else {
+        await dispatch(Statuses.actions.addStatusesToTimeline({ statuses: [result.data], timelineName: 'local' }))
+      }
 
       if (params.in_reply_to_id) {
-        const replyedStatus = await statusesApi.get({ config, params: { id: params.in_reply_to_id } })
-        if (replyedStatus.state === 'ok') {
-          await dispatch(Statuses.actions.addStatus({ status: replyedStatus.data }))
-        } else {
-          throw Error(replyedStatus.data.error || replyedStatus.state)
-        }
+        const replyedStatus = await statusesApi.get({ config: getConfig(getState, config), params: { id: params.in_reply_to_id } })
+          .then(res => apiErrorCatcher(res))
+        await dispatch(Statuses.actions.addStatus({ status: replyedStatus.data }))
       }
       return getState()
     }

@@ -22,12 +22,16 @@ describe('Conversations api', () => {
   })
   describe('/api/v1/pleroma/conversations/22/statuses', async () => {
     fetch.mockImplementationOnce(fetchMocker([{ id: 1 }, { id: 2 }], {
-      expectedUrl: 'https://pleroma.soykaf.com/api/v1/pleroma/conversations/22/statuses'
+      expectedUrl: 'https://pleroma.soykaf.com/api/v1/pleroma/conversations/22/statuses',
+      headers: {
+        link: '<https://pleroma.soykaf.com/api/v1/conversations/22/statuses?max_id=9gZ5VYhDG8GeCL8Vay>; rel="next", <https://pleroma.soykaf.com/api/v1/conversations/22/statuses?since_id=9gZ5g5Q6RlaAaN9Z5M>; rel="prev"'
+      }
     }))
     const res = await api.conversations.getTimeline({ config, params: { id: 22 } })
 
     expect(res.state).toBe('ok')
     expect(res.data).toEqual([{ id: 1 }, { id: 2 }])
+    expect(res.links).not.toBe(null)
   })
   describe('/api/v1/pleroma/conversations/:id', async () => {
     fetch.mockImplementationOnce(fetchMocker({ id: 22, accounts: [{ acct: 'nd', id: 1 }] }, {
