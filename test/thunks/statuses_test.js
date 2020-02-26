@@ -8,6 +8,7 @@ jest.mock('cross-fetch')
 
 const reducer = combineReducers({
   statuses: reducers.statuses.reducer,
+  conversations: reducers.conversations.reducer,
   users: reducers.users.reducer,
   api: reducers.api.reducer
 })
@@ -289,6 +290,33 @@ describe('Status thunks', () => {
 
     expect(state.statuses.timelines.local)
       .toEqual({ statusIds: ['1'] })
+  })
+
+  it('post status to conversation', async () => {
+    const store = { state: undefined }
+    const conversation = {
+      id: 'id',
+      last_status: { id: '1', status: 'aaa' }
+    }
+    const status = { id: '1', status: 'aaa' }
+
+    fetch.mockReset()
+    fetch.mockImplementationOnce(fetchMocker(
+      status,
+      {
+        expectedUrl: `https://pleroma.soykaf.com/api/v1/statuses`
+      }))
+      .mockImplementationOnce(fetchMocker(
+      [status],
+      {
+        expectedUrl: `https://pleroma.soykaf.com/api/v1/pleroma/conversations/id/statuses`
+      }
+      ))
+
+    let state = await statusesThunks.postStatus({ config, params: status, conversationId: 'id' })(dispatch(store), getState(store))
+
+    expect(state.conversations.conversationsByIds)
+      .toEqual({ id: { ...conversation, last_status: status, timeline: [{ id: '1', status: 'aaa' }] } })
   })
 
   it('favourite status', async () => {

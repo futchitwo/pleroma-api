@@ -11,6 +11,7 @@ const initialState = {
   },
   notifications: {},
   conversations: {},
+  conversation: {},
   userStatuses: {}
 }
 

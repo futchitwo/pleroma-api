@@ -119,10 +119,6 @@ describe('Conversations thunks', () => {
     }
     const getState = () => store.state
 
-    const conversation = {
-      id: 22,
-      last_status: { id: 1, content: 'hi' }
-    }
     const statuses = [
       { id: 1, content: 'hi' },
       { id: 2, content: 'test message' }
@@ -130,12 +126,6 @@ describe('Conversations thunks', () => {
 
     fetch.mockReset()
     fetch.mockImplementationOnce(fetchMocker(
-      conversation,
-      {
-        expectedUrl: `https://pleroma.soykaf.com/api/v1/pleroma/conversations/22`,
-      }
-    ))
-      .mockImplementationOnce(fetchMocker(
         statuses,
         {
           expectedUrl: `https://pleroma.soykaf.com/api/v1/pleroma/conversations/22/statuses`
@@ -145,9 +135,45 @@ describe('Conversations thunks', () => {
     let state = await conversationsThunks.fetchConversationTimeline({ config, params: { id: 22 } })(dispatch, getState)
 
     expect(state.conversations.conversationsByIds)
-      .toEqual({ 22: { ...conversation, timeline: statuses } })
-
+      .toEqual({ 22: { id: 22, last_status: { id: 2, content: 'test message' },timeline: statuses } })
   })
+
+  it('update conversation timeline', async () => {
+    const store = { state: {
+      conversations: {
+        conversationsByIds: {
+          22: {
+            id: 22,
+            last_status: { id: '1' },
+            timeline: [{ id: '1' }]
+          }
+        }
+      }
+    } }
+    const dispatch = (action) => {
+      store.state = reducer(store.state, action)
+    }
+    const getState = () => store.state
+
+    const statuses = [
+      { id: 1, content: 'hi' },
+      { id: 2, content: 'test message' }
+    ]
+
+    fetch.mockReset()
+    fetch.mockImplementationOnce(fetchMocker(
+      statuses,
+      {
+        expectedUrl: `https://pleroma.soykaf.com/api/v1/pleroma/conversations/22/statuses`
+      }
+    ))
+
+    let state = await conversationsThunks.fetchConversationTimeline({ config, params: { id: 22 } })(dispatch, getState)
+
+    expect(state.conversations.conversationsByIds)
+      .toEqual({ 22: { id: 22, timeline: statuses, last_status: { id: 2, content: 'test message' } } })
+  })
+
   it('change conversation recipients', async () => {
     const store = { state: undefined }
     const dispatch = (action) => {

@@ -3,11 +3,13 @@ import Api from '../reducers/api.js'
 import thunks from '../thunks.js'
 import usersThunks from './users_thunks.js'
 import has from 'lodash/has'
+import conversationsThunks from './conversations_thunks.js'
 
 const ENTITIES = {
   conversations: { name: 'conversations', thunk: 'fetch' },
   notifications: { name: 'notifications', thunk: 'fetch' },
-  userStatuses: { name: 'users', thunk: 'fetchUserStatuses' }
+  userStatuses: { name: 'users', thunk: 'fetchUserStatuses', clearLinksOnStop: true },
+  conversation: { name: 'conversation', module: 'conversations', thunk: 'fetchConversationTimeline', clearLinksOnStop: true }
 }
 
 const makeTimelineFetcher = ({ dispatch, getState, timelineName, type, queries }) => {
@@ -33,9 +35,9 @@ const makeFetcher = ({ entity, dispatch, getState, params, queries, clearLinksOn
   const fetch = () => {
     const state = getState().api
     const fullUrl = ((state[entity] && state[entity].prev) || {}).url
-    const { name, thunk } = ENTITIES[entity]
+    const { name, thunk, module } = ENTITIES[entity]
 
-    dispatch(thunks[name][thunk]({ config: state.config, fullUrl, params, queries }))
+    dispatch(thunks[module || name][thunk]({ config: state.config, fullUrl, params, queries }))
   }
 
   fetch()
@@ -124,6 +126,21 @@ const generateApiThunks = () => {
           params
         }))
       }
+    },
+    loadOlderConversation: ({ params, queries }) => {
+      return async (dispatch, getState) => {
+        const conversation = getState().api.conversation || {}
+        const config = getState().api.config
+        const fullUrl = (conversation.next || {}).url
+
+        return dispatch(conversationsThunks.fetchConversationTimeline({
+          older: true,
+          config,
+          fullUrl,
+          queries,
+          params
+        }))
+      }
     }
   }
 
@@ -139,7 +156,7 @@ const generateApiThunks = () => {
             getState,
             params,
             queries,
-            clearLinksOnStop: entity === 'userStatuses'
+            clearLinksOnStop: ENTITIES[entity].clearLinksOnStop
           })
 
           dispatch(Api.actions.setFetcher({ entity, fetcher }))

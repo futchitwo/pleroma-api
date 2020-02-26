@@ -17,12 +17,19 @@ const Conversations = {
       queries
     })
   },
-  async getTimeline ({ config, params }) {
+  async getTimeline ({ config, params, fullUrl, queries }) {
+    if (fullUrl) {
+      return utils.request({
+        config,
+        fullUrl
+      })
+    }
     return utils.request({
       config,
       method: 'GET',
       url: `${CONVERSATIONS_URL}/${params.id}/statuses`,
-      params
+      params,
+      queries
     })
   },
   async get ({ config, params: { id } }) {
