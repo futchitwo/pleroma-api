@@ -35,6 +35,27 @@ const Users = {
       config,
       url: `${ACCOUNTS_URL}/verify_credentials`
     })
+  },
+  async toggleFollow ({ config, params }) {
+    return utils.request({
+      config,
+      method: 'POST',
+      url: `${ACCOUNTS_URL}/${params.id}/${params.following ? 'unfollow' : 'follow'}`
+    })
+  },
+  async toggleMute ({ config, params }) {
+    return utils.request({
+      config,
+      method: 'POST',
+      url: `${ACCOUNTS_URL}/${params.id}/${params.muting ? 'unmute' : 'mute'}`
+    })
+  },
+  async toggleBlock ({ config, params }) {
+    return utils.request({
+      config,
+      method: 'POST',
+      url: `${ACCOUNTS_URL}/${params.id}/${params.blocking ? 'unblock' : 'block'}`
+    })
   }
 }
 
