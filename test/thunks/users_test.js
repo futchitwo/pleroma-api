@@ -56,4 +56,104 @@ describe('Users thunks', () => {
     expect(state.users.usersByIds)
       .toEqual({ 1: expectedResult })
   })
+
+  it('follow user', async () => {
+    const store = { state: {
+      users: {
+        usersByIds: {
+          '1': {
+            id: '1',
+            relationships: { following: false }
+          }
+        }
+      }
+    } }
+    const dispatch = (action) => {
+      store.state = reducer(store.state, action)
+    }
+    const getState = () => store.state
+
+    fetch.mockReset()
+    fetch
+      .mockImplementationOnce(fetchMocker(
+        { following: true },
+        { expectedUrl: `https://pleroma.soykaf.com/api/v1/accounts/1/follow` }
+      ))
+    let state = await usersThunks.toggleFollowState({ config, params: { id: '1', following: false } })(dispatch, getState)
+
+    const expectedResult = {
+      id: '1',
+      relationships: {
+        following: true
+      }
+    }
+    expect(state.users.usersByIds)
+      .toEqual({ 1: expectedResult })
+  })
+  it('unmute user', async () => {
+    const store = { state: {
+      users: {
+        usersByIds: {
+          '1': {
+            id: '1',
+            relationships: { muting: true }
+          }
+        }
+      }
+    } }
+    const dispatch = (action) => {
+      store.state = reducer(store.state, action)
+    }
+    const getState = () => store.state
+
+    fetch.mockReset()
+    fetch
+      .mockImplementationOnce(fetchMocker(
+        { muting: false },
+        { expectedUrl: `https://pleroma.soykaf.com/api/v1/accounts/1/unmute` }
+      ))
+    let state = await usersThunks.toggleMuteState({ config, params: { id: '1', muting: true } })(dispatch, getState)
+
+    const expectedResult = {
+      id: '1',
+      relationships: {
+        muting: false
+      }
+    }
+    expect(state.users.usersByIds)
+      .toEqual({ 1: expectedResult })
+  })
+  it('block user', async () => {
+    const store = { state: {
+      users: {
+        usersByIds: {
+          '1': {
+            id: '1',
+            relationships: { blocking: false }
+          }
+        }
+      }
+    } }
+    const dispatch = (action) => {
+      store.state = reducer(store.state, action)
+    }
+    const getState = () => store.state
+
+    fetch.mockReset()
+    fetch
+      .mockImplementationOnce(fetchMocker(
+        { blocking: true },
+        { expectedUrl: `https://pleroma.soykaf.com/api/v1/accounts/1/block` }
+      ))
+    let state = await usersThunks.toggleBlockState({ config, params: { id: '1', blocking: false } })(dispatch, getState)
+
+    const expectedResult = {
+      id: '1',
+      relationships: {
+        blocking: true
+      }
+    }
+    expect(state.users.usersByIds)
+      .toEqual({ 1: expectedResult })
+  })
 })

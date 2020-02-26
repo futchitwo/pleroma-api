@@ -51,6 +51,48 @@ const usersThunks = {
       }
       return getState()
     }
+  },
+
+  toggleFollowState: ({ config, params }) => {
+    return async (dispatch, getState) => {
+      const result = await usersApi.toggleFollow({ config: getConfig(getState, config), params })
+        .then(res => apiErrorCatcher(res))
+      const user = {
+        id: params.id,
+        relationships: { ...result.data }
+      }
+
+      await dispatch(Users.actions.addUser({ user }))
+      return getState()
+    }
+  },
+
+  toggleBlockState: ({ config, params }) => {
+    return async (dispatch, getState) => {
+      const result = await usersApi.toggleBlock({ config: getConfig(getState, config), params })
+        .then(res => apiErrorCatcher(res))
+      const user = {
+        id: params.id,
+        relationships: { ...result.data }
+      }
+
+      await dispatch(Users.actions.addUser({ user }))
+      return getState()
+    }
+  },
+
+  toggleMuteState: ({ config, params }) => {
+    return async (dispatch, getState) => {
+      const result = await usersApi.toggleMute({ config: getConfig(getState, config), params })
+        .then(res => apiErrorCatcher(res))
+      const user = {
+        id: params.id,
+        relationships: { ...result.data }
+      }
+
+      await dispatch(Users.actions.addUser({ user }))
+      return getState()
+    }
   }
 }
 
