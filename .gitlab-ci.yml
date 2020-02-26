@@ -1,0 +1,27 @@
+image: node:latest
+
+stages:
+  - lint
+  - build
+  - test
+
+before_script:
+  - yarn
+
+lint:
+  stage: lint
+  script:
+    - npm run lint
+
+build:
+  stage: build
+  script:
+    - npm run build
+  artifacts:
+    paths:
+    - build/
+
+test:
+  stage: test
+  script:
+    - npm run test
