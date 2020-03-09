@@ -154,6 +154,9 @@ const statusesThunks = {
     return async (dispatch, getState) => {
       await statusesApi.delete({ config: getConfig(getState, config), params }).then(res => apiErrorCatcher(res))
       dispatch(Statuses.actions.deleteStatus({ statusId: params.id }))
+      if (params.userId) {
+        dispatch(Users.actions.deleteUserStatus({ statusId: params.id, userId: params.userId }))
+      }
       return getState()
     }
   }

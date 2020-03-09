@@ -504,4 +504,60 @@ describe('Status thunks', () => {
     expect(state.statuses.statusesByIds)
       .toEqual({ 1: result })
   })
+
+  it('delete status', async () => {
+    const status = {
+      id: '1',
+      content: 'Status content'
+    }
+    const store = { state: { statuses: { statusesByIds: { 1: status } } }}
+
+    fetch.mockReset()
+    fetch
+      .mockImplementationOnce(
+        fetchMocker(
+          status,
+          {
+            expectedUrl: `https://pleroma.soykaf.com/api/v1/statuses/1`
+          })
+      )
+
+    let state = await statusesThunks.deleteStatus({ config, params: { id: '1' } })(dispatch(store), getState(store))
+
+    expect(state.statuses.statusesByIds)
+      .toEqual({})
+  })
+
+  it('delete status from user profile', async () => {
+    const status = {
+      id: '1',
+      content: 'Status content'
+    }
+    const user = {
+      id: '2',
+      acct: 'nd',
+      statuses: [ status ]
+    }
+    const store = { state: {
+      statuses: { statusesByIds: { 1: status } },
+      users: { usersByIds: { 2: user } }
+    }}
+
+    fetch.mockReset()
+    fetch
+      .mockImplementationOnce(
+        fetchMocker(
+          status,
+          {
+            expectedUrl: `https://pleroma.soykaf.com/api/v1/statuses/1`
+          })
+      )
+
+    let state = await statusesThunks.deleteStatus({ config, params: { id: '1', userId: '2' } })(dispatch(store), getState(store))
+
+    expect(state.statuses.statusesByIds)
+      .toEqual({})
+    expect(state.users.usersByIds)
+      .toEqual({ 2: { id: '2', acct: 'nd', statuses: [] } })
+  })
 })

@@ -121,5 +121,17 @@ describe('User reducers', () => {
 
       expect(resultState.usersByIds['1']).toEqual({ ...user, statuses })
     })
+
+    it('delete user status', () => {
+      const statuses = [{ id: 2, content: 'b' }, { id: 1, content: 'a' }]
+      const user = { id: '1', statuses: [ ...statuses ] }
+
+      const resultState = Users.reducer(
+        { usersByIds: { 1: user } },
+        Users.actions.deleteUserStatus({ userId: user.id, statusId: 1 })
+      )
+
+      expect(resultState.usersByIds['1']).toEqual({ ...user, statuses: [{ id: 2, content: 'b' }] })
+    })
   })
 })
