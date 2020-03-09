@@ -64,12 +64,29 @@ const addUserStatuses = (state, { userId, statuses }) => {
   }
 }
 
+const deleteUserStatus = (state, { userId, statusId }) => {
+  const oldUser = state.usersByIds[userId] || {}
+  const user = {
+    ...oldUser,
+    statuses: (oldUser.statuses || []).filter(({ id }) => id !== statusId)
+  }
+
+  return {
+    ...state,
+    usersByIds: {
+      ...state.usersByIds,
+      [userId]: user
+    }
+  }
+}
+
 const reducers = {
   addUsers,
   addUser,
   setCurrentUser,
   updateCurrentUser,
-  addUserStatuses
+  addUserStatuses,
+  deleteUserStatus
 }
 
 const actions = {
@@ -101,6 +118,12 @@ const actions = {
     return {
       type: 'addUserStatuses',
       payload: { userId, statuses }
+    }
+  },
+  deleteUserStatus: ({ userId, statusId }) => {
+    return {
+      type: 'deleteUserStatus',
+      payload: { userId, statusId }
     }
   }
 }
