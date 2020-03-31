@@ -7,6 +7,7 @@ import media from './api/media'
 import conversations from './api/conversations'
 import search from './api/search'
 import polls from './api/polls'
+import configs from './api/configs'
 
 export default {
   users,
@@ -17,5 +18,6 @@ export default {
   media,
   conversations,
   search,
-  polls
+  polls,
+  configs
 }

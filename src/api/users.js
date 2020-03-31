@@ -23,6 +23,17 @@ const Users = {
       queries
     })
   },
+  async register ({ config, params }) {
+    return utils.request({
+      config,
+      method: 'POST',
+      url: ACCOUNTS_URL,
+      body: JSON.stringify(params),
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    })
+  },
   async relationships ({ config, queries }) {
     return utils.request({
       config,
