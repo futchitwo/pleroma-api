@@ -8,6 +8,7 @@ const Search = async function ({ config, queries }) {
     url: SEARCH_URL,
     queries
   })
+    .then(res => ({ ...res, search: queries.q }))
 }
 
 export default Search
