@@ -3,6 +3,7 @@ import Api from '../reducers/api.js'
 import thunks from '../thunks.js'
 import usersThunks from './users_thunks.js'
 import has from 'lodash/has'
+import pollsThunks from './polls_thunks.js'
 import conversationsThunks from './conversations_thunks.js'
 
 const ENTITIES = {
@@ -47,6 +48,21 @@ const makeFetcher = ({ entity, dispatch, getState, params, queries, clearLinksOn
     if (clearLinksOnStop) {
       clearLinks({ dispatch, entity })
     }
+  }
+  return { stop }
+}
+
+const makePollFetcher = ({ dispatch, getState, params }) => {
+  const fetch = () => {
+    const state = getState().api
+
+    dispatch(pollsThunks.getPoll({ config: state.config, params }))
+  }
+
+  fetch()
+  const fetcher = window.setInterval(fetch, params.interval || 5000)
+  const stop = () => {
+    window.clearInterval(fetcher)
   }
   return { stop }
 }
@@ -125,6 +141,33 @@ const generateApiThunks = () => {
           queries,
           params
         }))
+      }
+    },
+    startFetchingPoll: ({ params }) => {
+      return async (dispatch, getState) => {
+        const polls = getState().api.polls || {}
+        const poll = polls[params.id] || {}
+        const config = getState().api.config
+
+        if (poll.fetcher) {
+          return getState()
+        } else {
+          const fetcher = makePollFetcher({ dispatch, getState, params, config })
+          dispatch(Api.actions.setPollFetcher({ fetcher, params }))
+          return getState()
+        }
+      }
+    },
+    stopFetchingPoll: ({ params }) => {
+      return async (dispatch, getState) => {
+        const state = getState().api.polls || {}
+        const poll = state[params.statusId] || {}
+
+        if (poll.fetcher) {
+          poll.fetcher.stop()
+          poll.fetcher = null
+        }
+        return getState()
       }
     },
     loadOlderConversation: ({ params, queries }) => {

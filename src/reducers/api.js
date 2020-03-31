@@ -11,8 +11,9 @@ const initialState = {
   },
   notifications: {},
   conversations: {},
+  userStatuses: {},
   conversation: {},
-  userStatuses: {}
+  polls: {}
 }
 
 const setProperty = ({ state, timelineName, entity, key, value }) => {
@@ -45,6 +46,15 @@ const reducers = {
   setFetcher: (state, { timelineName, entity, fetcher }) => {
     return setProperty({ state, timelineName, entity, key: 'fetcher', value: fetcher })
   },
+  setPollFetcher: (state, { params, fetcher }) => {
+    return {
+      ...state,
+      polls: {
+        ...state.polls,
+        [params.statusId]: { fetcher }
+      }
+    }
+  },
   setNext: (state, { timelineName, entity, next }) => {
     return setProperty({ state, timelineName, entity, key: 'next', value: next })
   },
@@ -76,6 +86,12 @@ const actions = {
     return {
       type: 'setFetcher',
       payload: { timelineName, entity, fetcher }
+    }
+  },
+  setPollFetcher: ({ params, fetcher }) => {
+    return {
+      type: 'setPollFetcher',
+      payload: { fetcher, params }
     }
   },
   setPrev: ({ timelineName, entity, prev }) => {
