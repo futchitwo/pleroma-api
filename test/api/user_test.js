@@ -77,6 +77,21 @@ describe('User api', () => {
     })
   })
 
+  describe('POST /api/v1/accounts', () => {
+    it('returns a new account', async () => {
+      const id = 1
+
+      fetch.mockImplementationOnce(fetchMocker(
+        { id: 1, username: 'nastassiad' },
+        { expectedUrl: `https://pleroma.soykaf.com/api/v1/accounts` }
+      ))
+      const res = await api.users.register({ config, params: { id } })
+
+      expect(res.state).toBe('ok')
+      expect(res.data).toEqual({ id: 1, username: 'nastassiad' })
+    })
+  })
+
   describe('/api/v1/accounts/relationships', () => {
     it('returns array of relationships', async () => {
       const id = 1

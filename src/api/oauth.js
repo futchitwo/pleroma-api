@@ -28,7 +28,7 @@ const getTokenWithCode = async ({ config, params }) => {
   params = {
     client_id: params.client_id,
     client_secret: params.client_secret,
-    grant_type: 'authorization_code',
+    grant_type: params.grant_type || 'authorization_code',
     code: params.code,
     redirect_uri: params.redirect_uri || defaultRedirectUri
   }
