@@ -25,6 +25,18 @@ describe('Api reducer', () => {
       expect(resultState.notifications.fetcher).toEqual(fetcher)
     })
 
+    it('sets a poll fetcher', () => {
+      const fetcher = 'fetcher'
+      const statusId = '193'
+
+      const resultState = Api.reducer(
+        undefined,
+        Api.actions.setPollFetcher({ params: { statusId }, fetcher })
+      )
+
+      expect(resultState.polls[statusId].fetcher).toEqual(fetcher)
+    })
+
     it('sets prev and next for a  timeline', () => {
       const prev = 'prev'
       const next = 'next'

@@ -17,9 +17,11 @@ const initialTimeline = {
 
 const addStatuses = (state, { statuses }) => {
   const newStatuses = reduce(statuses, (result, status) => {
-    status.content = emojify(status.content, status.emojis)
-    status.spoiler_text = emojify(status.spoiler_text, status.emojis)
-    result[status.id] = { ...(state.statusesByIds[status.id] || {}), ...status }
+    const oldStatus = state.statusesByIds[status.id] || {}
+
+    status.content = emojify(status.content || oldStatus.content, status.emojis || oldStatus.emojis)
+    status.spoiler_text = emojify(status.spoiler_text || oldStatus.spoiler_text, status.emojis || oldStatus.emojis)
+    result[status.id] = { ...oldStatus, ...status }
     return result
   }, {})
 

@@ -21,6 +21,7 @@ describe('Api thunks', () => {
       notifications: {},
       conversations: {},
       userStatuses: {},
+      polls: {},
       conversation: {}
     }
   })
@@ -177,7 +178,7 @@ describe('Api thunks', () => {
       const dispatch = (action) => {
         store.state = reducer(store.state, action)
         return store.state
-      }      
+      }
       const getState = () => store.state
 
       fetch.mockReset()
@@ -216,7 +217,28 @@ describe('Api thunks', () => {
       expect(getState().api.userStatuses.fetcher).toBeNull()
     })
   })
+  describe('polls fetcher', () => {
+    it('set and remove poll fetcher', async () => {
+      const store = { state: defaultState() }
+      const dispatch = (action) => {
+        store.state = reducer(store.state, action)
+        return store.state
+      }
+      const getState = () => store.state
 
+      fetch.mockReset()
+      fetch.mockImplementationOnce(fetchMocker([], {}))
+      const statusId = '11'
+      await apiThunks.startFetchingPoll({ params: { id: '193', statusId } })(dispatch, getState)
+
+      expect(getState().api.polls[statusId].fetcher).toBeDefined()
+
+      await apiThunks.stopFetchingPoll({ params: { statusId } })(dispatch, getState)
+
+      expect(getState().api.polls[statusId].fetcher).toBeNull()
+    }
+    )
+  })
   describe('startFetchingConversationTimeline', () => {
     it('creates a conversationTimeline fetcher', async () => {
       const store = { state: defaultState() }

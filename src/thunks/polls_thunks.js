@@ -11,6 +11,15 @@ const pollsThunks = {
       await dispatch(Statuses.actions.addStatus({ status: { id: params.statusId, poll: result.data } }))
       return getState()
     }
+  },
+  getPoll: ({ config, params }) => {
+    return async (dispatch, getState) => {
+      const result = await pollsApi.get({ config: getConfig(getState, config), params })
+        .then(res => apiErrorCatcher(res))
+
+      await dispatch(Statuses.actions.addStatus({ status: { id: params.statusId, poll: result.data } }))
+      return getState()
+    }
   }
 }
 

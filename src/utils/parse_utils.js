@@ -1,6 +1,6 @@
 export const emojify = (html, emojis) => {
   let replaced = html
-  if (!emojis) return html
+  if (!emojis || !html) return html
   for (let i = 0; i < emojis.length; i++) {
     let emoji = emojis[i]
     replaced = replaced.replace(
