@@ -16,6 +16,20 @@ const Timelines = {
       url: `${TIMELINES_URL}/home`,
       queries
     })
+  },
+  async tag ({ config, queries, params, fullUrl }) {
+    if (fullUrl) {
+      return utils.request({
+        config,
+        queries,
+        fullUrl
+      })
+    }
+    return utils.request({
+      config,
+      url: `${TIMELINES_URL}/tag/${params.tag}`,
+      queries
+    })
   }
 }
 

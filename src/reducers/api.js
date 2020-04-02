@@ -13,6 +13,7 @@ const initialState = {
   conversations: {},
   userStatuses: {},
   conversation: {},
+  tagTimeline: {},
   polls: {}
 }
 

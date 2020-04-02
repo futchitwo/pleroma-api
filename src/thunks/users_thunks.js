@@ -1,21 +1,8 @@
 import usersApi from '../api/users'
-import Api from '../reducers/api'
 import Users from '../reducers/users'
 import Statuses from '../reducers/statuses'
 import { apiErrorCatcher, getConfig } from '../utils/api_utils'
-import { updateLinks } from './api_thunks'
-
-const startLoading = ({ dispatch, entity, older }) => {
-  if (older) {
-    dispatch(Api.actions.setLoadingOlder({ entity, loading: true }))
-  }
-}
-
-const stopLoading = ({ dispatch, entity, older }) => {
-  if (older) {
-    dispatch(Api.actions.setLoadingOlder({ entity, loading: false }))
-  }
-}
+import { updateLinks, startLoading, stopLoading } from './api_thunks'
 
 const usersThunks = {
   fetchUser: ({ config, params }) => {

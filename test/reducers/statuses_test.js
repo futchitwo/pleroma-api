@@ -49,4 +49,44 @@ describe('Status reducers', () => {
       expect(resultState.timelines[timelineName].statusIds).toEqual(['123'])
     })
   })
+  describe('tags', () => {
+    it('should add statuses to tagTimeline', () => {
+      const statuses = [{ id: '123', info: 'oneinfo', other: 'info' }]
+
+      let resultState = Statuses.reducer(undefined, Statuses.actions.addTagTimeline({ statuses }))
+      expect(resultState.statusesByIds).toEqual({ '123': statuses[0] })
+      expect(resultState.tag).toEqual(['123'])
+    })
+    it('should add statuses to existing tagTimeline', () => {
+      const state = {
+        statusesByIds: {
+          '1': { id: '1' }
+        },
+        tag: ['1']
+      }
+      const newState ={ 
+        statusesByIds: {
+          '1': { id: '1' },
+          '2': { id: '2', content: '2', spoiler_text: '2' }
+        },
+        tag: [ '2', '1']
+      }
+      const statuses = [{ id: '2', content: '2', spoiler_text: '2' }]
+      let resultState = Statuses.reducer(state, Statuses.actions.addTagTimeline({ statuses }))
+      expect(resultState.statusesByIds).toEqual(newState.statusesByIds)
+      expect(resultState.tag).toEqual(newState.tag)
+    })
+    it('should clear tagTimeline', () => {
+      const state = {
+        statusesByIds: {
+          '1': { id: '1' }
+        },
+        tag: ['1']
+      }
+      const statuses = [{ id: '2', content: '2', spoiler_text: '2' }]
+      let resultState = Statuses.reducer(state, Statuses.actions.clearTagTimeline())
+      expect(resultState.statusesByIds).toEqual(state.statusesByIds)
+      expect(resultState.tag).toEqual([])
+    })
+  })
 })
