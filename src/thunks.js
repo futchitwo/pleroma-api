@@ -3,6 +3,7 @@ import notifications from './thunks/notifications_thunks'
 import api from './thunks/api_thunks'
 import users from './thunks/users_thunks'
 import conversations from './thunks/conversations_thunks'
+import tags from './thunks/tags_thunks'
 import polls from './thunks/polls_thunks'
 
 export default {
@@ -11,5 +12,6 @@ export default {
   api,
   users,
   conversations,
+  tags,
   polls
 }

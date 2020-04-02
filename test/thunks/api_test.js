@@ -283,4 +283,50 @@ describe('Api thunks', () => {
       expect(getState().api.conversation.fetcher).toBeNull()
     })
   })
+
+
+  describe('startFetchingTagTimeline', () => {
+    it('creates a tagTimeline fetcher', async () => {
+      const store = { state: defaultState() }
+      const dispatch = (action) => {
+        store.state = reducer(store.state, action)
+        return store.state
+      }      
+      const getState = () => store.state
+
+      fetch.mockReset()
+      fetch.mockImplementationOnce(fetchMocker([], {}))
+
+      await apiThunks.startFetchingTagTimeline({ })(dispatch, getState)
+
+      expect(getState().api.tagTimeline.fetcher).toBeDefined()
+
+      expect(typeof getState().api.tagTimeline.fetcher.stop)
+        .toEqual('function')
+
+      getState().api.tagTimeline.fetcher.stop()
+    })
+  })
+
+  describe('stopFetchingTagTimeline', () => {
+    it('stops and removes the tagTimeline fetcher', async () => {
+      const store = { state: defaultState() }
+      const dispatch = (action) => {
+        store.state = reducer(store.state, action)
+        return store.state
+      }
+      const getState = () => store.state
+
+      fetch.mockReset()
+      fetch.mockImplementationOnce(fetchMocker([], {}))
+
+      await apiThunks.startFetchingTagTimeline({})(dispatch, getState)
+
+      expect(getState().api.tagTimeline.fetcher).toBeDefined()
+
+      await apiThunks.stopFetchingTagTimeline({})(dispatch, getState)
+
+      expect(getState().api.tagTimeline.fetcher).toBeNull()
+    })
+  })
 })

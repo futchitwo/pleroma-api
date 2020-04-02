@@ -8,7 +8,8 @@ import { addStatusIds } from '../utils/status_utils'
 const initialState = {
   statusesByIds: {},
   timelines: {
-  }
+  },
+  tag: []
 }
 
 const initialTimeline = {
@@ -85,13 +86,32 @@ const deleteStatus = (state, { statusId }) => {
   return newState
 }
 
+const addTagTimeline = (state, { statuses }) => {
+  const newState = addStatuses(state, { statuses })
+  const timeline = state.tag
+
+  return {
+    ...newState,
+    tag: addStatusIds(timeline, map(statuses, 'id'))
+  }
+}
+
+const clearTagTimeline = (state) => {
+  return {
+    ...state,
+    tag: []
+  }
+}
+
 const reducers = {
   addStatus,
   addStatuses,
   addStatusIdsToTimeline,
   addStatusesToTimeline,
   cropOlderStatusesFromTimeline,
-  deleteStatus
+  deleteStatus,
+  addTagTimeline,
+  clearTagTimeline
 }
 
 const actions = {
@@ -129,6 +149,18 @@ const actions = {
     return {
       type: 'deleteStatus',
       payload: { statusId }
+    }
+  },
+  addTagTimeline: ({ statuses }) => {
+    return {
+      type: 'addTagTimeline',
+      payload: { statuses }
+    }
+  },
+  clearTagTimeline: () => {
+    return {
+      type: 'clearTagTimeline',
+      payload: {}
     }
   }
 }

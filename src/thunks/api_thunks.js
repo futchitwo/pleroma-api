@@ -5,13 +5,8 @@ import usersThunks from './users_thunks.js'
 import has from 'lodash/has'
 import pollsThunks from './polls_thunks.js'
 import conversationsThunks from './conversations_thunks.js'
-
-const ENTITIES = {
-  conversations: { name: 'conversations', thunk: 'fetch' },
-  notifications: { name: 'notifications', thunk: 'fetch' },
-  userStatuses: { name: 'users', thunk: 'fetchUserStatuses', clearLinksOnStop: true },
-  conversation: { name: 'conversation', module: 'conversations', thunk: 'fetchConversationTimeline', clearLinksOnStop: true }
-}
+import { ENTITIES } from './api_thunks_entities_config'
+import tagsThunks from './tags_thunks.js'
 
 const makeTimelineFetcher = ({ dispatch, getState, timelineName, type, queries }) => {
   const fetch = () => {
@@ -32,7 +27,7 @@ const makeTimelineFetcher = ({ dispatch, getState, timelineName, type, queries }
   return { stop }
 }
 
-const makeFetcher = ({ entity, dispatch, getState, params, queries, clearLinksOnStop }) => {
+const makeFetcher = ({ entity, dispatch, getState, params, queries, clearLinksOnStop, clearThunk }) => {
   const fetch = () => {
     const state = getState().api
     const fullUrl = ((state[entity] && state[entity].prev) || {}).url
@@ -43,10 +38,15 @@ const makeFetcher = ({ entity, dispatch, getState, params, queries, clearLinksOn
 
   fetch()
   const fetcher = window.setInterval(fetch, 5000)
-  const stop = () => {
+  const stop = async () => {
     window.clearInterval(fetcher)
     if (clearLinksOnStop) {
-      clearLinks({ dispatch, entity })
+      await clearLinks({ dispatch, entity })
+    }
+    if (clearThunk) {
+      const { name, module } = ENTITIES[entity]
+
+      dispatch(thunks[module || name][clearThunk]({ config: getState().api.config }))
     }
   }
   return { stop }
@@ -83,6 +83,18 @@ export const clearLinks = async ({ dispatch, entity }) => {
   await dispatch(Api.actions.setFetcher({ entity, fetcher: null }))
   await dispatch(Api.actions.setPrev({ entity, prev: null }))
   await dispatch(Api.actions.setNext({ entity, next: null }))
+}
+
+export const startLoading = ({ dispatch, entity, older }) => {
+  if (older) {
+    dispatch(Api.actions.setLoadingOlder({ entity, loading: true }))
+  }
+}
+
+export const stopLoading = ({ dispatch, entity, older }) => {
+  if (older) {
+    dispatch(Api.actions.setLoadingOlder({ entity, loading: false }))
+  }
 }
 
 const generateApiThunks = () => {
@@ -184,6 +196,21 @@ const generateApiThunks = () => {
           params
         }))
       }
+    },
+    loadOlderTagTimeline: ({ params, queries }) => {
+      return async (dispatch, getState) => {
+        const tagTimeline = getState().api.tags || {}
+        const config = getState().api.config
+        const fullUrl = (tagTimeline.next || {}).url
+
+        return dispatch(tagsThunks.fetch({
+          older: true,
+          config,
+          fullUrl,
+          queries,
+          params
+        }))
+      }
     }
   }
 
@@ -199,7 +226,8 @@ const generateApiThunks = () => {
             getState,
             params,
             queries,
-            clearLinksOnStop: ENTITIES[entity].clearLinksOnStop
+            clearLinksOnStop: ENTITIES[entity].clearLinksOnStop,
+            clearThunk: ENTITIES[entity].clearThunk
           })
 
           dispatch(Api.actions.setFetcher({ entity, fetcher }))
