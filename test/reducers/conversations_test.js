@@ -47,11 +47,11 @@ describe('Conversations reducers', () => {
   it('update conversation', async () => {
     const conversation = {
       id: 1,
-      accounts: [{ id: 2 }]
+      timeline: [{ id: 2 }]
     }
     const resultState = Conversations.reducer(undefined, Conversations.actions.updateConversation({ conversation }))
 
-    expect(resultState.conversationsByIds).toEqual({ 1: conversation })
+    expect(resultState.conversationsByIds).toEqual({ 1: { id: 1, timeline: [{ id: 2 }], last_status: { id: 2 }} })
   })
 
   it('clear conversations', async () => {

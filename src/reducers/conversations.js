@@ -1,4 +1,4 @@
-import { map, reduce, uniq } from 'lodash'
+import { map, reduce, uniq, uniqBy } from 'lodash'
 
 const initialState = {
   list: [],
@@ -34,14 +34,24 @@ const addConversation = (state, { conversation }) => {
   return addConversations(state, { conversations: [conversation] })
 }
 
-const updateConversation = (state, { conversation }) => {
+const updateConversation = (state, { conversation, older }) => {
   const currentConversationState = state.conversationsByIds[conversation.id] || {}
 
+  const timeline = conversation.timeline ? conversation.timeline : []
+  const currentTimeline = currentConversationState.timeline ? currentConversationState.timeline : []
+  const newTimeline = older ? timeline.concat(currentConversationState.timeline) : currentTimeline.concat(timeline)
+
+  const newConversationState = {
+    ...currentConversationState,
+    ...conversation,
+    last_status: newTimeline.length ? newTimeline[newTimeline.length - 1] : {},
+    timeline: uniqBy(newTimeline, (e) => e.id)
+  }
   return {
     ...state,
     conversationsByIds: {
       ...state.conversationsByIds,
-      [conversation.id]: { ...currentConversationState, ...conversation }
+      [conversation.id]: newConversationState
     }
   }
 }
@@ -81,10 +91,10 @@ const actions = {
       payload: { conversation }
     }
   },
-  updateConversation: ({ conversation }) => {
+  updateConversation: ({ conversation, older }) => {
     return {
       type: 'updateConversation',
-      payload: { conversation }
+      payload: { conversation, older }
     }
   },
   clearConversations: () => {
