@@ -31,11 +31,13 @@ const conversationsThunks = {
       const result = await conversationsApi.getTimeline({ config: getConfig(getState, config), params, fullUrl, queries })
         .then(res => apiErrorCatcher(res))
 
-      await dispatch(Conversations.actions.updateConversation({ conversation: {
-        id: params.id,
-        last_status: result.data[result.data.length - 1],
-        timeline: result.data
-      } }))
+      await dispatch(Conversations.actions.updateConversation({
+        older,
+        conversation: {
+          id: params.id,
+          timeline: result.data
+        }
+      }))
       if (result.links) {
         const statuses = getState().api.conversation
         await updateLinks({ dispatch, statuses, entity: 'conversation', links: result.links, older })

@@ -145,7 +145,7 @@ describe('Conversations thunks', () => {
           22: {
             id: 22,
             last_status: { id: '1' },
-            timeline: [{ id: '1' }]
+            timeline: [{ id: 1, content: 'hi' }]
           }
         }
       }
@@ -156,7 +156,6 @@ describe('Conversations thunks', () => {
     const getState = () => store.state
 
     const statuses = [
-      { id: 1, content: 'hi' },
       { id: 2, content: 'test message' }
     ]
 
@@ -171,7 +170,7 @@ describe('Conversations thunks', () => {
     let state = await conversationsThunks.fetchConversationTimeline({ config, params: { id: 22 } })(dispatch, getState)
 
     expect(state.conversations.conversationsByIds)
-      .toEqual({ 22: { id: 22, timeline: statuses, last_status: { id: 2, content: 'test message' } } })
+      .toEqual({ 22: { id: 22, timeline: [{ id: 1, content: 'hi' },{ id: 2, content: 'test message' }] , last_status: { id: 2, content: 'test message' } } })
   })
 
   it('change conversation recipients', async () => {
