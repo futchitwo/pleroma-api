@@ -5,6 +5,7 @@ import users from './thunks/users_thunks'
 import conversations from './thunks/conversations_thunks'
 import tags from './thunks/tags_thunks'
 import polls from './thunks/polls_thunks'
+import config from './thunks/config_thunks'
 
 export default {
   statuses,
@@ -13,5 +14,6 @@ export default {
   users,
   conversations,
   tags,
-  polls
+  polls,
+  config
 }

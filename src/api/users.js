@@ -47,6 +47,14 @@ const Users = {
       url: `${ACCOUNTS_URL}/verify_credentials`
     })
   },
+  async updateCredentials ({ config, params }) {
+    return utils.request({
+      config,
+      method: 'PATCH',
+      url: `${ACCOUNTS_URL}/update_credentials`,
+      body: params
+    })
+  },
   async toggleFollow ({ config, params }) {
     return utils.request({
       config,
