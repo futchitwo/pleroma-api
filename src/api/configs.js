@@ -21,6 +21,12 @@ const Configs = {
       config,
       url: `/nodeinfo/2.1.json`
     })
+  },
+  async getConfig ({ config }) {
+    return utils.request({
+      config,
+      url: `/static/config.json`
+    })
   }
 }
 

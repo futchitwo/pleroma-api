@@ -46,4 +46,14 @@ describe('Configs api', () => {
       expect(res.data).toEqual({ invitesEnabled: true, nodeName: 'pleroma.site' })
     })
   })
+  describe('/static/config', () => {
+    it('returns instance configurations', async () => {
+      fetch.mockImplementationOnce(fetchMocker({ hideUserStats: true, hidePostStats: false }, {
+        expectedUrl: 'https://pleroma.soykaf.com/static/config.json'
+      }))
+      const res = await api.configs.getConfig({ config })
+
+      expect(res.data).toEqual({ hideUserStats: true, hidePostStats: false })
+    })
+  })
 })

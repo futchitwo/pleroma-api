@@ -57,6 +57,22 @@ describe('User api', () => {
     })
   })
 
+
+  describe('/api/v1/accounts/update_credentials', () => {
+    it('returns updated user data', async () => {
+      const accessToken = 'qNhQPCb-_lRjt_K6mXkwcrle_AoHWBkOmWjWhn9H6EQ='
+
+      fetch.mockImplementationOnce(fetchMocker({ id: '1', username: 'nd' }, {
+        expectedUrl: 'https://pleroma.soykaf.com/api/v1/accounts/update_credentials',
+        expectedToken: `Bearer ${accessToken}`
+      }))
+
+      const res = await api.users.updateCredentials({ config: { ...config, accessToken }, params: { id: '1', username: 'nd' } })
+      expect(res.state).toBe('ok')
+      expect(res.data).toEqual({ id: '1', username: 'nd' })
+    })
+  })
+
   describe('/api/v1/accounts/:id/statuses', () => {
     it('returns the statuses and the links', async () => {
       const id = 1

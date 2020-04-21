@@ -1,15 +1,17 @@
-import statuses from './reducers/statuses.js'
-import users from './reducers/users.js'
-import notifications from './reducers/notifications.js'
+import statuses from './reducers/statuses'
+import users from './reducers/users'
+import notifications from './reducers/notifications'
 import api from './reducers/api.js'
 import conversations from './reducers/conversations'
+import config from './reducers/config'
 
 const reducers = {
   statuses,
   users,
   notifications,
   api,
-  conversations
+  conversations,
+  config
 }
 
 export default reducers
