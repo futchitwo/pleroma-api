@@ -28,7 +28,10 @@ const Notifications = {
     return utils.request({
       config,
       url: `${NOTIFICATIONS_URL}/clear`,
-      method: 'POST'
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      }
     })
   },
 
@@ -37,7 +40,10 @@ const Notifications = {
       config,
       url: `${NOTIFICATIONS_URL}/dismiss`,
       method: 'POST',
-      body: JSON.stringify(params)
+      body: JSON.stringify(params),
+      headers: {
+        'Content-Type': 'application/json'
+      }
     })
   }
 }

@@ -14,6 +14,22 @@ const notificationsThunks = {
       }
       return getState()
     }
+  },
+  read: ({ config, params }) => {
+    return async (dispatch, getState) => {
+      await notificationsApi.dismiss({ config: getConfig(getState, config), params })
+        .then(res => apiErrorCatcher(res))
+      await dispatch(Notifications.actions.read({ notificationId: params.id }))
+      return getState()
+    }
+  },
+  readAll: ({ config }) => {
+    return async (dispatch, getState) => {
+      await notificationsApi.clear({ config: getConfig(getState, config) })
+        .then(res => apiErrorCatcher(res))
+      await dispatch(Notifications.actions.readAll())
+      return getState()
+    }
   }
 }
 

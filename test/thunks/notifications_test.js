@@ -107,4 +107,62 @@ describe('Notifications thunks', () => {
         url: 'https://pleroma.soykaf.com/api/v1/notifications?min_id=16'
       })
   })
+
+  it('dismiss a single notification', async () => {
+    const store = { state: {
+      notifications: {
+        notificationsByIds: {
+          '1': { id: '1', pleroma: { is_seen: false } }
+        },
+        list: ['1']
+      }
+    } }
+
+    const dispatch = (action) => {
+      store.state = reducer(store.state, action)
+    }
+    const getState = () => store.state
+
+    fetch.mockReset()
+    fetch.mockImplementationOnce(fetchMocker(
+      {},
+      { expectedUrl: `https://pleroma.soykaf.com/api/v1/notifications/dismiss` }
+    ))
+
+    let state = await notificationsThunks.read({ config, params:{ id: '1' } })(dispatch, getState)
+    expect(state.notifications.notificationsByIds)
+      .toEqual({ 1: { id: '1', pleroma: { is_seen: true } } })
+
+    expect(state.notifications.list)
+      .toEqual(['1'])
+  })
+
+  it('read all notification', async () => {
+    const store = { state: {
+      notifications: {
+        notificationsByIds: {
+          '1': { id: '1', pleroma: { is_seen: false } }
+        },
+        list: ['1']
+      }
+    } }
+
+    const dispatch = (action) => {
+      store.state = reducer(store.state, action)
+    }
+    const getState = () => store.state
+
+    fetch.mockReset()
+    fetch.mockImplementationOnce(fetchMocker(
+      {},
+      { expectedUrl: `https://pleroma.soykaf.com/api/v1/notifications/clear` }
+    ))
+
+    let state = await notificationsThunks.readAll({ config, params:{ id: '1' } })(dispatch, getState)
+    expect(state.notifications.notificationsByIds)
+      .toEqual({ 1: { id: '1', pleroma: { is_seen: true } } })
+
+    expect(state.notifications.list)
+      .toEqual(['1'])
+  })
 })
