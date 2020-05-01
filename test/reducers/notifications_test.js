@@ -57,4 +57,34 @@ describe('Notifications reducers', () => {
     expect(resultState.list).toEqual([])
     expect(resultState.notificationsByIds).toEqual({})
   })
+
+  it('dismiss single notification', async () => {
+    const initState = {
+      list: ['1', '2'],
+      notificationsByIds: {
+        1: { id: '1', pleroma: { is_seen: false } },
+        2: { id: '2' }
+      }
+    }
+    const resultState = Notifications.reducer(initState, Notifications.actions.read({ notificationId: '1' }))
+
+    expect(resultState.list).toEqual(['1', '2'])
+    expect(resultState.notificationsByIds).toEqual({ 1: { id: '1', pleroma: { is_seen: true } }, 2: { id: '2' } })
+  })
+
+  it('read all notifications', async () => {
+    const initState = {
+      list: ['1', '2'],
+      notificationsByIds: {
+        1: { id: '1', pleroma: { is_seen: false } },
+        2: { id: '2', pleroma: { is_seen: false } }
+      }
+    }
+    const resultState = Notifications.reducer(initState, Notifications.actions.readAll())
+
+    expect(resultState.list).toEqual(['1', '2'])
+    expect(resultState.notificationsByIds).toEqual({
+      1: { id: '1', pleroma: { is_seen: true } },
+      2: { id: '2', pleroma: { is_seen: true } } })
+  })
 })
