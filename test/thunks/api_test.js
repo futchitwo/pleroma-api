@@ -284,7 +284,6 @@ describe('Api thunks', () => {
     })
   })
 
-
   describe('startFetchingTagTimeline', () => {
     it('creates a tagTimeline fetcher', async () => {
       const store = { state: defaultState() }

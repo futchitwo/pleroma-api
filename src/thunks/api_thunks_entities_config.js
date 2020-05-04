@@ -18,6 +18,16 @@ export const ENTITIES = {
     thunk: 'fetchConversationTimeline',
     clearLinksOnStop: true
   },
+  chats: {
+    name: 'chats',
+    module: 'chats',
+    thunk: 'fetch'
+  },
+  chat: {
+    name: 'chat',
+    module: 'chats',
+    thunk: 'fetchChatMessages'
+  },
   tagTimeline: {
     name: 'tagTimeline',
     module: 'tags',

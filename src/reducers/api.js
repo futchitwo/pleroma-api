@@ -11,6 +11,8 @@ const initialState = {
   },
   notifications: {},
   conversations: {},
+  chats: {},
+  chat: {},
   userStatuses: {},
   conversation: {},
   tagTimeline: {},

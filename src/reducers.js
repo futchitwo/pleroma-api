@@ -3,6 +3,7 @@ import users from './reducers/users'
 import notifications from './reducers/notifications'
 import api from './reducers/api.js'
 import conversations from './reducers/conversations'
+import chats from './reducers/chats'
 import config from './reducers/config'
 
 const reducers = {
@@ -11,6 +12,7 @@ const reducers = {
   notifications,
   api,
   conversations,
+  chats,
   config
 }
 

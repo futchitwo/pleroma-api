@@ -45,6 +45,7 @@ const request = async ({ method = 'GET', url, params, queries, config, fullUrl =
       }
     }
   } catch (e) {
+    console.warn(e)
     return {
       state: 'error',
       error: e

@@ -11,8 +11,8 @@ const fetchMocker = (result, { expectedUrl, ok = true, expectedToken, headers = 
       throw `fetchMocker: Unexpected token, expected '${expectedToken}', got '${token}}'`
     }
 
-    if (expectedBody && (expectedBody != options.body)) {
-      throw `fetchMocker: Unexpected body, expected '${expectedBody}', got '${options.body}}'`
+    if (expectedBody && !isEqual(expectedBody, options.body)) {
+      throw `fetchMocker: Unexpected body, expected '${JSON.stringify(expectedBody)}', got '${JSON.parse(options.body)}}'`
     }
 
     if (expectedJSON && !isEqual(expectedJSON, JSON.parse(options.body))) {
