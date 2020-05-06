@@ -211,6 +211,35 @@ const generateApiThunks = () => {
           params
         }))
       }
+    },
+    stopAllFetchers: () => {
+      return async (dispatch, getState) => {
+        const computedState = getState().api
+
+        Object.keys(computedState.polls).forEach(statusId => {
+          const state = computedState.polls[statusId] || {}
+          if (state.fetcher) {
+            state.fetcher.stop()
+            state.fetcher = null
+          }
+        })
+        Object.keys(computedState.timelines).forEach(timelineName => {
+          const state = computedState.timelines[timelineName] || {}
+          if (state.fetcher) {
+            state.fetcher.stop()
+            state.fetcher = null
+          }
+        })
+        Object.keys(ENTITIES).forEach(entity => {
+          const state = computedState[entity] || {}
+          if (state.fetcher) {
+            state.fetcher.stop()
+            state.fetcher = null
+          }
+        })
+
+        return getState()
+      }
     }
   }
 
