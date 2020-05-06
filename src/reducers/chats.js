@@ -39,7 +39,7 @@ const updateChat = (state, { chat, older }) => {
 
   const messages = chat.messages || []
   const currentMessages = currentChatState.messages || []
-  const newMessages = older ? messages.concat(currentChatState.messages) : currentMessages.concat(messages)
+  const newMessages = older ? currentChatState.messages.concat(messages) : messages.concat(currentMessages)
 
   const newChatState = {
     ...currentChatState,
