@@ -26,6 +26,27 @@ describe('Api thunks', () => {
     }
   })
 
+  describe('stopAllFetchers', () => {
+    it ('stop all existing fetchers', async () => {
+      const state = defaultState()
+      const store = { state: { ...state } }
+      const dispatch = (action) => {
+        store.state = reducer(store.state, action)
+        return store.state
+      }
+      const getState = () => store.state
+
+      await apiThunks.startFetchingNotifications({})(dispatch, getState)
+      await apiThunks.startFetchingPoll({ params: { id: '193', statusId: '11' } })(dispatch, getState)
+      await apiThunks.startFetchingTimeline({ timelineName: 'home', type: 'home' })(dispatch, getState)
+      apiThunks.stopAllFetchers()(dispatch, getState)
+
+      expect(getState().api.notifications.fetcher).toBeNull()
+      expect(getState().api.polls['11'].fetcher).toBeNull()
+      expect(getState().api.timelines['home'].fetcher).toBeNull()
+    })
+  })
+
   describe('startFetchingTimeline', () => {
     it('creates a timeline fetcher', async () => {
       const store = { state: defaultState() }
