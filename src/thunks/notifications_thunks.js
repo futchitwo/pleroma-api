@@ -15,7 +15,7 @@ const notificationsThunks = {
       return getState()
     }
   },
-  read: ({ config, params }) => {
+  dismiss: ({ config, params }) => {
     return async (dispatch, getState) => {
       await notificationsApi.dismiss({ config: getConfig(getState, config), params })
         .then(res => apiErrorCatcher(res))
@@ -23,11 +23,31 @@ const notificationsThunks = {
       return getState()
     }
   },
-  readAll: ({ config }) => {
+  dismissAll: ({ config }) => {
     return async (dispatch, getState) => {
       await notificationsApi.clear({ config: getConfig(getState, config) })
         .then(res => apiErrorCatcher(res))
       await dispatch(Notifications.actions.readAll())
+      return getState()
+    }
+  },
+  read: ({ config, params }) => {
+    return async (dispatch, getState) => {
+      const passedParams = {}
+
+      if (params && params.id) {
+        passedParams.id = params.id
+      } else {
+        passedParams.max_id = params && params.max_id ? params.max_id : getState().api.notifications.prev.min_id
+      }
+      await notificationsApi.read({ config: getConfig(getState, config), params: passedParams })
+        .then(res => apiErrorCatcher(res))
+
+      if (passedParams.id) {
+        await dispatch(Notifications.actions.read({ notificationId: passedParams.id }))
+      } else {
+        await dispatch(Notifications.actions.readAll())
+      }
       return getState()
     }
   }
