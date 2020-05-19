@@ -23,14 +23,19 @@ describe('Config thunks', () => {
     const getState = () => store.state
 
     fetch.mockReset()
-    fetch.mockImplementationOnce(fetchMocker(
-      { theme: 'pleroma-dark' },
-      { expectedUrl: `https://pleroma.soykaf.com/static/config.json` }
-    ))
+    fetch
+      .mockImplementationOnce(fetchMocker(
+        { theme: 'pleroma-dark' },
+        { expectedUrl: `https://pleroma.soykaf.com/static/config.json` }
+      ))
+      .mockImplementationOnce(fetchMocker(
+        { configOption: true },
+        { expectedUrl: `https://pleroma.soykaf.com/api/statusnet/config.json` }
+      ))
 
-    let state = await configThunks.fetchConfig({ config })(dispatch, getState)
+    let state = await configThunks.fetchConfig({ config, appId: 'kenoma' })(dispatch, getState)
 
-    expect(state.config.settings)
-      .toEqual({ theme: 'pleroma-dark' })
+    expect(state.config.kenoma)
+      .toEqual({ configOption: true, theme: 'pleroma-dark' })
   })
 })

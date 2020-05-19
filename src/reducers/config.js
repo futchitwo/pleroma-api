@@ -1,10 +1,9 @@
 const initialState = {
-  settings: {}
 }
 
 const addConfig = (state, { config }) => ({
   ...state,
-  settings: config
+  ...config
 })
 const clear = (state) => ({
   ...initialState

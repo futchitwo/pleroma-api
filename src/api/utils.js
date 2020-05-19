@@ -3,7 +3,17 @@ import parseLinkHeader from 'parse-link-header'
 
 const queryParams = (params) => {
   return Object.keys(params)
-    .map(k => encodeURIComponent(k) + '=' + encodeURIComponent(params[k]))
+    .map(k => {
+      const field = params[k]
+
+      if (Array.isArray(field)) {
+        return field
+          .reduce((acc, cur) => acc.concat(encodeURIComponent(k) + '[]=' + encodeURIComponent(cur)), [])
+          .join('&')
+      } else {
+        return encodeURIComponent(k) + '=' + encodeURIComponent(field)
+      }
+    })
     .join('&')
 }
 
