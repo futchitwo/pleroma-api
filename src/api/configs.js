@@ -27,6 +27,12 @@ const Configs = {
       config,
       url: `/static/config.json`
     })
+  },
+  async getStatusnetConfig ({ config }) {
+    return utils.request({
+      config,
+      url: '/api/statusnet/config.json'
+    })
   }
 }
 
