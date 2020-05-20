@@ -37,9 +37,15 @@ const notificationsThunks = {
 
       if (params && params.id) {
         passedParams.id = params.id
+      } else if (params && params.max_id) {
+        passedParams.max_id = params.max_id
       } else {
-        passedParams.max_id = params && params.max_id ? params.max_id : getState().api.notifications.prev.min_id
+        const lastNotification = getState().api.notifications.prev
+        if (lastNotification) {
+          passedParams.max_id = lastNotification.min_id
+        }
       }
+      if (!passedParams.id && !passedParams.max_id) return getState()
       await notificationsApi.read({ config: getConfig(getState, config), params: passedParams })
         .then(res => apiErrorCatcher(res))
 
