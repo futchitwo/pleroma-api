@@ -10,3 +10,12 @@ export const emojify = (html, emojis) => {
   }
   return replaced
 }
+
+export const emojifyAccount = (account, oldAccount) => {
+  if (!account) return null
+
+  account.display_name = emojify(
+    account.display_name || (oldAccount ? oldAccount.display_name : ''),
+    account.emojis || (oldAccount ? oldAccount.emojis : []))
+  return account
+}
