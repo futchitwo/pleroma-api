@@ -2,7 +2,7 @@ import reduce from 'lodash/reduce'
 import map from 'lodash/map'
 import slice from 'lodash/slice'
 import forEach from 'lodash/forEach'
-import { emojify } from '../utils/parse_utils'
+import { emojify, emojifyAccount } from '../utils/parse_utils'
 import { addStatusIds } from '../utils/status_utils'
 
 const initialState = {
@@ -20,8 +20,18 @@ const addStatuses = (state, { statuses }) => {
   const newStatuses = reduce(statuses, (result, status) => {
     const oldStatus = state.statusesByIds[status.id] || {}
 
-    status.content = emojify(status.content || oldStatus.content, status.emojis || oldStatus.emojis)
-    status.spoiler_text = emojify(status.spoiler_text || oldStatus.spoiler_text, status.emojis || oldStatus.emojis)
+    if (status.account) {
+      status.account = emojifyAccount(status.account, oldStatus.account)
+    }
+    if (status.reblog) {
+      const { reblog } = status
+      const oldReblog = oldStatus.reblog
+      status.reblog.account = emojifyAccount(reblog.account, oldReblog ? oldReblog.account : null)
+    }
+    const emojis = status.reblog ? status.reblog.emojis : status.emojis
+    const oldEmojis = oldStatus.reblog ? oldStatus.reblog.emojis : oldStatus.emojis
+    status.content = emojify(status.content || oldStatus.content, emojis || oldEmojis)
+    status.spoiler_text = emojify(status.spoiler_text || oldStatus.spoiler_text, emojis || oldEmojis)
     result[status.id] = { ...oldStatus, ...status }
     return result
   }, {})
