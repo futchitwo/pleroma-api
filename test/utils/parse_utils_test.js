@@ -57,5 +57,27 @@ describe('ParseUtils', () => {
       expect(ParseUtils.emojifyAccount(account, old_account)).toEqual(expected)
     })
   })
+  describe('Emojify status', () => {
+    it('should return status with emojified content', () => {
+      const status = {
+        content: '<p>This is a test :marko:</p>',
+        emojis,
+        account: {
+          emojis,
+          display_name: '<p>This is a test :marko:</p>',
+        }
+      }
+      const res = "<p>This is a test <img draggable='false' class='custom-emoji' src='http://thesourceurl' alt='marko' title='marko' /></p>"
+      const expected = {
+        content: res,
+        emojis,
+        account: {
+          display_name: res,
+          emojis
+        }
+      }
+      expect(ParseUtils.emojifyStatus(status, {})).toEqual(expected)
+    })
+  })
   
 })

@@ -1,4 +1,5 @@
 import usersApi from '../api/users'
+import searchApi from '../api/search'
 import Users from '../reducers/users'
 import Statuses from '../reducers/statuses'
 import { apiErrorCatcher, getConfig } from '../utils/api_utils'
@@ -81,6 +82,21 @@ const usersThunks = {
 
       await dispatch(Users.actions.addUser({ user }))
       return getState()
+    }
+  },
+
+  searchUsers: ({ config, queries }) => {
+    return async (dispatch, getState) => {
+      const searchCache = getState().users.searchCache
+      if (searchCache.includes(queries.q)) {
+        dispatch(Users.actions.addSearchResult({ users: [], request: queries.q }))
+      } else {
+        const res = await searchApi({ config: getConfig(getState, config), queries })
+          .then(res => apiErrorCatcher(res))
+
+        dispatch(Users.actions.addSearchResult({ users: res.data.accounts, request: queries.q }))
+      }
+      return { q: queries.q, state: getState() }
     }
   }
 }
