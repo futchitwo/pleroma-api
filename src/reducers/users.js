@@ -1,10 +1,11 @@
-import reduce from 'lodash/reduce'
-import { emojify, emojifyAccount } from '../utils/parse_utils'
+import { reduce, uniq } from 'lodash'
+import { emojify, emojifyStatus } from '../utils/parse_utils'
 import { addStatuses } from '../utils/status_utils'
 
 const initialState = {
   usersByIds: {},
-  currentUser: false
+  currentUser: false,
+  searchCache: []
 }
 
 const addUsers = (state, { users }) => {
@@ -49,14 +50,10 @@ const addUserStatuses = (state, { userId, statuses }) => {
   const user = {
     ...oldUser,
     statuses: addStatuses(oldUser.statuses || [],
-      statuses ? statuses.map(status => {
-        status.account = emojifyAccount(status.account)
-        return {
-          ...status,
-          content: emojify(status.content, status.emojis),
-          spoiler_text: emojify(status.spoiler_text, status.emojis)
-        }
-      }) : [])
+      statuses ? statuses.map(status => ({
+        ...status,
+        ...emojifyStatus(status, {})
+      })) : [])
   }
   return {
     ...state,
@@ -83,13 +80,23 @@ const deleteUserStatus = (state, { userId, statusId }) => {
   }
 }
 
+const addSearchResult = (state, { request, users }) => {
+  const searchCache = uniq([request, ...state.searchCache])
+
+  return addUsers({
+    ...state,
+    searchCache: searchCache.splice(0, 10)
+  }, { users })
+}
+
 const reducers = {
   addUsers,
   addUser,
   setCurrentUser,
   updateCurrentUser,
   addUserStatuses,
-  deleteUserStatus
+  deleteUserStatus,
+  addSearchResult
 }
 
 const actions = {
@@ -127,6 +134,12 @@ const actions = {
     return {
       type: 'deleteUserStatus',
       payload: { userId, statusId }
+    }
+  },
+  addSearchResult: ({ request, users }) => {
+    return {
+      type: 'addSearchResult',
+      payload: { request, users }
     }
   }
 }

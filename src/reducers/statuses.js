@@ -2,8 +2,8 @@ import reduce from 'lodash/reduce'
 import map from 'lodash/map'
 import slice from 'lodash/slice'
 import forEach from 'lodash/forEach'
-import { emojify, emojifyAccount } from '../utils/parse_utils'
 import { addStatusIds } from '../utils/status_utils'
+import { emojifyStatus } from '../utils/parse_utils'
 
 const initialState = {
   statusesByIds: {},
@@ -19,20 +19,7 @@ const initialTimeline = {
 const addStatuses = (state, { statuses }) => {
   const newStatuses = reduce(statuses, (result, status) => {
     const oldStatus = state.statusesByIds[status.id] || {}
-
-    if (status.account) {
-      status.account = emojifyAccount(status.account, oldStatus.account)
-    }
-    if (status.reblog) {
-      const { reblog } = status
-      const oldReblog = oldStatus.reblog
-      status.reblog.account = emojifyAccount(reblog.account, oldReblog ? oldReblog.account : null)
-    }
-    const emojis = status.reblog ? status.reblog.emojis : status.emojis
-    const oldEmojis = oldStatus.reblog ? oldStatus.reblog.emojis : oldStatus.emojis
-    status.content = emojify(status.content || oldStatus.content, emojis || oldEmojis)
-    status.spoiler_text = emojify(status.spoiler_text || oldStatus.spoiler_text, emojis || oldEmojis)
-    result[status.id] = { ...oldStatus, ...status }
+    result[status.id] = { ...oldStatus, ...emojifyStatus(status, oldStatus) }
     return result
   }, {})
 

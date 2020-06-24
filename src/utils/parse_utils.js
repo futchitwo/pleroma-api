@@ -19,3 +19,20 @@ export const emojifyAccount = (account, oldAccount) => {
     account.emojis || (oldAccount ? oldAccount.emojis : []))
   return account
 }
+
+export const emojifyStatus = (status, oldStatus) => {
+  if (!status) return null
+  if (status.account) {
+    status.account = emojifyAccount(status.account, oldStatus.account)
+  }
+  if (status.reblog) {
+    const { reblog } = status
+    const oldReblog = oldStatus.reblog
+    status.reblog.account = emojifyAccount(reblog.account, oldReblog ? oldReblog.account : null)
+  }
+  const emojis = status.reblog ? status.reblog.emojis : status.emojis
+  const oldEmojis = oldStatus.reblog ? oldStatus.reblog.emojis : oldStatus.emojis
+  status.content = emojify(status.content || oldStatus.content, emojis || oldEmojis)
+  status.spoiler_text = emojify(status.spoiler_text || oldStatus.spoiler_text, emojis || oldEmojis)
+  return status
+}

@@ -134,4 +134,31 @@ describe('User reducers', () => {
       expect(resultState.usersByIds['1']).toEqual({ ...user, statuses: [{ id: 2, content: 'b' }] })
     })
   })
+  it('add search result', () => {
+    const user = { id: '1', name: 'a' }
+
+    const resultState = Users.reducer(
+      { usersByIds: {}, searchCache: ['1'] },
+      Users.actions.addSearchResult({ users: [user], request: 'a' })
+    )
+
+    expect(resultState.usersByIds['1']).toEqual(user)
+    expect(resultState.searchCache).toEqual(['a','1'])
+  })
+  it('push search result to overfilled cache', () => {
+    const resultState = Users.reducer(
+      { searchCache: ['0','1','2','3','4','5','6','7','8','9'] },
+      Users.actions.addSearchResult({ request: 'a' })
+    )
+
+    expect(resultState.searchCache).toEqual(['a','0','1','2','3','4','5','6','7','8'])
+  })
+  it('add the request which is already stored', () => {
+    const resultState = Users.reducer(
+      { searchCache: ['0','1','2','3','4','5','6','7','8','9'] },
+      Users.actions.addSearchResult({ request: '3' })
+    )
+
+    expect(resultState.searchCache).toEqual(['3','0','1','2','4','5','6','7','8','9'])
+  })
 })

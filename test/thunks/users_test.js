@@ -156,4 +156,33 @@ describe('Users thunks', () => {
     expect(state.users.usersByIds)
       .toEqual({ 1: expectedResult })
   })
+
+  it('search Users', async () => {
+    const store = { state: {
+      users: {
+        usersByIds: {},
+        searchCache: []
+      }
+    } }
+    const dispatch = (action) => {
+      store.state = reducer(store.state, action)
+    }
+    const getState = () => store.state
+    const account = {
+      acct: 'nd',
+      id: 1
+    }
+    fetch.mockReset()
+    fetch
+      .mockImplementationOnce(fetchMocker(
+        { accounts: [account] },
+        { expectedUrl: `https://pleroma.soykaf.com/api/v2/search?q=nd` }
+      ))
+    let res = await usersThunks.searchUsers({ config, queries: { q: 'nd' } })(dispatch, getState)
+
+    expect(res.state.users.usersByIds)
+      .toEqual({ 1: account })
+      expect(res.state.users.searchCache)
+      .toEqual(['nd'])
+  })
 })
