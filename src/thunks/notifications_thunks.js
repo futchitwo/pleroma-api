@@ -1,5 +1,6 @@
 import notificationsApi from '../api/notifications.js'
 import Notifications from '../reducers/notifications.js'
+import Users from '../reducers/users.js'
 import Api from '../reducers/api'
 import { apiErrorCatcher, getConfig } from '../utils/api_utils'
 
@@ -48,11 +49,17 @@ const notificationsThunks = {
       if (!passedParams.id && !passedParams.max_id) return getState()
       await notificationsApi.read({ config: getConfig(getState, config), params: passedParams })
         .then(res => apiErrorCatcher(res))
-
       if (passedParams.id) {
         await dispatch(Notifications.actions.read({ notificationId: passedParams.id }))
       } else {
         await dispatch(Notifications.actions.readAll())
+      }
+      const state = await getState()
+
+      if (state.users && state.users.currentUser) {
+        const oldUnreadNotificationsCount = state.users.currentUser.pleroma.unread_notifications_count
+        const unreadNotificationsCount = passedParams.id && oldUnreadNotificationsCount > 1 ? oldUnreadNotificationsCount - 1 : 0
+        await dispatch(Users.actions.updateUnreadNotificationsCount({ unreadNotificationsCount }))
       }
       return getState()
     }

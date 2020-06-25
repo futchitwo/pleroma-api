@@ -8,7 +8,8 @@ jest.mock('cross-fetch')
 
 const reducer = combineReducers({
   api: reducers.api.reducer,
-  notifications: reducers.notifications.reducer
+  notifications: reducers.notifications.reducer,
+  users: reducers.users.reducer,
 })
 
 describe('Notifications thunks', () => {
@@ -174,6 +175,14 @@ describe('Notifications thunks', () => {
           '2': { id: '2', pleroma: { is_seen: false } }
         },
         list: ['1', '2']
+      },
+      users: {
+        currentUser: {
+          id: '3',
+          pleroma: {
+            unread_notifications_count: 3
+          }
+        }
       }
     } }
 
@@ -196,6 +205,8 @@ describe('Notifications thunks', () => {
 
     expect(state.notifications.list)
       .toEqual(['1', '2'])
+    expect(state.users.currentUser.pleroma.unread_notifications_count)
+      .toEqual(2)
   })
 
   it('read all notification', async () => {
@@ -205,6 +216,12 @@ describe('Notifications thunks', () => {
           '1': { id: '1', pleroma: { is_seen: false } }
         },
         list: ['1']
+      },
+      users: {
+        currentUser: {
+          id: '2',
+          pleroma: { unread_notifications_count: 3 }
+        }
       }
     } }
 
@@ -225,5 +242,7 @@ describe('Notifications thunks', () => {
 
     expect(state.notifications.list)
       .toEqual(['1'])
+    expect(state.users.currentUser.pleroma.unread_notifications_count)
+      .toEqual(0)
   })
 })
