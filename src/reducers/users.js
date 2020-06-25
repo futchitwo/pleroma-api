@@ -80,6 +80,18 @@ const deleteUserStatus = (state, { userId, statusId }) => {
   }
 }
 
+const updateUnreadNotificationsCount = (state, { unreadNotificationsCount }) => {
+  return {
+    ...state,
+    currentUser: {
+      ...state.currentUser,
+      pleroma: {
+        ...state.currentUser.pleroma,
+        unread_notifications_count: unreadNotificationsCount
+      }
+    }
+  }
+}
 const addSearchResult = (state, { request, users }) => {
   const searchCache = uniq([request, ...state.searchCache])
 
@@ -96,6 +108,7 @@ const reducers = {
   updateCurrentUser,
   addUserStatuses,
   deleteUserStatus,
+  updateUnreadNotificationsCount,
   addSearchResult
 }
 
@@ -134,6 +147,12 @@ const actions = {
     return {
       type: 'deleteUserStatus',
       payload: { userId, statusId }
+    }
+  },
+  updateUnreadNotificationsCount: ({ unreadNotificationsCount }) => {
+    return {
+      type: 'updateUnreadNotificationsCount',
+      payload: { unreadNotificationsCount }
     }
   },
   addSearchResult: ({ request, users }) => {

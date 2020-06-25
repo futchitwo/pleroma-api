@@ -133,6 +133,16 @@ describe('User reducers', () => {
 
       expect(resultState.usersByIds['1']).toEqual({ ...user, statuses: [{ id: 2, content: 'b' }] })
     })
+    it('update unread notifications count', () => {
+      const currentUser = { id: '1', pleroma: { unread_notifications_count: 5 } }
+
+      const resultState = Users.reducer(
+        { currentUser },
+        Users.actions.updateUnreadNotificationsCount({ unreadNotificationsCount: 1 })
+      )
+
+      expect(resultState.currentUser).toEqual({ id: '1', pleroma: { unread_notifications_count: 1 } })
+    })
   })
   it('add search result', () => {
     const user = { id: '1', name: 'a' }
