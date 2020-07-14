@@ -56,4 +56,22 @@ describe('Configs api', () => {
       expect(res.data).toEqual({ hideUserStats: true, hidePostStats: false })
     })
   })
+  describe('/api/v1/custom_emojis', () => {
+    it('returns list of custom emoji', async () => {
+      const emojis = [
+        { "girlpower": {
+          "tags": [
+            "Finmoji"
+          ],
+          "image_url": "/finmoji/128px/girlpower-128.png"
+        } }
+      ]
+      fetch.mockImplementationOnce(fetchMocker(emojis, {
+        expectedUrl: 'https://pleroma.soykaf.com/api/v1/custom_emojis'
+      }))
+      const res = await api.configs.getCustomEmojis({ config })
+
+      expect(res.data).toEqual(emojis)
+    })
+  })
 })

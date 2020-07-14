@@ -5,11 +5,16 @@ const addConfig = (state, { config }) => ({
   ...state,
   ...config
 })
+const addEmojis = (state, { emojis }) => ({
+  ...state,
+  emojis
+})
 const clear = (state) => ({
   ...initialState
 })
 const reducers = {
   addConfig,
+  addEmojis,
   clear
 }
 
@@ -18,6 +23,12 @@ const actions = {
     return {
       type: 'addConfig',
       payload: { config }
+    }
+  },
+  addEmojis: ({ emojis }) => {
+    return {
+      type: 'addEmojis',
+      payload: { emojis }
     }
   },
   clear: () => {

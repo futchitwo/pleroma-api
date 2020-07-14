@@ -14,6 +14,14 @@ const configThunks = {
       await dispatch(Config.actions.addConfig({ config: { [appId]: Object.assign(result[0].data, result[1].data) } }))
       return getState()
     }
+  },
+  fetchCustomEmoji: ({ config }) => {
+    return async (dispatch, getState) => {
+      const result = await configsApi.getCustomEmojis({ config: getConfig(getState, config) })
+        .then(res => apiErrorCatcher(res))
+      await dispatch(Config.actions.addEmojis({ emojis: result.data }))
+      return getState()
+    }
   }
 }
 
