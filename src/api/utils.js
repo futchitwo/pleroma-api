@@ -1,7 +1,7 @@
 import fetch from 'cross-fetch'
 import parseLinkHeader from 'parse-link-header'
 
-const queryParams = (params) => {
+export const queryParams = (params) => {
   return Object.keys(params)
     .map(k => {
       const field = params[k]
