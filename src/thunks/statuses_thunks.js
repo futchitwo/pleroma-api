@@ -6,10 +6,9 @@ import Users from '../reducers/users.js'
 import Api from '../reducers/api.js'
 import Conversations from '../thunks/conversations_thunks'
 import { apiErrorCatcher, getConfig } from '../utils/api_utils'
-
-import map from 'lodash/map'
 import last from 'lodash/last'
 import has from 'lodash/has'
+import { getUsersFromStatusesList } from '../utils/users_utils.js'
 
 const fetchTimeline = async ({ type, config, queries, fullUrl }) => {
   if (fullUrl) {
@@ -71,8 +70,7 @@ const statusesThunks = {
       stopLoading(dispatch, timelineName, older)
 
       await dispatch(Statuses.actions.addStatusesToTimeline({ statuses: result.data, timelineName }))
-      const users = map(result.data, 'account')
-      await dispatch(Users.actions.addUsers({ users }))
+      await dispatch(Users.actions.addUsers({ users: getUsersFromStatusesList(result.data) }))
 
       if (result.links) {
         const timeline = getState().api.timelines[timelineName] || {}

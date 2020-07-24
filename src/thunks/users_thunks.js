@@ -4,6 +4,7 @@ import Users from '../reducers/users'
 import Statuses from '../reducers/statuses'
 import { apiErrorCatcher, getConfig } from '../utils/api_utils'
 import { updateLinks, startLoading, stopLoading } from './api_thunks'
+import { getUsersFromStatusesList } from '../utils/users_utils'
 
 const usersThunks = {
   fetchUser: ({ config, params }) => {
@@ -35,6 +36,8 @@ const usersThunks = {
       stopLoading({ dispatch, entity: 'userStatuses', older })
       await dispatch(Users.actions.addUserStatuses({ userId: params.id, statuses: result.data }))
       await dispatch(Statuses.actions.addStatuses({ statuses: result.data }))
+      await dispatch(Users.actions.addUsers({ users: getUsersFromStatusesList(result.data) }))
+
       if (result.links) {
         const statuses = getState().api.userStatuses
         await updateLinks({ dispatch, statuses, entity: 'userStatuses', links: result.links, older })
