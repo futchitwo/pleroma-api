@@ -1,6 +1,6 @@
 import configsApi from '../api/configs'
 import Config from '../reducers/config'
-import { apiErrorCatcher, getConfig } from '../utils/api_utils'
+import { getConfig, apiErrorCatcher } from '../utils/api_utils'
 
 const configThunks = {
   fetchConfig: ({ config, appId }) => {
@@ -10,8 +10,9 @@ const configThunks = {
         configsApi.getConfig({ config: computedConfig }),
         configsApi.getStatusnetConfig({ config: computedConfig })
       ])
-        .then(res => apiErrorCatcher(res))
-      await dispatch(Config.actions.addConfig({ config: { [appId]: Object.assign(result[0].data, result[1].data) } }))
+      await dispatch(Config.actions.addConfig({ config: {
+        [appId]: result.reduce((acc, curr) => curr.state === 'ok' ? Object.assign(acc, curr.data) : acc, {})
+      } }))
       return getState()
     }
   },
