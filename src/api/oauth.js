@@ -68,8 +68,7 @@ const resetPassword = async ({ config, queries }) => {
   return utils.request({
     method: 'POST',
     config,
-    url: `/auth/password?${queryParams(queries)}`,
-    body: '{}'
+    url: `/auth/password?${queryParams(queries)}`
   })
 }
 

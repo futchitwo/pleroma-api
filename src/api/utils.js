@@ -42,16 +42,23 @@ const request = async ({ method = 'GET', url, params, queries, config, fullUrl =
       body
     })
 
+    let parsedResult = null
+    try {
+      parsedResult = await result.json()
+    } catch (e) {
+      parsedResult = result
+    }
+
     if (result.ok) {
       return {
         state: 'ok',
-        data: await result.json(),
+        data: parsedResult,
         links: parseLinkHeader(result.headers.get('link'))
       }
     } else {
       return {
         state: 'error',
-        data: await result.json()
+        data: parsedResult
       }
     }
   } catch (e) {
