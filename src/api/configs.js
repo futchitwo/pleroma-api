@@ -33,6 +33,12 @@ const Configs = {
       config,
       url: '/api/statusnet/config.json'
     })
+  },
+  async getCustomEmojis ({ config }) {
+    return utils.request({
+      config,
+      url: `/api/v1/custom_emojis`
+    })
   }
 }
 
