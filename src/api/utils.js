@@ -1,7 +1,7 @@
 import fetch from 'cross-fetch'
 import parseLinkHeader from 'parse-link-header'
 
-const queryParams = (params) => {
+export const queryParams = (params) => {
   return Object.keys(params)
     .map(k => {
       const field = params[k]
@@ -42,16 +42,23 @@ const request = async ({ method = 'GET', url, params, queries, config, fullUrl =
       body
     })
 
+    let parsedResult = null
+    try {
+      parsedResult = await result.json()
+    } catch (e) {
+      parsedResult = result
+    }
+
     if (result.ok) {
       return {
         state: 'ok',
-        data: await result.json(),
+        data: parsedResult,
         links: parseLinkHeader(result.headers.get('link'))
       }
     } else {
       return {
         state: 'error',
-        data: await result.json()
+        data: parsedResult
       }
     }
   } catch (e) {

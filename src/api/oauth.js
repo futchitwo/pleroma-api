@@ -1,4 +1,4 @@
-import utils from './utils.js'
+import utils, { queryParams } from './utils.js'
 
 const createApp = async ({ config, params = {} }) => {
   const defaults = {
@@ -64,10 +64,19 @@ const getTokenWithPassword = async ({ config, params }) => {
   })
 }
 
+const resetPassword = async ({ config, queries }) => {
+  return utils.request({
+    method: 'POST',
+    config,
+    url: `/auth/password?${queryParams(queries)}`
+  })
+}
+
 const oauth = {
   createApp,
   getTokenWithCode,
-  getTokenWithPassword
+  getTokenWithPassword,
+  resetPassword
 }
 
 export default oauth
