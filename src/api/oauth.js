@@ -72,11 +72,33 @@ const resetPassword = async ({ config, queries }) => {
   })
 }
 
+const changePassword = async ({ config, params }) => utils.request({
+  method: 'POST',
+  config,
+  url: `api/pleroma/change_password`,
+  body: JSON.stringify(params),
+  headers: {
+    'Content-Type': 'application/json'
+  }
+})
+
+const changeEmail = async ({ config, params }) => utils.request({
+  method: 'POST',
+  config,
+  url: `/api/pleroma/change_email`,
+  body: JSON.stringify(params),
+  headers: {
+    'Content-Type': 'application/json'
+  }
+})
+
 const oauth = {
   createApp,
   getTokenWithCode,
   getTokenWithPassword,
-  resetPassword
+  resetPassword,
+  changePassword,
+  changeEmail
 }
 
 export default oauth
