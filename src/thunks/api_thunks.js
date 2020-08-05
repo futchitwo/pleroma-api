@@ -1,4 +1,5 @@
 import statusesThunks from './statuses_thunks.js'
+import searchApi from '../api/search'
 import Api from '../reducers/api.js'
 import thunks from '../thunks.js'
 import usersThunks from './users_thunks.js'
@@ -7,6 +8,8 @@ import pollsThunks from './polls_thunks.js'
 import conversationsThunks from './conversations_thunks.js'
 import { ENTITIES } from './api_thunks_entities_config'
 import tagsThunks from './tags_thunks.js'
+import { apiErrorCatcher, getConfig } from '../utils/api_utils'
+import reducers from '../reducers'
 
 const makeTimelineFetcher = ({ dispatch, getState, timelineName, type, queries }) => {
   const fetch = () => {
@@ -239,6 +242,27 @@ const generateApiThunks = () => {
         })
 
         return getState()
+      }
+    },
+    search: ({ config, queries, options }) => {
+      return async (dispatch, getState) => {
+        const searchCache = getState().api.searchCache
+
+        if (searchCache.includes(queries.q) && options && options.muteRequest) {
+          await dispatch(Api.actions.addSearchCache({ request: queries.q }))
+          return { q: queries.q, state: getState() }
+        } else {
+          const result = await searchApi({ config: getConfig(getState, config), queries })
+            .then(res => apiErrorCatcher(res))
+          const dispatchedActions = [Api.actions.addSearchCache({ request: result.search })]
+
+          if (result.data) {
+            dispatchedActions.push(reducers.users.actions.addUsers({ users: result.data.accounts }))
+            dispatchedActions.push(reducers.statuses.actions.addStatuses({ statuses: result.data.statuses }))
+          }
+          await Promise.all(dispatchedActions.map(action => dispatch(action)))
+          return { q: queries.q, results: result.data, state: getState() }
+        }
       }
     }
   }
