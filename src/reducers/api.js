@@ -1,3 +1,5 @@
+import { uniq, remove } from 'lodash'
+
 const emptyTimeline = () => ({
   loadingOlder: false
 })
@@ -14,7 +16,8 @@ const initialState = {
   userStatuses: {},
   conversation: {},
   tagTimeline: {},
-  polls: {}
+  polls: {},
+  searchCache: []
 }
 
 const setProperty = ({ state, timelineName, entity, key, value }) => {
@@ -73,46 +76,59 @@ const reducers = {
         ...config
       }
     }
+  },
+  addSearchCache: (state, { request }) => {
+    const searchCache = uniq([request, ...state.searchCache]).filter(i => i.length)
+
+    return {
+      ...state,
+      searchCache: searchCache.splice(0, 10)
+    }
+  },
+  removeItemFromSearchCache: (state, { request }) => {
+    const searchCache = [...state.searchCache]
+
+    remove(searchCache, (item) => item === request)
+    return {
+      ...state,
+      searchCache
+    }
   }
 }
 
 const actions = {
-  addConfig: ({ config }) => {
-    return {
-      type: 'addConfig',
-      payload: { config }
-    }
-  },
-  setFetcher: ({ timelineName, entity, fetcher }) => {
-    return {
-      type: 'setFetcher',
-      payload: { timelineName, entity, fetcher }
-    }
-  },
-  setPollFetcher: ({ params, fetcher }) => {
-    return {
-      type: 'setPollFetcher',
-      payload: { fetcher, params }
-    }
-  },
-  setPrev: ({ timelineName, entity, prev }) => {
-    return {
-      type: 'setPrev',
-      payload: { timelineName, entity, prev }
-    }
-  },
-  setNext: ({ timelineName, entity, next }) => {
-    return {
-      type: 'setNext',
-      payload: { timelineName, entity, next }
-    }
-  },
-  setLoadingOlder: ({ entity, timelineName, loading }) => {
-    return {
-      type: 'setLoadingOlder',
-      payload: { entity, timelineName, loading }
-    }
-  }
+  addConfig: ({ config }) => ({
+    type: 'addConfig',
+    payload: { config }
+  }),
+  setFetcher: ({ timelineName, entity, fetcher }) => ({
+    type: 'setFetcher',
+    payload: { timelineName, entity, fetcher }
+  }),
+  setPollFetcher: ({ params, fetcher }) => ({
+    type: 'setPollFetcher',
+    payload: { fetcher, params }
+  }),
+  setPrev: ({ timelineName, entity, prev }) => ({
+    type: 'setPrev',
+    payload: { timelineName, entity, prev }
+  }),
+  setNext: ({ timelineName, entity, next }) => ({
+    type: 'setNext',
+    payload: { timelineName, entity, next }
+  }),
+  setLoadingOlder: ({ entity, timelineName, loading }) => ({
+    type: 'setLoadingOlder',
+    payload: { entity, timelineName, loading }
+  }),
+  addSearchCache: ({ request }) => ({
+    type: 'addSearchCache',
+    payload: { request }
+  }),
+  removeItemFromSearchCache: ({ request }) => ({
+    type: 'removeItemFromSearchCache',
+    payload: { request }
+  })
 }
 
 const reducer = (state = initialState, action) => {

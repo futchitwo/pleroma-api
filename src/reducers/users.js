@@ -1,11 +1,10 @@
-import { reduce, uniq } from 'lodash'
+import { reduce } from 'lodash'
 import { emojify, emojifyStatus } from '../utils/parse_utils'
 import { addStatuses } from '../utils/status_utils'
 
 const initialState = {
   usersByIds: {},
-  currentUser: false,
-  searchCache: []
+  currentUser: false
 }
 
 const addUsers = (state, { users }) => {
@@ -92,14 +91,6 @@ const updateUnreadNotificationsCount = (state, { unreadNotificationsCount }) => 
     }
   }
 }
-const addSearchResult = (state, { request, users }) => {
-  const searchCache = uniq([request, ...state.searchCache])
-
-  return addUsers({
-    ...state,
-    searchCache: searchCache.splice(0, 10)
-  }, { users })
-}
 
 const reducers = {
   addUsers,
@@ -108,8 +99,7 @@ const reducers = {
   updateCurrentUser,
   addUserStatuses,
   deleteUserStatus,
-  updateUnreadNotificationsCount,
-  addSearchResult
+  updateUnreadNotificationsCount
 }
 
 const actions = {
@@ -153,12 +143,6 @@ const actions = {
     return {
       type: 'updateUnreadNotificationsCount',
       payload: { unreadNotificationsCount }
-    }
-  },
-  addSearchResult: ({ request, users }) => {
-    return {
-      type: 'addSearchResult',
-      payload: { request, users }
     }
   }
 }

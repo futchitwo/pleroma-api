@@ -105,5 +105,47 @@ describe('Api reducer', () => {
         accessToken: 'token'
       })
     })
+  }),
+  describe('search cache', () => {
+    it('add search result', () => {
+      const resultState = Api.reducer(
+        { searchCache: ['1'] },
+        Api.actions.addSearchCache({ request: 'a' })
+      )
+
+      expect(resultState.searchCache).toEqual(['a','1'])
+    })
+    it('push search result to overfilled cache', () => {
+      const resultState = Api.reducer(
+        { searchCache: ['0','1','2','3','4','5','6','7','8','9'] },
+        Api.actions.addSearchCache({ request: 'a' })
+      )
+
+      expect(resultState.searchCache).toEqual(['a','0','1','2','3','4','5','6','7','8'])
+    })
+    it('add the request which is already stored', () => {
+      const resultState = Api.reducer(
+        { searchCache: ['0','1','2','3','4','5','6','7','8','9'] },
+        Api.actions.addSearchCache({ request: '3' })
+      )
+
+      expect(resultState.searchCache).toEqual(['3','0','1','2','4','5','6','7','8','9'])
+    }),
+    it('try to save empty value', () => {
+      const resultState = Api.reducer(
+        { searchCache: ['0'] },
+        Api.actions.addSearchCache({ request: '' })
+      )
+
+      expect(resultState.searchCache).toEqual(['0'])
+    }),
+    it('remove item from cache', () => {
+      const resultState = Api.reducer(
+        { searchCache: ['0','1','2','3'] },
+        Api.actions.removeItemFromSearchCache({ request: '2' })
+      )
+
+      expect(resultState.searchCache).toEqual(['0', '1', '3'])
+    })
   })
 })
