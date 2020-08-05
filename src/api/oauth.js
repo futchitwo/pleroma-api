@@ -72,11 +72,22 @@ const resetPassword = async ({ config, queries }) => {
   })
 }
 
+const revokeToken = async ({ config, params }) => utils.request({
+  url: `/oauth/revoke`,
+  method: 'POST',
+  config,
+  body: JSON.stringify(params),
+  headers: {
+    'Content-Type': 'application/json'
+  }
+})
+
 const oauth = {
   createApp,
   getTokenWithCode,
   getTokenWithPassword,
-  resetPassword
+  resetPassword,
+  revokeToken
 }
 
 export default oauth
