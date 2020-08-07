@@ -72,6 +72,26 @@ const resetPassword = async ({ config, queries }) => {
   })
 }
 
+const changePassword = async ({ config, params }) => utils.request({
+  method: 'POST',
+  config,
+  url: `api/pleroma/change_password`,
+  body: JSON.stringify(params),
+  headers: {
+    'Content-Type': 'application/json'
+  }
+})
+
+const changeEmail = async ({ config, params }) => utils.request({
+  method: 'POST',
+  config,
+  url: `/api/pleroma/change_email`,
+  body: JSON.stringify(params),
+  headers: {
+    'Content-Type': 'application/json'
+  }
+})
+
 const revokeToken = async ({ config, params }) => utils.request({
   url: `/oauth/revoke`,
   method: 'POST',
@@ -87,6 +107,8 @@ const oauth = {
   getTokenWithCode,
   getTokenWithPassword,
   resetPassword,
+  changePassword,
+  changeEmail,
   revokeToken
 }
 
