@@ -126,7 +126,7 @@ describe('Users thunks', () => {
         { following: true },
         { expectedUrl: `https://pleroma.soykaf.com/api/v1/accounts/1/follow` }
       ))
-    let state = await usersThunks.toggleFollowState({ config, params: { id: '1', following: false } })(dispatch, getState)
+    let { state } = await usersThunks.toggleFollowState({ config, params: { id: '1', following: false } })(dispatch, getState)
 
     const expectedResult = {
       id: '1',
