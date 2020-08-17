@@ -92,13 +92,24 @@ const changeEmail = async ({ config, params }) => utils.request({
   }
 })
 
+const revokeToken = async ({ config, params }) => utils.request({
+  url: `/oauth/revoke`,
+  method: 'POST',
+  config,
+  body: JSON.stringify(params),
+  headers: {
+    'Content-Type': 'application/json'
+  }
+})
+
 const oauth = {
   createApp,
   getTokenWithCode,
   getTokenWithPassword,
   resetPassword,
   changePassword,
-  changeEmail
+  changeEmail,
+  revokeToken
 }
 
 export default oauth
