@@ -158,6 +158,39 @@ const generateApiThunks = () => {
         }))
       }
     },
+
+    loadOlderUserFollowers: ({ params, queries }) => {
+      return async (dispatch, getState) => {
+        const userFollowers = getState().api.userFollowers || {}
+        const config = getState().api.config
+        const fullUrl = (userFollowers.next || {}).url
+
+        return dispatch(usersThunks.fetchUserFollowers({
+          older: true,
+          config,
+          fullUrl,
+          queries,
+          params
+        }))
+      }
+    },
+
+    loadOlderUserFollowing: ({ params, queries }) => {
+      return async (dispatch, getState) => {
+        const userFollowing = getState().api.userFollowing || {}
+        const config = getState().api.config
+        const fullUrl = (userFollowing.next || {}).url
+
+        return dispatch(usersThunks.fetchUserFollowing({
+          older: true,
+          config,
+          fullUrl,
+          queries,
+          params
+        }))
+      }
+    },
+
     startFetchingPoll: ({ params }) => {
       return async (dispatch, getState) => {
         const polls = getState().api.polls || {}
@@ -301,4 +334,10 @@ const generateApiThunks = () => {
   })
   return apiThunks
 }
-export default generateApiThunks()
+export default {
+  ...generateApiThunks(),
+  updateLinks,
+  clearLinks,
+  startLoading,
+  stopLoading
+}
