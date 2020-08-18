@@ -1,6 +1,7 @@
 import { reduce } from 'lodash'
 import { emojify, emojifyStatus } from '../utils/parse_utils'
 import { addStatuses } from '../utils/status_utils'
+import { addIdsToList } from '../utils/common_utils'
 
 const initialState = {
   usersByIds: {},
@@ -63,6 +64,40 @@ const addUserStatuses = (state, { userId, statuses }) => {
   }
 }
 
+const addUserFollowers = (state, { userId, followers }) => {
+  const oldUser = state.usersByIds[userId] || {}
+  const user = {
+    ...oldUser,
+    followers: addIdsToList(oldUser.followers || [],
+      followers ? followers.map(account => account.id) : [])
+  }
+
+  return {
+    ...state,
+    usersByIds: {
+      ...state.usersByIds,
+      [userId]: user
+    }
+  }
+}
+
+const addUserFollowing = (state, { userId, following }) => {
+  const oldUser = state.usersByIds[userId] || {}
+  const user = {
+    ...oldUser,
+    following: addIdsToList(oldUser.following || [],
+      following ? following.map(account => account.id) : [])
+  }
+
+  return {
+    ...state,
+    usersByIds: {
+      ...state.usersByIds,
+      [userId]: user
+    }
+  }
+}
+
 const deleteUserStatus = (state, { userId, statusId }) => {
   const oldUser = state.usersByIds[userId] || {}
   const user = {
@@ -98,6 +133,8 @@ const reducers = {
   setCurrentUser,
   updateCurrentUser,
   addUserStatuses,
+  addUserFollowers,
+  addUserFollowing,
   deleteUserStatus,
   updateUnreadNotificationsCount
 }
@@ -131,6 +168,18 @@ const actions = {
     return {
       type: 'addUserStatuses',
       payload: { userId, statuses }
+    }
+  },
+  addUserFollowers: ({ userId, followers }) => {
+    return {
+      type: 'addUserFollowers',
+      payload: { userId, followers }
+    }
+  },
+  addUserFollowing: ({ userId, following }) => {
+    return {
+      type: 'addUserFollowing',
+      payload: { userId, following }
     }
   },
   deleteUserStatus: ({ userId, statusId }) => {
