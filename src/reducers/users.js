@@ -64,12 +64,12 @@ const addUserStatuses = (state, { userId, statuses }) => {
   }
 }
 
-const addUserFollowers = (state, { userId, followers }) => {
+const addUserList = (state, { userId, listName, items }) => {
   const oldUser = state.usersByIds[userId] || {}
   const user = {
     ...oldUser,
-    followers: addIdsToList(oldUser.followers || [],
-      followers ? followers.map(account => account.id) : [])
+    [listName]: addIdsToList(oldUser[listName] || [],
+      items ? items.map(account => account.id) : [])
   }
 
   return {
@@ -81,21 +81,12 @@ const addUserFollowers = (state, { userId, followers }) => {
   }
 }
 
-const addUserFollowing = (state, { userId, following }) => {
-  const oldUser = state.usersByIds[userId] || {}
-  const user = {
-    ...oldUser,
-    following: addIdsToList(oldUser.following || [],
-      following ? following.map(account => account.id) : [])
-  }
+const addUserFollowers = (state, { userId, followers }) => {
+  return addUserList(state, { userId, listName: 'followers', items: followers })
+}
 
-  return {
-    ...state,
-    usersByIds: {
-      ...state.usersByIds,
-      [userId]: user
-    }
-  }
+const addUserFollowing = (state, { userId, following }) => {
+  return addUserList(state, { userId, listName: 'following', items: following })
 }
 
 const deleteUserStatus = (state, { userId, statusId }) => {

@@ -6,7 +6,7 @@ import usersThunks from './users_thunks.js'
 import has from 'lodash/has'
 import pollsThunks from './polls_thunks.js'
 import conversationsThunks from './conversations_thunks.js'
-import { ENTITIES } from './api_thunks_entities_config'
+import { ENTITIES, LOAD_OLDER_USER_FIELDS_CONFIG } from './api_thunks_entities_config'
 import tagsThunks from './tags_thunks.js'
 import { apiErrorCatcher, getConfig } from '../utils/api_utils'
 import reducers from '../reducers'
@@ -159,29 +159,16 @@ const generateApiThunks = () => {
       }
     },
 
-    loadOlderUserFollowers: ({ params, queries }) => {
+    loadOlderUserList: ({ params, queries, entity }) => {
+      const loadOlderEntityConfig = LOAD_OLDER_USER_FIELDS_CONFIG[entity]
+
+      if (!entity || !loadOlderEntityConfig) return
       return async (dispatch, getState) => {
-        const userFollowers = getState().api.userFollowers || {}
+        const items = getState().api[loadOlderEntityConfig.reducerField] || {}
         const config = getState().api.config
-        const fullUrl = (userFollowers.next || {}).url
+        const fullUrl = (items.next || {}).url
 
-        return dispatch(usersThunks.fetchUserFollowers({
-          older: true,
-          config,
-          fullUrl,
-          queries,
-          params
-        }))
-      }
-    },
-
-    loadOlderUserFollowing: ({ params, queries }) => {
-      return async (dispatch, getState) => {
-        const userFollowing = getState().api.userFollowing || {}
-        const config = getState().api.config
-        const fullUrl = (userFollowing.next || {}).url
-
-        return dispatch(usersThunks.fetchUserFollowing({
+        return dispatch(usersThunks[loadOlderEntityConfig.thunk]({
           older: true,
           config,
           fullUrl,
