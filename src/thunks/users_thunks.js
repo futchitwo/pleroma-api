@@ -28,7 +28,7 @@ const usersThunks = {
       if (older && !fullUrl && (!queries || !queries['max_id'])) {
         const userStatuses = (getState().users.usersByIds[params.id] || {}).statuses || []
         queries = queries || {}
-        queries['max_id'] = userStatuses[userStatuses.length - 1].id
+        queries['max_id'] = userStatuses.length ? userStatuses[userStatuses.length - 1].id : null
       }
       startLoading({ dispatch, entity: 'userStatuses', older })
       const result = await usersApi.statuses({ config: getConfig(getState, config), fullUrl, params, queries })
@@ -51,7 +51,7 @@ const usersThunks = {
       if (older && !fullUrl && (!queries || !queries['max_id'])) {
         const userFollowers = (getState().users.usersByIds[params.id] || {}).followers || []
         queries = queries || {}
-        queries['max_id'] = userFollowers[userFollowers.length - 1].id
+        queries['max_id'] = userFollowers.length ? userFollowers[userFollowers.length - 1].id : null
       }
       startLoading({ dispatch, entity: 'userFollowers', older })
       const result = await usersApi.followers({ config: getConfig(getState, config), fullUrl, params, queries })
@@ -79,7 +79,7 @@ const usersThunks = {
       if (older && !fullUrl && (!queries || !queries['max_id'])) {
         const userFollowing = (getState().users.usersByIds[params.id] || {}).following || []
         queries = queries || {}
-        queries['max_id'] = userFollowing[userFollowing.length - 1].id
+        queries['max_id'] = userFollowing.length ? userFollowing[userFollowing.length - 1].id : null
       }
       startLoading({ dispatch, entity: 'userFollowing', older })
       const result = await usersApi.following({ config: getConfig(getState, config), fullUrl, params, queries })
