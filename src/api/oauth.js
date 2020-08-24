@@ -75,7 +75,7 @@ const resetPassword = async ({ config, queries }) => {
 const changePassword = async ({ config, params }) => utils.request({
   method: 'POST',
   config,
-  url: `api/pleroma/change_password`,
+  url: `/api/pleroma/change_password`,
   body: JSON.stringify(params),
   headers: {
     'Content-Type': 'application/json'
