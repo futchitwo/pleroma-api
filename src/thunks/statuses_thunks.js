@@ -138,10 +138,27 @@ const statusesThunks = {
   getStatusWithContext: ({ config, params }) => {
     return async (dispatch, getState) => {
       const result = await Promise.all([
-        statusesApi.get({ config, params }),
-        statusesApi.context({ config, params })
+        statusesApi.get({ config: getConfig(getState, config), params }),
+        statusesApi.context({ config: getConfig(getState, config), params })
       ]).then(res => apiErrorCatcher(res))
       const status = { ...result[0].data, context: { ...result[1].data } }
+
+      await dispatch(Statuses.actions.addStatus({ status }))
+      return getState()
+    }
+  },
+
+  getStatusLists: ({ config, params }) => {
+    return async (dispatch, getState) => {
+      const result = await Promise.all([
+        statusesApi.favouritedBy({ config: getConfig(getState, config), params }),
+        statusesApi.rebloggedBy({ config: getConfig(getState, config), params })
+      ]).then(res => apiErrorCatcher(res))
+      const status = {
+        id: params.id,
+        favourited_by: result[0].data,
+        reblogged_by: result[1].data
+      }
 
       await dispatch(Statuses.actions.addStatus({ status }))
       return getState()

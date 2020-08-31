@@ -58,6 +58,18 @@ const Statuses = {
       url: `${STATUSES_URL}/${id}/unmute`
     })
   },
+  async favouritedBy ({ config, params: { id } }) {
+    return utils.request({
+      config,
+      url: `${STATUSES_URL}/${id}/favourited_by`
+    })
+  },
+  async rebloggedBy ({ config, params: { id } }) {
+    return utils.request({
+      config,
+      url: `${STATUSES_URL}/${id}/reblogged_by`
+    })
+  },
   async post ({ config, params }) {
     const body = createFormData(params)
 
