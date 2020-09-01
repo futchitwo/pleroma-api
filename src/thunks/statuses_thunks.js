@@ -159,6 +159,12 @@ const statusesThunks = {
         favourited_by: result[0].data,
         reblogged_by: result[1].data
       }
+      if (result[0].data.length) {
+        status.favourites_count = result[0].data.length
+      }
+      if (result[1].data.length) {
+        status.reblogs_count = result[1].data.length
+      }
 
       await dispatch(Statuses.actions.addStatus({ status }))
       return getState()
