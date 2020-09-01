@@ -14,6 +14,8 @@ const initialState = {
   notifications: {},
   conversations: {},
   userStatuses: {},
+  userFollowers: {},
+  userFollowing: {},
   conversation: {},
   tagTimeline: {},
   polls: {},

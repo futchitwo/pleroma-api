@@ -2,8 +2,8 @@ import reduce from 'lodash/reduce'
 import map from 'lodash/map'
 import slice from 'lodash/slice'
 import forEach from 'lodash/forEach'
-import { addStatusIds } from '../utils/status_utils'
 import { emojifyStatus } from '../utils/parse_utils'
+import { addIdsToList } from '../utils/common_utils'
 
 const initialState = {
   statusesByIds: {},
@@ -40,7 +40,7 @@ const addStatusIdsToTimeline = (state, { statusIds, timelineName }) => {
   let timeline = state.timelines[timelineName] || { ...initialTimeline }
   timeline = {
     ...timeline,
-    statusIds: addStatusIds(timeline.statusIds, statusIds)
+    statusIds: addIdsToList(timeline.statusIds, statusIds)
   }
   return {
     ...state,
@@ -89,7 +89,7 @@ const addTagTimeline = (state, { statuses }) => {
 
   return {
     ...newState,
-    tag: addStatusIds(timeline, map(statuses, 'id'))
+    tag: addIdsToList(timeline, map(statuses, 'id'))
   }
 }
 
