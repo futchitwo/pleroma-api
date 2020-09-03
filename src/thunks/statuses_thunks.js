@@ -165,8 +165,12 @@ const statusesThunks = {
       if (result[1].data.length) {
         status.reblogs_count = result[1].data.length
       }
+      if (params.userId) {
+        await dispatch(Users.actions.updateUserStatus({ status, userId: params.userId }))
+      } else {
+        await dispatch(Statuses.actions.addStatus({ status }))
+      }
 
-      await dispatch(Statuses.actions.addStatus({ status }))
       return getState()
     }
   },
