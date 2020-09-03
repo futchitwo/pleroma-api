@@ -23,6 +23,34 @@ const Users = {
       queries
     })
   },
+  async followers ({ config, fullUrl, params, queries }) {
+    if (fullUrl) {
+      return utils.request({
+        config,
+        params,
+        fullUrl
+      })
+    }
+    return utils.request({
+      config,
+      url: `${ACCOUNTS_URL}/${params.id}/followers`,
+      queries
+    })
+  },
+  async following ({ config, fullUrl, params, queries }) {
+    if (fullUrl) {
+      return utils.request({
+        config,
+        params,
+        fullUrl
+      })
+    }
+    return utils.request({
+      config,
+      url: `${ACCOUNTS_URL}/${params.id}/following`,
+      queries
+    })
+  },
   async register ({ config, params }) {
     return utils.request({
       config,

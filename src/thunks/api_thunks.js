@@ -6,7 +6,7 @@ import usersThunks from './users_thunks.js'
 import has from 'lodash/has'
 import pollsThunks from './polls_thunks.js'
 import conversationsThunks from './conversations_thunks.js'
-import { ENTITIES } from './api_thunks_entities_config'
+import { ENTITIES, LOAD_OLDER_USER_FIELDS_CONFIG } from './api_thunks_entities_config'
 import tagsThunks from './tags_thunks.js'
 import { apiErrorCatcher, getConfig } from '../utils/api_utils'
 import reducers from '../reducers'
@@ -158,6 +158,26 @@ const generateApiThunks = () => {
         }))
       }
     },
+
+    loadOlderUserList: ({ params, queries, entity }) => {
+      const loadOlderEntityConfig = LOAD_OLDER_USER_FIELDS_CONFIG[entity]
+
+      if (!entity || !loadOlderEntityConfig) return
+      return async (dispatch, getState) => {
+        const items = getState().api[loadOlderEntityConfig.reducerField] || {}
+        const config = getState().api.config
+        const fullUrl = (items.next || {}).url
+
+        return dispatch(usersThunks[loadOlderEntityConfig.thunk]({
+          older: true,
+          config,
+          fullUrl,
+          queries,
+          params
+        }))
+      }
+    },
+
     startFetchingPoll: ({ params }) => {
       return async (dispatch, getState) => {
         const polls = getState().api.polls || {}
@@ -301,4 +321,10 @@ const generateApiThunks = () => {
   })
   return apiThunks
 }
-export default generateApiThunks()
+export default {
+  ...generateApiThunks(),
+  updateLinks,
+  clearLinks,
+  startLoading,
+  stopLoading
+}

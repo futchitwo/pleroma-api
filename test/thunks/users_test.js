@@ -104,6 +104,64 @@ describe('Users thunks', () => {
       .toEqual(expectedResult)
   })
 
+  it(`fetch user's followers`, async () => {
+    const store = { state: undefined }
+    const dispatch = (action) => {
+      store.state = reducer(store.state, action)
+    }
+    const getState = () => store.state
+    const followers = [
+      { id: 1, acct: 'user1' },
+      { id: 0, acct: 'user2' },
+    ]
+
+    fetch.mockReset()
+    fetch
+      .mockImplementationOnce(fetchMocker(
+        followers,
+        { expectedUrl: `https://pleroma.soykaf.com/api/v1/accounts/2/followers` }
+      ))
+    let state = await usersThunks.fetchUserFollowers({ config, params: { id: '2' } })(dispatch, getState)
+
+    const expectedResult = {
+      '0': { id: 0, acct: 'user2', display_name: undefined, note: undefined },
+      '1': { id: 1, acct: 'user1', display_name: undefined, note: undefined },
+      '2': { followers: [1, 0], display_name: undefined, note: undefined }
+    }
+
+    expect(state.users.usersByIds)
+      .toEqual(expectedResult)
+  })
+
+  it(`fetch user's following`, async () => {
+    const store = { state: undefined }
+    const dispatch = (action) => {
+      store.state = reducer(store.state, action)
+    }
+    const getState = () => store.state
+    const following = [
+      { id: 1, acct: 'user1' },
+      { id: 0, acct: 'user2' },
+    ]
+
+    fetch.mockReset()
+    fetch
+      .mockImplementationOnce(fetchMocker(
+        following,
+        { expectedUrl: `https://pleroma.soykaf.com/api/v1/accounts/2/following` }
+      ))
+    let state = await usersThunks.fetchUserFollowing({ config, params: { id: '2' } })(dispatch, getState)
+
+    const expectedResult = {
+      '0': { id: 0, acct: 'user2', display_name: undefined, note: undefined },
+      '1': { id: 1, acct: 'user1', display_name: undefined, note: undefined },
+      '2': { following: [1, 0], display_name: undefined, note: undefined }
+    }
+
+    expect(state.users.usersByIds)
+      .toEqual(expectedResult)
+  })
+
   it('follow user', async () => {
     const store = { state: {
       users: {
