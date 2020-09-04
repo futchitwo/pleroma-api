@@ -78,7 +78,10 @@ const updateUserStatus = (state, { userId, status }) => {
         ...emojifyStatus(status, {})
       }])
   } else {
-    newUser.statuses[statusIndex] = emojifyStatus(status, user.statuses[statusIndex])
+    newUser.statuses[statusIndex] = {
+      ...user.statuses[statusIndex],
+      ...emojifyStatus(status, user.statuses[statusIndex])
+    }
   }
   return {
     ...state,

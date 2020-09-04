@@ -554,7 +554,7 @@ describe('Status thunks', () => {
           id: '1',
           acct: 'nd',
           statuses: [
-            { id: '1', content: 'Status content', spoiler_text: '' }
+            { id: '1', content: 'Status content', spoiler_text: '', reblogged: false }
           ]
         }
       }}
@@ -589,6 +589,7 @@ describe('Status thunks', () => {
           id: '1',
           content: 'Status content',
           spoiler_text: '',
+          reblogged: false,
           favourited_by: favouritedByList,
           reblogged_by: rebloggedByList,
           reblogs_count: 2,

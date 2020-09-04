@@ -137,7 +137,7 @@ describe('User reducers', () => {
 
   describe(`update user status`, () => {
     it('should update user status', () => {
-      const status = { id: '2', content: 'content', spoiler_text: 'header' }
+      const status = { id: '2', content: 'content', spoiler_text: 'header', avatar: 'nd' }
       const user = {
         id: '1',
         statuses: [status]
