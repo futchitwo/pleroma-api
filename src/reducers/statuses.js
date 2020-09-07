@@ -20,6 +20,20 @@ const addStatuses = (state, { statuses }) => {
   const newStatuses = reduce(statuses, (result, status) => {
     const oldStatus = state.statusesByIds[status.id] || {}
     result[status.id] = { ...oldStatus, ...emojifyStatus(status, oldStatus) }
+    if (result[status.id].context) {
+      if (result[status.id].context.ancestors) {
+        result[status.id].context.ancestors = result[status.id].context.ancestors.map(item => ({
+          ...item,
+          ...emojifyStatus(item, {})
+        }))
+      }
+      if (result[status.id].context.descendants) {
+        result[status.id].context.descendants = result[status.id].context.descendants.map(item => ({
+          ...item,
+          ...emojifyStatus(item, {})
+        }))
+      }
+    }
     return result
   }, {})
 
