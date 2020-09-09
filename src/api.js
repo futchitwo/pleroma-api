@@ -8,6 +8,7 @@ import conversations from './api/conversations'
 import search from './api/search'
 import polls from './api/polls'
 import configs from './api/configs'
+import reactions from './api/reactions'
 
 export default {
   users,
@@ -19,5 +20,6 @@ export default {
   conversations,
   search,
   polls,
-  configs
+  configs,
+  reactions
 }
