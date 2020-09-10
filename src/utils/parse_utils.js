@@ -32,7 +32,10 @@ export const emojifyStatus = (status, oldStatus) => {
   }
   const emojis = status.reblog ? status.reblog.emojis : status.emojis
   const oldEmojis = oldStatus.reblog ? oldStatus.reblog.emojis : oldStatus.emojis
-  status.content = emojify(status.content || oldStatus.content, emojis || oldEmojis)
-  status.spoiler_text = emojify(status.spoiler_text || oldStatus.spoiler_text, emojis || oldEmojis)
+
+  if (emojis || oldEmojis) {
+    status.content = emojify(status.content || oldStatus.content, emojis || oldEmojis)
+    status.spoiler_text = emojify(status.spoiler_text || oldStatus.spoiler_text, emojis || oldEmojis)
+  }
   return status
 }

@@ -470,7 +470,10 @@ describe('Status thunks', () => {
       id: '1',
       content: 'Status content'
     }
-    const context = { ancestors: [], descendants: [] }
+    const context = {
+      ancestors: [{ id: '2', content: '', spoiler_text: '' }],
+      descendants: [{ id: '3', content: '', spoiler_text: '' }]
+    }
 
     fetch.mockReset()
     fetch
@@ -496,8 +499,8 @@ describe('Status thunks', () => {
       content: 'Status content',
       spoiler_text: undefined,
       context: {
-        ancestors: [],
-        descendants: []
+        ancestors: [{ id: '2', content: '', spoiler_text: '' }],
+        descendants: [{ id: '3', content: '', spoiler_text: '' }]
       }
     }
 
