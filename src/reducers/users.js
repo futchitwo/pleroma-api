@@ -1,4 +1,4 @@
-import { reduce } from 'lodash'
+import { reduce, cloneDeep } from 'lodash'
 import { emojify, emojifyStatus } from '../utils/parse_utils'
 import { addStatuses } from '../utils/status_utils'
 import { addIdsToList } from '../utils/common_utils'
@@ -64,6 +64,34 @@ const addUserStatuses = (state, { userId, statuses }) => {
   }
 }
 
+const updateUserStatus = (state, { userId, status }) => {
+  const user = state.usersByIds[userId]
+
+  if (!user) return state
+  const statusIndex = user.statuses ? user.statuses.findIndex(item => status.id === item.id) : -1
+  const newUser = cloneDeep(user)
+
+  if (statusIndex === -1) {
+    newUser.statuses = addStatuses(newUser.statuses || [],
+      [{
+        ...status,
+        ...emojifyStatus(status, {})
+      }])
+  } else {
+    newUser.statuses[statusIndex] = {
+      ...user.statuses[statusIndex],
+      ...emojifyStatus(status, user.statuses[statusIndex])
+    }
+  }
+  return {
+    ...state,
+    usersByIds: {
+      ...state.usersByIds,
+      [userId]: newUser
+    }
+  }
+}
+
 const addUserList = (state, { userId, listName, items }) => {
   const oldUser = state.usersByIds[userId] || {}
   const user = {
@@ -124,6 +152,7 @@ const reducers = {
   setCurrentUser,
   updateCurrentUser,
   addUserStatuses,
+  updateUserStatus,
   addUserFollowers,
   addUserFollowing,
   deleteUserStatus,
@@ -161,6 +190,10 @@ const actions = {
       payload: { userId, statuses }
     }
   },
+  updateUserStatus: ({ userId, status }) => ({
+    type: 'updateUserStatus',
+    payload: { userId, status }
+  }),
   addUserFollowers: ({ userId, followers }) => {
     return {
       type: 'addUserFollowers',
