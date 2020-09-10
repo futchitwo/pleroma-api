@@ -135,6 +135,36 @@ describe('User reducers', () => {
     })
   })
 
+  describe(`update user status`, () => {
+    it('should update user status', () => {
+      const status = { id: '2', content: 'content', spoiler_text: 'header', avatar: 'nd' }
+      const user = {
+        id: '1',
+        statuses: [status]
+      }
+
+      const resultState = Users.reducer(
+        { usersByIds: { '1': user } },
+        Users.actions.updateUserStatus({ userId: '1', status: { ...status, followed_by: [{ id: 'f1' }] } })
+      )
+
+      expect(resultState.usersByIds['1']).toEqual({ id: '1', statuses: [{...status, followed_by: [{ id: 'f1' }] }] })
+    })
+    it(`should set status, if it wasn't exist`, () => {
+      const status = { id: '2', content: 'content', spoiler_text: 'header' }
+      const user = {
+        id: '1'
+      }
+
+      const resultState = Users.reducer(
+        { usersByIds: { '1': user } },
+        Users.actions.updateUserStatus({ userId: '1', status: { ...status, followed_by: [{ id: 'f1' }] } })
+      )
+
+      expect(resultState.usersByIds['1']).toEqual({ id: '1', statuses: [{...status, followed_by: [{ id: 'f1' }] }] })
+    })
+  }) 
+
   describe(`adding a user's followers`, () => {
     it('add followersIds no a new user', () => {
       const followers = [{ id: 2, acct: 'b' }, { id: 1, acct: 'a' }]

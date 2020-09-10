@@ -114,6 +114,32 @@ describe('Statuses api', () => {
     })
   })
 
+  describe('/api/v1/statuses/:id/favourited_by', () => {
+    it('mute conversation', async () => {
+      const id = 1
+      fetch.mockImplementationOnce(fetchMocker([{ id: 1 }, { id: 2 }], {
+        expectedUrl: 'https://pleroma.soykaf.com/api/v1/statuses/1/favourited_by'
+      }))
+      const res = await api.statuses.favouritedBy({ config, params: { id } })
+
+      expect(res.state).toBe('ok')
+      expect(res.data).toEqual([{ id: 1 }, { id: 2 }])
+    })
+  })
+
+  describe('/api/v1/statuses/:id/reblogged_by', () => {
+    it('mute conversation', async () => {
+      const id = 1
+      fetch.mockImplementationOnce(fetchMocker([{ id: 1 }, { id: 2 }], {
+        expectedUrl: 'https://pleroma.soykaf.com/api/v1/statuses/1/reblogged_by'
+      }))
+      const res = await api.statuses.rebloggedBy({ config, params: { id } })
+
+      expect(res.state).toBe('ok')
+      expect(res.data).toEqual([{ id: 1 }, { id: 2 }])
+    })
+  })
+
   describe('POST /api/v1/statuses', () => {
     it('posts a status', async () => {
       const id = 1
