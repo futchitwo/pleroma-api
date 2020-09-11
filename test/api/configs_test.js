@@ -36,12 +36,30 @@ describe('Configs api', () => {
       expect(res.data).toEqual({ theme: 'dark' })
     })
   })
+  describe('/.well-known/nodeinfo', () => {
+    it('returns list of supported nodeinfo schemes', async () => {
+      fetch.mockImplementationOnce(fetchMocker({ invitesEnabled: true, nodeName: 'pleroma.site' }, {
+        expectedUrl: 'https://pleroma.soykaf.com/.well-known/nodeinfo'
+      }))
+      const res = await api.configs.getNodeinfoSchemes({ config })
+
+      expect(res.data).toEqual({ invitesEnabled: true, nodeName: 'pleroma.site' })
+    })
+  })
   describe('/nodeinfo/2.1.json', () => {
-    it('returns instance configurations', async () => {
+    it('returns instance configurations by full url', async () => {
       fetch.mockImplementationOnce(fetchMocker({ invitesEnabled: true, nodeName: 'pleroma.site' }, {
         expectedUrl: 'https://pleroma.soykaf.com/nodeinfo/2.1.json'
       }))
-      const res = await api.configs.getInstanceConfigurations({ config })
+      const res = await api.configs.getInstanceNodeinfo({ config, fullUrl: `https://pleroma.soykaf.com/nodeinfo/2.1.json` })
+
+      expect(res.data).toEqual({ invitesEnabled: true, nodeName: 'pleroma.site' })
+    })
+    it('returns instance configurations by nodeinfo version', async () => {
+      fetch.mockImplementationOnce(fetchMocker({ invitesEnabled: true, nodeName: 'pleroma.site' }, {
+        expectedUrl: 'https://pleroma.soykaf.com/nodeinfo/2.1.json'
+      }))
+      const res = await api.configs.getInstanceNodeinfo({ config, params: { version: '2.1' } })
 
       expect(res.data).toEqual({ invitesEnabled: true, nodeName: 'pleroma.site' })
     })
