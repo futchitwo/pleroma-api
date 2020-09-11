@@ -16,11 +16,33 @@ const Configs = {
       url: `${baseUrl}/frontend_configurations`
     })
   },
-  async getInstanceConfigurations ({ config }) {
+  async getNodeinfoSchemes ({ config }) {
     return utils.request({
       config,
-      url: `/nodeinfo/2.1.json`
+      url: `/.well-known/nodeinfo`
     })
+  },
+  async getInstanceNodeinfo ({ config, params, fullUrl }) {
+    if (fullUrl) {
+      return utils.request({
+        config,
+        fullUrl
+      })
+    }
+    return utils.request({
+      config,
+      url: `/nodeinfo/${params.version}.json`
+    })
+  },
+  async getInstanceConfigurations ({ config }) {
+    return this.getNodeinfoSchemes({ config })
+      .then(({ data }) => {
+        if (data.links) {
+          return Promise.allSettled(data.links.map(link => this.getInstanceNodeinfo({ config, fullUrl: link.href })))
+        } else {
+          return {}
+        }
+      })
   },
   async getConfig ({ config }) {
     return utils.request({
