@@ -13,6 +13,19 @@ const reactionsThunks = {
       await dispatch(Statuses.actions.addStatus({ status: result.data }))
       return getState()
     }
+  },
+  getReactions: ({ config, params }) => {
+    return async (dispatch, getState) => {
+      const result = await reactionsApi.list({ config: getConfig(getState, config), params })
+        .then(res => apiErrorCatcher(res))
+      const oldStatus = getState().statuses.statusesByIds[params.statusId] || {}
+
+      if (oldStatus.pleroma) {
+        oldStatus.pleroma.emoji_reactions = result.data
+      }
+      await dispatch(Statuses.actions.addStatus({ status: { id: params.statusId, ...oldStatus } }))
+      return getState()
+    }
   }
 }
 
