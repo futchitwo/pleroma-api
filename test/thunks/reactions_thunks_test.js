@@ -7,7 +7,8 @@ import reactionsThunks from '../../src/thunks/reactions_thunks'
 jest.mock('cross-fetch')
 
 const reducer = combineReducers({
-  statuses: reducers.statuses.reducer
+  statuses: reducers.statuses.reducer,
+  users: reducers.users.reducer
 })
 
 describe('Reactions thunks', () => {
@@ -51,7 +52,7 @@ describe('Reactions thunks', () => {
         content: '',
         spoiler_text: '',
         pleroma: {
-          emoji_reactions: [{count: 1, me: true, name: "😃"}]
+          emoji_reactions: [{ count: 1, me: true, name: "😃", accounts: null }]
         }
       }})
   })
@@ -133,5 +134,55 @@ describe('Reactions thunks', () => {
           emoji_reactions: [{count: 1, me: true, name: "😃", accounts: [{ id: 'id1', acct: 'name1' }, { id: 'id2', acct: 'name2' }] }]
         }
       }})
+  })
+  it(`get reactions of user's status`, async () => {
+    const store = { state: { users: { usersByIds: {
+      '1': {
+        id: '1',
+        acct: 'user',
+        display_name: 'user',
+        statuses: [
+          {
+            id: '21',
+            content: '',
+            spoiler_text: '',
+            pleroma: {
+              emoji_reactions: [{count: 1, me: true, name: "😃"}]
+            }
+          }
+        ]
+      } } } } }
+    const dispatch = (action) => {
+      store.state = reducer(store.state, action)
+    }
+    const getState = () => store.state
+
+    const accounts = [{ id: 'id1', acct: 'name1' }, { id: 'id2', acct: 'name2' }] 
+    fetch.mockReset()
+    fetch.mockImplementationOnce(fetchMocker(
+      [{count: 1, me: true, name: "😃", accounts }],
+      {
+        expectedUrl: `https://pleroma.soykaf.com/api/v1/pleroma/statuses/21/reactions`,
+      }
+    ))
+
+    let state = await reactionsThunks.getReactions({ config, params: { statusId: '21', userId: '1' } })(dispatch, getState)
+
+    expect(state.users.usersByIds['1'])
+      .toEqual({
+        id: '1',
+        acct: 'user',
+        display_name: 'user',
+        statuses: [
+          {
+            id: '21',
+            content: '',
+            spoiler_text: '',
+            pleroma: {
+              emoji_reactions: [{count: 1, me: true, name: "😃", accounts }]
+            }
+          }
+        ]
+      })
   })
 })

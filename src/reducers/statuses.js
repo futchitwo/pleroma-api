@@ -2,7 +2,7 @@ import reduce from 'lodash/reduce'
 import map from 'lodash/map'
 import slice from 'lodash/slice'
 import forEach from 'lodash/forEach'
-import { emojifyStatus } from '../utils/parse_utils'
+import { emojifyStatus, emojifyAccount } from '../utils/parse_utils'
 import { addIdsToList } from '../utils/common_utils'
 
 const initialState = {
@@ -20,19 +20,26 @@ const addStatuses = (state, { statuses }) => {
   const newStatuses = reduce(statuses, (result, status) => {
     const oldStatus = state.statusesByIds[status.id] || {}
     result[status.id] = { ...oldStatus, ...emojifyStatus(status, oldStatus) }
-    if (result[status.id].context) {
-      if (result[status.id].context.ancestors) {
-        result[status.id].context.ancestors = result[status.id].context.ancestors.map(item => ({
+    const tempStatus = result[status.id]
+    if (tempStatus.context) {
+      if (tempStatus.context.ancestors) {
+        tempStatus.context.ancestors = tempStatus.context.ancestors.map(item => ({
           ...item,
           ...emojifyStatus(item, {})
         }))
       }
-      if (result[status.id].context.descendants) {
-        result[status.id].context.descendants = result[status.id].context.descendants.map(item => ({
+      if (tempStatus.context.descendants) {
+        tempStatus.context.descendants = tempStatus.context.descendants.map(item => ({
           ...item,
           ...emojifyStatus(item, {})
         }))
       }
+    }
+    if (tempStatus.pleroma && tempStatus.pleroma.emoji_reactions) {
+      tempStatus.pleroma.emoji_reactions = tempStatus.pleroma.emoji_reactions.map(item => ({
+        ...item,
+        accounts: item.accounts ? item.accounts.map(account => emojifyAccount(account, {})) : null
+      }))
     }
     return result
   }, {})

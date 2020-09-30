@@ -1,5 +1,6 @@
 import reactionsApi from '../api/reactions'
 import Statuses from '../reducers/statuses'
+import Users from '../reducers/users'
 import { apiErrorCatcher, getConfig } from '../utils/api_utils'
 
 const reactionsThunks = {
@@ -18,12 +19,29 @@ const reactionsThunks = {
     return async (dispatch, getState) => {
       const result = await reactionsApi.list({ config: getConfig(getState, config), params })
         .then(res => apiErrorCatcher(res))
-      const oldStatus = getState().statuses.statusesByIds[params.statusId] || {}
 
-      if (oldStatus.pleroma) {
-        oldStatus.pleroma.emoji_reactions = result.data
+      if (params.userId) {
+        const user = getState().users.usersByIds[params.userId]
+        let oldStatus = {}
+        if (user.statuses) {
+          oldStatus = user.statuses.find(status => status.id === params.statusId) || {}
+        }
+        if (oldStatus.pleroma) {
+          oldStatus.pleroma.emoji_reactions = result.data
+        }
+        await dispatch(Users.actions.updateUserStatus({
+          status: { id: params.statusId, ...oldStatus },
+          userId: params.userId
+        }))
+      } else {
+        const oldStatus = getState().statuses.statusesByIds[params.statusId] || {}
+
+        if (oldStatus.pleroma) {
+          oldStatus.pleroma.emoji_reactions = result.data
+        }
+        await dispatch(Statuses.actions.addStatus({ status: { id: params.statusId, ...oldStatus } }))
       }
-      await dispatch(Statuses.actions.addStatus({ status: { id: params.statusId, ...oldStatus } }))
+
       return getState()
     }
   }

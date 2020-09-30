@@ -1,5 +1,5 @@
 import { reduce, cloneDeep } from 'lodash'
-import { emojify, emojifyStatus } from '../utils/parse_utils'
+import { emojify, emojifyStatus, emojifyAccount } from '../utils/parse_utils'
 import { addStatuses } from '../utils/status_utils'
 import { addIdsToList } from '../utils/common_utils'
 
@@ -81,6 +81,14 @@ const updateUserStatus = (state, { userId, status }) => {
     newUser.statuses[statusIndex] = {
       ...user.statuses[statusIndex],
       ...emojifyStatus(status, user.statuses[statusIndex])
+    }
+    if (newUser.statuses[statusIndex].pleroma) {
+      newUser.statuses[statusIndex].pleroma.emoji_reactions = newUser.statuses[statusIndex].pleroma.emoji_reactions
+        ? newUser.statuses[statusIndex].pleroma.emoji_reactions.map(item => ({
+          ...item,
+          accounts: item.accounts ? item.accounts.map(account => emojifyAccount(account, {})) : null
+        }))
+        : []
     }
   }
   return {
