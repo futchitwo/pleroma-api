@@ -17,7 +17,7 @@ const reactionsThunks = {
   },
   getReactions: ({ config, params }) => {
     return async (dispatch, getState) => {
-      const result = await reactionsApi.list({ config: getConfig(getState, config), params })
+      const result = await reactionsApi.list({ config: getConfig(getState, config), params: { statusId: params.reblogStatusId || params.statusId } })
         .then(res => apiErrorCatcher(res))
 
       if (params.userId) {
@@ -35,8 +35,9 @@ const reactionsThunks = {
         }))
       } else {
         const oldStatus = getState().statuses.statusesByIds[params.statusId] || {}
-
-        if (oldStatus.pleroma) {
+        if (oldStatus.reblog && oldStatus.reblog.pleroma) {
+          oldStatus.reblog.pleroma.emoji_reactions = result.data
+        } else if (oldStatus.pleroma) {
           oldStatus.pleroma.emoji_reactions = result.data
         }
         await dispatch(Statuses.actions.addStatus({ status: { id: params.statusId, ...oldStatus } }))

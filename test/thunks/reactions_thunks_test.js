@@ -185,4 +185,52 @@ describe('Reactions thunks', () => {
         ]
       })
   })
+  it(`get reactions of status with reblog`, async () => {
+    const store = { state: { statuses: { statusesByIds: {
+      '1': {
+        id: '1',
+        content: '',
+        spoiler_text: '',
+        pleroma: {},
+        reblog: {
+          id: '2',
+          content: '',
+          spoiler_text: '',
+          pleroma: {
+            emoji_reactions: [{count: 1, me: true, name: "😃" }]
+          }
+        }
+      } } } } }
+    const dispatch = (action) => {
+      store.state = reducer(store.state, action)
+    }
+    const getState = () => store.state
+    const accounts = [{ id: 'id1', acct: 'name1' }] 
+    fetch.mockReset()
+    fetch.mockImplementationOnce(fetchMocker(
+      [{count: 1, me: true, name: "😃", accounts }],
+      {
+        expectedUrl: `https://pleroma.soykaf.com/api/v1/pleroma/statuses/2/reactions`,
+      }
+    ))
+
+    let state = await reactionsThunks.getReactions({ config, params: { statusId: '1', reblogStatusId: '2' } })(dispatch, getState)
+
+    expect(state.statuses.statusesByIds['1'])
+      .toEqual({
+        id: '1',
+        content: '',
+        spoiler_text: '',
+        pleroma: {},
+        reblog: {
+          id: '2',
+          content: '',
+          spoiler_text: '',
+          account: null,
+          pleroma: {
+            emoji_reactions: [{count: 1, me: true, name: "😃", accounts }]
+          }
+        }
+      })
+  })
 })
