@@ -1,5 +1,13 @@
 import find from 'lodash/find'
 
+function NotFoundError (message) {
+  this.name = 'NotFoundError'
+  this.message = message || 'Not found'
+  this.stack = (new Error()).stack
+}
+NotFoundError.prototype = Object.create(Error.prototype)
+NotFoundError.prototype.constructor = NotFoundError
+
 export const getConfig = (getState, config) => {
   if (!config) {
     const { api } = getState()
@@ -14,13 +22,18 @@ export const apiErrorCatcher = (result) => {
       return result
     } else {
       const errorRes = find(result, ({ state }) => state !== 'ok')
-
+      if (errorRes.status === 404) {
+        throw new NotFoundError((errorRes.data && errorRes.data.error) || errorRes.state)
+      }
       throw new Error((errorRes.data && errorRes.data.error) || errorRes.state)
     }
   } else {
     if (result.state === 'ok') {
       return result
     } else {
+      if (result.status === 404) {
+        throw new NotFoundError((result.data && result.data.error) || result.state)
+      }
       throw new Error((result.data && result.data.error) || result.state)
     }
   }
