@@ -8,6 +8,14 @@ function NotFoundError (message) {
 NotFoundError.prototype = Object.create(Error.prototype)
 NotFoundError.prototype.constructor = NotFoundError
 
+function ForbiddenError (message) {
+  this.name = 'ForbiddenError'
+  this.message = message || 'Not allowed'
+  this.stack = (new Error()).stack
+}
+ForbiddenError.prototype = Object.create(Error.prototype)
+ForbiddenError.prototype.constructor = ForbiddenError
+
 export const getConfig = (getState, config) => {
   if (!config) {
     const { api } = getState()
@@ -22,19 +30,25 @@ export const apiErrorCatcher = (result) => {
       return result
     } else {
       const errorRes = find(result, ({ state }) => state !== 'ok')
+      const error = (errorRes.data && errorRes.data.error) || errorRes.state
       if (errorRes.status === 404) {
-        throw new NotFoundError((errorRes.data && errorRes.data.error) || errorRes.state)
+        throw new NotFoundError(error)
+      } else if (errorRes.status === 403) {
+        throw new ForbiddenError(error)
       }
-      throw new Error((errorRes.data && errorRes.data.error) || errorRes.state)
+      throw new Error(error)
     }
   } else {
     if (result.state === 'ok') {
       return result
     } else {
+      const error = (result.data && result.data.error) || result.state
       if (result.status === 404) {
-        throw new NotFoundError((result.data && result.data.error) || result.state)
+        throw new NotFoundError(error)
+      } else if (result.status === 403) {
+        throw new ForbiddenError(error)
       }
-      throw new Error((result.data && result.data.error) || result.state)
+      throw new Error(error)
     }
   }
 }
