@@ -1,7 +1,9 @@
 import notificationsApi from '../api/notifications.js'
 import Notifications from '../reducers/notifications.js'
+import Statuses from '../reducers/statuses.js'
 import Users from '../reducers/users.js'
 import Api from '../reducers/api'
+import Reactions from '../thunks/reactions_thunks'
 import { apiErrorCatcher, getConfig } from '../utils/api_utils'
 
 const notificationsThunks = {
@@ -9,7 +11,25 @@ const notificationsThunks = {
     return async (dispatch, getState) => {
       const result = await notificationsApi.list({ config: getConfig(getState, config), fullUrl, queries })
         .then(res => apiErrorCatcher(res))
-      await dispatch(Notifications.actions.addNotifications({ notifications: result.data }))
+      const reactionsToUpdate = []
+      const statuses = result.data.reduce((prev, curr) => {
+        if (curr.status) {
+          prev.push(curr.status)
+        }
+        if (curr.type === 'pleroma:emoji_reaction') {
+          const params = {
+            statusId: curr.status.id,
+            reblogStatusId: curr.status.reblog ? curr.status.reblog.id : null
+          }
+          reactionsToUpdate.push(dispatch(Reactions.getReactions({ params })))
+        }
+        return prev
+      }, [])
+      await Promise.allSettled([
+        dispatch(Notifications.actions.addNotifications({ notifications: result.data })),
+        dispatch(Statuses.actions.addStatuses({ statuses }))
+      ])
+      await Promise.all(reactionsToUpdate)
       if (result.links && result.links.prev) {
         await dispatch(Api.actions.setPrev({ entity: 'notifications', prev: result.links.prev }))
       }

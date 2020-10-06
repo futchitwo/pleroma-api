@@ -15,6 +15,28 @@ describe('Status reducers', () => {
       resultState = Statuses.reducer(resultState, Statuses.actions.addStatus({ status: updatedStatus }))
       expect(resultState.statusesByIds).toEqual({ '123': { id: '123', info: 'someinfo', other: 'info' } })
     })
+
+    it('should emojify status correctly', () => {
+      const emojis = [
+        {
+          shortcode: 'marko',
+          url: 'http://thesourceurl'
+        }
+      ]
+      const status = { id: '123', pleroma: { emoji_reactions: [{ count: 1, name: '🤔'}] } }
+      let resultState = Statuses.reducer(undefined, Statuses.actions.addStatus({ status }))
+      const updatedStatus = { id: '123', pleroma: {
+        emoji_reactions: [{ count: 1, name: '🤔', accounts: [{ id: 'acc1', emojis, display_name: 'user :marko:' }]}]
+      } }
+      resultState = Statuses.reducer(resultState, Statuses.actions.addStatus({ status: updatedStatus }))
+      expect(resultState.statusesByIds).toEqual({ '123': { id: '123', pleroma: {
+        emoji_reactions: [{ count: 1, name: '🤔', accounts: [{
+          id: 'acc1',
+          emojis,
+          display_name: "user <img draggable='false' class='custom-emoji' src='http://thesourceurl' alt='marko' title='marko' />"
+        }]}]
+      } } })
+    })
   })
 
   describe('timelines', () => {
