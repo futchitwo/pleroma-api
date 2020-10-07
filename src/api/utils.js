@@ -25,7 +25,7 @@ const authHeaders = ({ accessToken }) => {
   }
 }
 
-const request = async ({ method = 'GET', url, params, queries, config, fullUrl = undefined, body = undefined, headers = {} }) => {
+const request = async ({ method = 'GET', url, queries, config, fullUrl = undefined, body = undefined, headers = {} }) => {
   const instance = config.instance
   fullUrl = fullUrl || `${instance}${url}`
 
@@ -58,7 +58,8 @@ const request = async ({ method = 'GET', url, params, queries, config, fullUrl =
     } else {
       return {
         state: 'error',
-        data: parsedResult
+        data: parsedResult,
+        status: result.status
       }
     }
   } catch (e) {
