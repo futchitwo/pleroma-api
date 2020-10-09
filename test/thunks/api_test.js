@@ -26,6 +26,27 @@ describe('Api thunks', () => {
     }
   })
 
+  describe('stopAllFetchers', () => {
+    it ('stop all existing fetchers', async () => {
+      const state = defaultState()
+      const store = { state: { ...state } }
+      const dispatch = (action) => {
+        store.state = reducer(store.state, action)
+        return store.state
+      }
+      const getState = () => store.state
+
+      await apiThunks.startFetchingNotifications({})(dispatch, getState)
+      await apiThunks.startFetchingPoll({ params: { id: '193', statusId: '11' } })(dispatch, getState)
+      await apiThunks.startFetchingTimeline({ timelineName: 'home', type: 'home' })(dispatch, getState)
+      apiThunks.stopAllFetchers()(dispatch, getState)
+
+      expect(getState().api.notifications.fetcher).toBeNull()
+      expect(getState().api.polls['11'].fetcher).toBeNull()
+      expect(getState().api.timelines['home'].fetcher).toBeNull()
+    })
+  })
+
   describe('startFetchingTimeline', () => {
     it('creates a timeline fetcher', async () => {
       const store = { state: defaultState() }
@@ -326,6 +347,93 @@ describe('Api thunks', () => {
       await apiThunks.stopFetchingTagTimeline({})(dispatch, getState)
 
       expect(getState().api.tagTimeline.fetcher).toBeNull()
+    })
+  })
+  describe('search Users', () => {
+    it('should add search result and request to searchCache', async () => {
+      const config = {
+        instance: 'https://pleroma.soykaf.com'
+      }
+      const store = { state: {
+        users: { usersByIds: {} },
+        api: { searchCache: [] }
+      } }
+      const dispatch = (action) => {
+        store.state = reducer(store.state, action)
+      }
+      const getState = () => store.state
+      const account = {
+        acct: 'nd',
+        id: 1
+      }
+      fetch.mockReset()
+      fetch
+        .mockImplementationOnce(fetchMocker(
+          { accounts: [account] },
+          { expectedUrl: `https://pleroma.soykaf.com/api/v2/search?q=nd` }
+        ))
+      let res = await apiThunks.search({ config, queries: { q: 'nd' } })(dispatch, getState)
+
+      expect(res.state.users.usersByIds)
+        .toEqual({ 1: account })
+      expect(res.state.api.searchCache)
+        .toEqual(['nd'])
+    }),
+    it('repeated search request', async () => {
+      const config = {
+        instance: 'https://pleroma.soykaf.com'
+      }
+      const store = { state: {
+        api: {
+          searchCache: ['nd']
+        }
+      } }
+      const account = {
+        acct: 'nd',
+        id: 1
+      }
+      const dispatch = (action) => {
+        store.state = reducer(store.state, action)
+      }
+      const getState = () => store.state
+      fetch.mockReset()
+      fetch
+        .mockImplementationOnce(fetchMocker(
+          { accounts: [account] },
+          { expectedUrl: `https://pleroma.soykaf.com/api/v2/search?q=nd` }
+        ))
+      let res = await apiThunks.search({ config, queries: { q: 'nd' } })(dispatch, getState)
+
+      expect(res.state.api.searchCache)
+        .toEqual(['nd'])
+    }),
+    it('should prevent request if muteRequest: true', async () => {
+      const config = {
+        instance: 'https://pleroma.soykaf.com'
+      }
+      const account = {
+        acct: 'nd',
+        id: 1
+      }
+      const store = { state: {
+        users: { usersByIds: { 1 : account } },
+        api: { searchCache: ['nd'] }
+      } }
+      const dispatch = (action) => {
+        store.state = reducer(store.state, action)
+      }
+      const getState = () => store.state
+      
+      let res = await apiThunks.search({
+        config,
+        queries: { q: 'nd' },
+        options: { muteRequest: true }
+      })(dispatch, getState)
+
+      expect(res.state.users.usersByIds)
+        .toEqual({ 1: account })
+      expect(res.state.api.searchCache)
+        .toEqual(['nd'])
     })
   })
 })

@@ -2,8 +2,8 @@ import reduce from 'lodash/reduce'
 import map from 'lodash/map'
 import slice from 'lodash/slice'
 import forEach from 'lodash/forEach'
-import { emojify } from '../utils/parse_utils'
-import { addStatusIds } from '../utils/status_utils'
+import { emojifyStatus, emojifyAccount } from '../utils/parse_utils'
+import { addIdsToList } from '../utils/common_utils'
 
 const initialState = {
   statusesByIds: {},
@@ -19,10 +19,28 @@ const initialTimeline = {
 const addStatuses = (state, { statuses }) => {
   const newStatuses = reduce(statuses, (result, status) => {
     const oldStatus = state.statusesByIds[status.id] || {}
-
-    status.content = emojify(status.content || oldStatus.content, status.emojis || oldStatus.emojis)
-    status.spoiler_text = emojify(status.spoiler_text || oldStatus.spoiler_text, status.emojis || oldStatus.emojis)
-    result[status.id] = { ...oldStatus, ...status }
+    result[status.id] = { ...oldStatus, ...emojifyStatus(status, oldStatus) }
+    const tempStatus = result[status.id]
+    if (tempStatus.context) {
+      if (tempStatus.context.ancestors) {
+        tempStatus.context.ancestors = tempStatus.context.ancestors.map(item => ({
+          ...item,
+          ...emojifyStatus(item, {})
+        }))
+      }
+      if (tempStatus.context.descendants) {
+        tempStatus.context.descendants = tempStatus.context.descendants.map(item => ({
+          ...item,
+          ...emojifyStatus(item, {})
+        }))
+      }
+    }
+    if (tempStatus.pleroma && tempStatus.pleroma.emoji_reactions) {
+      tempStatus.pleroma.emoji_reactions = tempStatus.pleroma.emoji_reactions.map(item => ({
+        ...item,
+        accounts: item.accounts ? item.accounts.map(account => emojifyAccount(account, {})) : null
+      }))
+    }
     return result
   }, {})
 
@@ -43,7 +61,7 @@ const addStatusIdsToTimeline = (state, { statusIds, timelineName }) => {
   let timeline = state.timelines[timelineName] || { ...initialTimeline }
   timeline = {
     ...timeline,
-    statusIds: addStatusIds(timeline.statusIds, statusIds)
+    statusIds: addIdsToList(timeline.statusIds, statusIds)
   }
   return {
     ...state,
@@ -92,7 +110,7 @@ const addTagTimeline = (state, { statuses }) => {
 
   return {
     ...newState,
-    tag: addStatusIds(timeline, map(statuses, 'id'))
+    tag: addIdsToList(timeline, map(statuses, 'id'))
   }
 }
 

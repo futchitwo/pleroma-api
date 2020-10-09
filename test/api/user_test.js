@@ -93,6 +93,47 @@ describe('User api', () => {
     })
   })
 
+  describe('/api/v1/accounts/:id/followers', () => {
+    it('returns the followers and the links', async () => {
+      const id = 1
+
+      fetch.mockImplementationOnce(fetchMocker(
+        [{ id: 1 }, { id: 2 }],
+        {
+          expectedUrl: `https://pleroma.soykaf.com/api/v1/accounts/${id}/followers?max_id=1`,
+          headers: {
+            link: '<https://pleroma.soykaf.com/api/v1/accounts/1/statuses?max_id=9gZ5VYhDG8GeCL8Vay>; rel="next", <https://pleroma.soykaf.com/api/v1/accounts/1/statuses?since_id=9gZ5g5Q6RlaAaN9Z5M>; rel="prev"'
+          }
+        }))
+      const res = await api.users.followers({ config, params: { id }, queries: { max_id: 1 } })
+
+      expect(res.state).toBe('ok')
+      expect(res.data).toEqual([{ id: 1 }, { id: 2 }])
+      expect(res.links).not.toBe(null)
+    })
+  })
+
+
+  describe('/api/v1/accounts/:id/following', () => {
+    it('returns the following and the links', async () => {
+      const id = 1
+
+      fetch.mockImplementationOnce(fetchMocker(
+        [{ id: 1 }, { id: 2 }],
+        {
+          expectedUrl: `https://pleroma.soykaf.com/api/v1/accounts/${id}/following?max_id=1`,
+          headers: {
+            link: '<https://pleroma.soykaf.com/api/v1/accounts/1/following?max_id=9gZ5VYhDG8GeCL8Vay>; rel="next", <https://pleroma.soykaf.com/api/v1/accounts/1/statuses?since_id=9gZ5g5Q6RlaAaN9Z5M>; rel="prev"'
+          }
+        }))
+      const res = await api.users.following({ config, params: { id }, queries: { max_id: 1 } })
+
+      expect(res.state).toBe('ok')
+      expect(res.data).toEqual([{ id: 1 }, { id: 2 }])
+      expect(res.links).not.toBe(null)
+    })
+  })
+
   describe('POST /api/v1/accounts', () => {
     it('returns a new account', async () => {
       const id = 1

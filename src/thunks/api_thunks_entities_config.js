@@ -36,3 +36,14 @@ export const ENTITIES = {
     clearThunk: 'clear'
   }
 }
+
+export const LOAD_OLDER_USER_FIELDS_CONFIG = {
+  followers: {
+    reducerField: 'userFollowers',
+    thunk: 'fetchUserFollowers'
+  },
+  following: {
+    reducerField: 'userFollowing',
+    thunk: 'fetchUserFollowing'
+  }
+}

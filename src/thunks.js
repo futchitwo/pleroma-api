@@ -7,6 +7,7 @@ import chats from './thunks/chats_thunks'
 import tags from './thunks/tags_thunks'
 import polls from './thunks/polls_thunks'
 import config from './thunks/config_thunks'
+import reactions from './thunks/reactions_thunks'
 
 export default {
   statuses,
@@ -17,5 +18,6 @@ export default {
   chats,
   tags,
   polls,
-  config
+  config,
+  reactions
 }

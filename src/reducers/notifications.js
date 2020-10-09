@@ -1,4 +1,5 @@
-import { map, reduce, uniq } from 'lodash'
+import { map, reduce, uniq, mapValues } from 'lodash'
+import { emojifyAccount } from '../utils/parse_utils'
 
 const initialState = {
   list: [],
@@ -7,7 +8,10 @@ const initialState = {
 
 const addNotifications = (state, { notifications }) => {
   const newNotifications = reduce(notifications, (result, notification) => {
-    result[notification.id] = { ...state.notificationsByIds[notification.id], ...notification }
+    const oldNotification = state.notificationsByIds[notification.id] || {}
+
+    notification.account = emojifyAccount(notification.account, oldNotification.account)
+    result[notification.id] = { ...oldNotification, ...notification }
     return result
   }, {})
 
@@ -42,11 +46,38 @@ const clearNotifications = (state) => {
   }
 }
 
+const read = (state, { notificationId }) => {
+  return {
+    ...state,
+    notificationsByIds: {
+      ...state.notificationsByIds,
+      [notificationId]: {
+        ...state.notificationsByIds[notificationId],
+        pleroma: { is_seen: true }
+      }
+    }
+  }
+}
+
+const readAll = (state) => {
+  const notificationsByIds = mapValues(
+    state.notificationsByIds,
+    notification => ({ ...notification, pleroma: { is_seen: true } })
+  )
+
+  return {
+    ...state,
+    notificationsByIds
+  }
+}
+
 const reducers = {
   addNotifications,
   addNotification,
   addNotificationIds,
-  clearNotifications
+  clearNotifications,
+  read,
+  readAll
 }
 
 const actions = {
@@ -71,6 +102,17 @@ const actions = {
   clearNotifications: () => {
     return {
       type: 'clearNotifications'
+    }
+  },
+  read: ({ notificationId }) => {
+    return {
+      type: 'read',
+      payload: { notificationId }
+    }
+  },
+  readAll: () => {
+    return {
+      type: 'readAll'
     }
   }
 }

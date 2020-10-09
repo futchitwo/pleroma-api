@@ -1,6 +1,7 @@
-import reduce from 'lodash/reduce'
-import { emojify } from '../utils/parse_utils'
+import { reduce, cloneDeep } from 'lodash'
+import { emojify, emojifyStatus, emojifyAccount } from '../utils/parse_utils'
 import { addStatuses } from '../utils/status_utils'
+import { addIdsToList } from '../utils/common_utils'
 
 const initialState = {
   usersByIds: {},
@@ -51,8 +52,7 @@ const addUserStatuses = (state, { userId, statuses }) => {
     statuses: addStatuses(oldUser.statuses || [],
       statuses ? statuses.map(status => ({
         ...status,
-        content: emojify(status.content, status.emojis),
-        spoiler_text: emojify(status.spoiler_text, status.emojis)
+        ...emojifyStatus(status, {})
       })) : [])
   }
   return {
@@ -62,6 +62,67 @@ const addUserStatuses = (state, { userId, statuses }) => {
       [userId]: user
     }
   }
+}
+
+const updateUserStatus = (state, { userId, status }) => {
+  const user = state.usersByIds[userId]
+
+  if (!user) return state
+  const statusIndex = user.statuses ? user.statuses.findIndex(item => status.id === item.id) : -1
+  const newUser = cloneDeep(user)
+
+  if (statusIndex === -1) {
+    newUser.statuses = addStatuses(newUser.statuses || [],
+      [{
+        ...status,
+        ...emojifyStatus(status, {})
+      }])
+  } else {
+    newUser.statuses[statusIndex] = {
+      ...user.statuses[statusIndex],
+      ...emojifyStatus(status, user.statuses[statusIndex])
+    }
+    if (newUser.statuses[statusIndex].pleroma) {
+      newUser.statuses[statusIndex].pleroma.emoji_reactions = newUser.statuses[statusIndex].pleroma.emoji_reactions
+        ? newUser.statuses[statusIndex].pleroma.emoji_reactions.map(item => ({
+          ...item,
+          accounts: item.accounts ? item.accounts.map(account => emojifyAccount(account, {})) : null
+        }))
+        : []
+    }
+  }
+  return {
+    ...state,
+    usersByIds: {
+      ...state.usersByIds,
+      [userId]: newUser
+    }
+  }
+}
+
+const addUserList = (state, { userId, listName, items }) => {
+  const oldUser = state.usersByIds[userId] || {}
+  const user = {
+    ...oldUser,
+    [listName]: addIdsToList(oldUser[listName] || [],
+      items ? items.map(account => account.id) : [])
+  }
+
+  return {
+    ...state,
+    usersByIds: {
+      ...state.usersByIds,
+      [userId]: user
+    }
+  }
+}
+
+const addUserFollowers = (state, { userId, followers }) => {
+  return addUserList(state, { userId, listName: 'followers', items: followers })
+}
+
+const addUserFollowing = (state, { userId, following }) => {
+  return addUserList(state, { userId, listName: 'following', items: following })
 }
 
 const deleteUserStatus = (state, { userId, statusId }) => {
@@ -80,13 +141,30 @@ const deleteUserStatus = (state, { userId, statusId }) => {
   }
 }
 
+const updateUnreadNotificationsCount = (state, { unreadNotificationsCount }) => {
+  return {
+    ...state,
+    currentUser: {
+      ...state.currentUser,
+      pleroma: {
+        ...state.currentUser.pleroma,
+        unread_notifications_count: unreadNotificationsCount
+      }
+    }
+  }
+}
+
 const reducers = {
   addUsers,
   addUser,
   setCurrentUser,
   updateCurrentUser,
   addUserStatuses,
-  deleteUserStatus
+  updateUserStatus,
+  addUserFollowers,
+  addUserFollowing,
+  deleteUserStatus,
+  updateUnreadNotificationsCount
 }
 
 const actions = {
@@ -120,10 +198,32 @@ const actions = {
       payload: { userId, statuses }
     }
   },
+  updateUserStatus: ({ userId, status }) => ({
+    type: 'updateUserStatus',
+    payload: { userId, status }
+  }),
+  addUserFollowers: ({ userId, followers }) => {
+    return {
+      type: 'addUserFollowers',
+      payload: { userId, followers }
+    }
+  },
+  addUserFollowing: ({ userId, following }) => {
+    return {
+      type: 'addUserFollowing',
+      payload: { userId, following }
+    }
+  },
   deleteUserStatus: ({ userId, statusId }) => {
     return {
       type: 'deleteUserStatus',
       payload: { userId, statusId }
+    }
+  },
+  updateUnreadNotificationsCount: ({ unreadNotificationsCount }) => {
+    return {
+      type: 'updateUnreadNotificationsCount',
+      payload: { unreadNotificationsCount }
     }
   }
 }

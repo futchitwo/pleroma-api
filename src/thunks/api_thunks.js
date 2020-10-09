@@ -1,12 +1,15 @@
 import statusesThunks from './statuses_thunks.js'
+import searchApi from '../api/search'
 import Api from '../reducers/api.js'
 import thunks from '../thunks.js'
 import usersThunks from './users_thunks.js'
 import has from 'lodash/has'
 import pollsThunks from './polls_thunks.js'
 import conversationsThunks from './conversations_thunks.js'
-import { ENTITIES } from './api_thunks_entities_config'
+import { ENTITIES, LOAD_OLDER_USER_FIELDS_CONFIG } from './api_thunks_entities_config'
 import tagsThunks from './tags_thunks.js'
+import { apiErrorCatcher, getConfig } from '../utils/api_utils'
+import reducers from '../reducers'
 
 const makeTimelineFetcher = ({ dispatch, getState, timelineName, type, queries }) => {
   const fetch = () => {
@@ -155,6 +158,26 @@ const generateApiThunks = () => {
         }))
       }
     },
+
+    loadOlderUserList: ({ params, queries, entity }) => {
+      const loadOlderEntityConfig = LOAD_OLDER_USER_FIELDS_CONFIG[entity]
+
+      if (!entity || !loadOlderEntityConfig) return
+      return async (dispatch, getState) => {
+        const items = getState().api[loadOlderEntityConfig.reducerField] || {}
+        const config = getState().api.config
+        const fullUrl = (items.next || {}).url
+
+        return dispatch(usersThunks[loadOlderEntityConfig.thunk]({
+          older: true,
+          config,
+          fullUrl,
+          queries,
+          params
+        }))
+      }
+    },
+
     startFetchingPoll: ({ params }) => {
       return async (dispatch, getState) => {
         const polls = getState().api.polls || {}
@@ -211,6 +234,56 @@ const generateApiThunks = () => {
           params
         }))
       }
+    },
+    stopAllFetchers: () => {
+      return async (dispatch, getState) => {
+        const computedState = getState().api
+
+        Object.keys(computedState.polls).forEach(statusId => {
+          const state = computedState.polls[statusId] || {}
+          if (state.fetcher) {
+            state.fetcher.stop()
+            state.fetcher = null
+          }
+        })
+        Object.keys(computedState.timelines).forEach(timelineName => {
+          const state = computedState.timelines[timelineName] || {}
+          if (state.fetcher) {
+            state.fetcher.stop()
+            state.fetcher = null
+          }
+        })
+        Object.keys(ENTITIES).forEach(entity => {
+          const state = computedState[entity] || {}
+          if (state.fetcher) {
+            state.fetcher.stop()
+            state.fetcher = null
+          }
+        })
+
+        return getState()
+      }
+    },
+    search: ({ config, queries, options }) => {
+      return async (dispatch, getState) => {
+        const searchCache = getState().api.searchCache
+
+        if (searchCache.includes(queries.q) && options && options.muteRequest) {
+          await dispatch(Api.actions.addSearchCache({ request: queries.q }))
+          return { q: queries.q, state: getState() }
+        } else {
+          const result = await searchApi({ config: getConfig(getState, config), queries })
+            .then(res => apiErrorCatcher(res))
+          const dispatchedActions = [Api.actions.addSearchCache({ request: result.search })]
+
+          if (result.data) {
+            dispatchedActions.push(reducers.users.actions.addUsers({ users: result.data.accounts }))
+            dispatchedActions.push(reducers.statuses.actions.addStatuses({ statuses: result.data.statuses }))
+          }
+          await Promise.all(dispatchedActions.map(action => dispatch(action)))
+          return { q: queries.q, results: result.data, state: getState() }
+        }
+      }
     }
   }
 
@@ -248,4 +321,10 @@ const generateApiThunks = () => {
   })
   return apiThunks
 }
-export default generateApiThunks()
+export default {
+  ...generateApiThunks(),
+  updateLinks,
+  clearLinks,
+  startLoading,
+  stopLoading
+}

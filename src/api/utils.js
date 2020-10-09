@@ -1,9 +1,19 @@
 import fetch from 'cross-fetch'
 import parseLinkHeader from 'parse-link-header'
 
-const queryParams = (params) => {
+export const queryParams = (params) => {
   return Object.keys(params)
-    .map(k => encodeURIComponent(k) + '=' + encodeURIComponent(params[k]))
+    .map(k => {
+      const field = params[k]
+
+      if (Array.isArray(field)) {
+        return field
+          .reduce((acc, cur) => acc.concat(encodeURIComponent(k) + '[]=' + encodeURIComponent(cur)), [])
+          .join('&')
+      } else {
+        return encodeURIComponent(k) + '=' + encodeURIComponent(field)
+      }
+    })
     .join('&')
 }
 
@@ -15,7 +25,7 @@ const authHeaders = ({ accessToken }) => {
   }
 }
 
-const request = async ({ method = 'GET', url, params, queries, config, fullUrl = undefined, body = undefined, headers = {} }) => {
+const request = async ({ method = 'GET', url, queries, config, fullUrl = undefined, body = undefined, headers = {} }) => {
   const instance = config.instance
   fullUrl = fullUrl || `${instance}${url}`
 
@@ -32,16 +42,24 @@ const request = async ({ method = 'GET', url, params, queries, config, fullUrl =
       body
     })
 
+    let parsedResult = null
+    try {
+      parsedResult = await result.json()
+    } catch (e) {
+      parsedResult = result
+    }
+
     if (result.ok) {
       return {
         state: 'ok',
-        data: await result.json(),
+        data: parsedResult,
         links: parseLinkHeader(result.headers.get('link'))
       }
     } else {
       return {
         state: 'error',
-        data: await result.json()
+        data: parsedResult,
+        status: result.status
       }
     }
   } catch (e) {

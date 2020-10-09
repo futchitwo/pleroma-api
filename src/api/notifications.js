@@ -1,6 +1,7 @@
 import utils from './utils'
 
 const NOTIFICATIONS_URL = '/api/v1/notifications'
+const PLEROMA_NOTIFICATIONS_URL = '/api/v1/pleroma/notifications'
 
 const Notifications = {
   async list ({ config, fullUrl, queries }) {
@@ -28,7 +29,10 @@ const Notifications = {
     return utils.request({
       config,
       url: `${NOTIFICATIONS_URL}/clear`,
-      method: 'POST'
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      }
     })
   },
 
@@ -37,7 +41,22 @@ const Notifications = {
       config,
       url: `${NOTIFICATIONS_URL}/dismiss`,
       method: 'POST',
-      body: JSON.stringify(params)
+      body: JSON.stringify(params),
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    })
+  },
+
+  async read ({ config, params }) {
+    return utils.request({
+      config,
+      url: `${PLEROMA_NOTIFICATIONS_URL}/read`,
+      method: 'POST',
+      body: JSON.stringify(params),
+      headers: {
+        'Content-Type': 'application/json'
+      }
     })
   }
 }

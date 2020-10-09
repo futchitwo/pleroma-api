@@ -134,4 +134,92 @@ describe('User reducers', () => {
       expect(resultState.usersByIds['1']).toEqual({ ...user, statuses: [{ id: 2, content: 'b' }] })
     })
   })
+
+  describe(`update user status`, () => {
+    it('should update user status', () => {
+      const status = { id: '2', content: 'content', spoiler_text: 'header', avatar: 'nd' }
+      const user = {
+        id: '1',
+        statuses: [status]
+      }
+
+      const resultState = Users.reducer(
+        { usersByIds: { '1': user } },
+        Users.actions.updateUserStatus({ userId: '1', status: { ...status, followed_by: [{ id: 'f1' }] } })
+      )
+
+      expect(resultState.usersByIds['1']).toEqual({ id: '1', statuses: [{...status, followed_by: [{ id: 'f1' }] }] })
+    })
+    it(`should set status, if it wasn't exist`, () => {
+      const status = { id: '2', content: 'content', spoiler_text: 'header' }
+      const user = {
+        id: '1'
+      }
+
+      const resultState = Users.reducer(
+        { usersByIds: { '1': user } },
+        Users.actions.updateUserStatus({ userId: '1', status: { ...status, followed_by: [{ id: 'f1' }] } })
+      )
+
+      expect(resultState.usersByIds['1']).toEqual({ id: '1', statuses: [{...status, followed_by: [{ id: 'f1' }] }] })
+    })
+  }) 
+
+  describe(`adding a user's followers`, () => {
+    it('add followersIds no a new user', () => {
+      const followers = [{ id: 2, acct: 'b' }, { id: 1, acct: 'a' }]
+      const resultState = Users.reducer(
+        undefined,
+        Users.actions.addUserFollowers({ userId: '1', followers })
+      )
+
+      expect(resultState.usersByIds['1']).toEqual({ followers: [2, 1] })
+    })
+
+    it('update user followersIds', () => {
+      const user = { id: 1 }
+      const followers = [{ id: 2, acct: 'b' }, { id: 1, acct: 'a' }]
+      const resultState = Users.reducer(
+        { usersByIds: { 1: user } },
+        Users.actions.addUserFollowers({ userId: user.id, followers  })
+      )
+
+      expect(resultState.usersByIds['1']).toEqual({ ...user, followers: [2, 1] })
+    })
+  })
+
+
+  describe(`adding a user's following`, () => {
+    it('add followingIds no a new user', () => {
+      const following = [{ id: 2, acct: 'b' }, { id: 1, acct: 'a' }]
+      const resultState = Users.reducer(
+        undefined,
+        Users.actions.addUserFollowing({ userId: '1', following })
+      )
+
+      expect(resultState.usersByIds['1']).toEqual({ following: [2, 1] })
+    })
+
+    it('update user followingIds', () => {
+      const user = { id: 1 }
+      const following = [{ id: 2, acct: 'b' }, { id: 1, acct: 'a' }]
+      const resultState = Users.reducer(
+        { usersByIds: { 1: user } },
+        Users.actions.addUserFollowing({ userId: user.id, following  })
+      )
+
+      expect(resultState.usersByIds['1']).toEqual({ ...user, following: [2, 1] })
+    })
+  })
+
+  it('update unread notifications count', () => {
+    const currentUser = { id: '1', pleroma: { unread_notifications_count: 5 } }
+
+    const resultState = Users.reducer(
+      { currentUser },
+      Users.actions.updateUnreadNotificationsCount({ unreadNotificationsCount: 1 })
+    )
+
+    expect(resultState.currentUser).toEqual({ id: '1', pleroma: { unread_notifications_count: 1 } })
+  })
 })

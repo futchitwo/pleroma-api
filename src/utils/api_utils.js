@@ -1,5 +1,21 @@
 import find from 'lodash/find'
 
+function NotFoundError (message) {
+  this.name = 'NotFoundError'
+  this.message = message || 'Not found'
+  this.stack = (new Error()).stack
+}
+NotFoundError.prototype = Object.create(Error.prototype)
+NotFoundError.prototype.constructor = NotFoundError
+
+function ForbiddenError (message) {
+  this.name = 'ForbiddenError'
+  this.message = message || 'Not allowed'
+  this.stack = (new Error()).stack
+}
+ForbiddenError.prototype = Object.create(Error.prototype)
+ForbiddenError.prototype.constructor = ForbiddenError
+
 export const getConfig = (getState, config) => {
   if (!config) {
     const { api } = getState()
@@ -14,14 +30,25 @@ export const apiErrorCatcher = (result) => {
       return result
     } else {
       const errorRes = find(result, ({ state }) => state !== 'ok')
-
-      throw new Error((errorRes.data && errorRes.data.error) || errorRes.state)
+      const error = (errorRes.data && errorRes.data.error) || errorRes.state
+      if (errorRes.status === 404) {
+        throw new NotFoundError(error)
+      } else if (errorRes.status === 403) {
+        throw new ForbiddenError(error)
+      }
+      throw new Error(error)
     }
   } else {
     if (result.state === 'ok') {
       return result
     } else {
-      throw new Error((result.data && result.data.error) || result.state)
+      const error = (result.data && result.data.error) || result.state
+      if (result.status === 404) {
+        throw new NotFoundError(error)
+      } else if (result.status === 403) {
+        throw new ForbiddenError(error)
+      }
+      throw new Error(error)
     }
   }
 }
