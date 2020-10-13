@@ -30,6 +30,12 @@ export const emojifyStatus = (status, oldStatus) => {
     const oldReblog = oldStatus.reblog
     status.reblog.account = emojifyAccount(reblog.account, oldReblog ? oldReblog.account : null)
   }
+  if (status.favourited_by) {
+    status.favourited_by = status.favourited_by.map(account => emojifyAccount(account))
+  }
+  if (status.reblogged_by) {
+    status.reblogged_by = status.reblogged_by.map(account => emojifyAccount(account))
+  }
   const emojis = status.reblog ? status.reblog.emojis : status.emojis
   const oldEmojis = oldStatus.reblog ? oldStatus.reblog.emojis : oldStatus.emojis
 
