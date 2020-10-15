@@ -217,7 +217,7 @@ describe('Users thunks', () => {
         { muting: false },
         { expectedUrl: `https://pleroma.soykaf.com/api/v1/accounts/1/unmute` }
       ))
-    let state = await usersThunks.toggleMuteState({ config, params: { id: '1', muting: true } })(dispatch, getState)
+    let { state } = await usersThunks.toggleMuteState({ config, params: { id: '1', muting: true } })(dispatch, getState)
 
     const expectedResult = {
       id: '1',
@@ -250,7 +250,7 @@ describe('Users thunks', () => {
         { blocking: true },
         { expectedUrl: `https://pleroma.soykaf.com/api/v1/accounts/1/block` }
       ))
-    let state = await usersThunks.toggleBlockState({ config, params: { id: '1', blocking: false } })(dispatch, getState)
+    let { state } = await usersThunks.toggleBlockState({ config, params: { id: '1', blocking: false } })(dispatch, getState)
 
     const expectedResult = {
       id: '1',
