@@ -628,6 +628,33 @@ describe('Status thunks', () => {
       .toEqual({})
   })
 
+  it('delete reblog', async () => {
+    const status = {
+      id: '1',
+      content: 'Status content'
+    }
+    const statusesByIds = {
+      '1': status,
+      '2': {
+        id: '2',
+        reblog: status
+      }
+    }
+    const store = { state: { statuses: { statusesByIds } }}
+
+    fetch.mockReset()
+    fetch
+      .mockImplementationOnce(
+        fetchMocker(
+          status, { expectedUrl: `https://pleroma.soykaf.com/api/v1/statuses/1/unreblog` })
+      )
+
+    let state = await statusesThunks.deleteStatus({ config, params: { id: '1', reblogId: '2' } })(dispatch(store), getState(store))
+
+    expect(state.statuses.statusesByIds)
+      .toEqual({ '1': status })
+  })
+
   it('delete status from user profile', async () => {
     const status = {
       id: '1',
