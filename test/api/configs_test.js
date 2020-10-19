@@ -93,7 +93,7 @@ describe('Configs api', () => {
     })
   })
   describe('/api/v1/instance/peers', () => {
-    it('returns list of custom emoji', async () => {
+    it('returns list of known remote instances', async () => {
       const instances = [
         'nsfw.social',
         'friendica.a-zwenkau.de'

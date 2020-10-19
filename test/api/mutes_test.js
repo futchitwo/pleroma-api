@@ -4,7 +4,7 @@ import fetchMocker from './fetch_mocker.js'
 
 jest.mock('cross-fetch')
 
-describe('Blocks api', () => {
+describe('Mutes api', () => {
   const config = {
     instance: 'https://pleroma.soykaf.com'
   }
