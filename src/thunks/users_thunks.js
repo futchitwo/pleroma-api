@@ -124,7 +124,7 @@ const usersThunks = {
       }
 
       await dispatch(Users.actions.addUser({ user }))
-      return getState()
+      return { state: getState(), result }
     }
   },
 
@@ -138,7 +138,7 @@ const usersThunks = {
       }
 
       await dispatch(Users.actions.addUser({ user }))
-      return getState()
+      return { state: getState(), result }
     }
   }
 }

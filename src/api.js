@@ -10,6 +10,8 @@ import search from './api/search'
 import polls from './api/polls'
 import configs from './api/configs'
 import reactions from './api/reactions'
+import mutes from './api/mutes'
+import blocks from './api/blocks'
 
 export default {
   users,
@@ -23,5 +25,7 @@ export default {
   search,
   polls,
   configs,
-  reactions
+  reactions,
+  mutes,
+  blocks
 }

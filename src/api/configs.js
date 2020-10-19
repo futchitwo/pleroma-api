@@ -61,6 +61,12 @@ const Configs = {
       config,
       url: `/api/v1/custom_emojis`
     })
+  },
+  async getRemoteInstances ({ config }) {
+    return utils.request({
+      config,
+      url: '/api/v1/instance/peers'
+    })
   }
 }
 

@@ -92,4 +92,18 @@ describe('Configs api', () => {
       expect(res.data).toEqual(emojis)
     })
   })
+  describe('/api/v1/instance/peers', () => {
+    it('returns list of known remote instances', async () => {
+      const instances = [
+        'nsfw.social',
+        'friendica.a-zwenkau.de'
+      ]
+      fetch.mockImplementationOnce(fetchMocker(instances, {
+        expectedUrl: 'https://pleroma.soykaf.com/api/v1/instance/peers'
+      }))
+      const res = await api.configs.getRemoteInstances({ config })
+
+      expect(res.data).toEqual(instances)
+    })
+  })
 })
