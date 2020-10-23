@@ -7,7 +7,7 @@ import fetch from 'cross-fetch'
 jest.mock('cross-fetch')
 
 const reducer = combineReducers({
-  config: reducers.config.reducer,
+  config: reducers.config.reducer
 })
 
 describe('Config thunks', () => {
@@ -26,14 +26,14 @@ describe('Config thunks', () => {
     fetch
       .mockImplementationOnce(fetchMocker(
         { theme: 'pleroma-dark' },
-        { expectedUrl: `https://pleroma.soykaf.com/static/config.json` }
+        { expectedUrl: 'https://pleroma.soykaf.com/static/config.json' }
       ))
       .mockImplementationOnce(fetchMocker(
         { configOption: true },
-        { expectedUrl: `https://pleroma.soykaf.com/api/statusnet/config.json` }
+        { expectedUrl: 'https://pleroma.soykaf.com/api/statusnet/config.json' }
       ))
 
-    let state = await configThunks.fetchConfig({ config, appId: 'kenoma' })(dispatch, getState)
+    const state = await configThunks.fetchConfig({ config, appId: 'kenoma' })(dispatch, getState)
 
     expect(state.config.kenoma)
       .toEqual({ configOption: true, theme: 'pleroma-dark' })

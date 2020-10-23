@@ -12,7 +12,6 @@ const emojis = [
 
 describe('ParseUtils', () => {
   describe('emojify', () => {
-
     it('should convert :short_code: to img tag', () => {
       const content = '<p>This is a test :marko:</p>'
       const expected = "<p>This is a test <img draggable='false' class='custom-emoji' src='http://thesourceurl' alt='marko' title='marko' /></p>"
@@ -44,7 +43,7 @@ describe('ParseUtils', () => {
       const account = {
         emojis
       }
-      const old_account = {
+      const oldAccount = {
         display_name: '<p>This is a test :marko::tim::marko:</p>',
         emojis
       }
@@ -54,7 +53,7 @@ describe('ParseUtils', () => {
         "<img draggable='false' class='custom-emoji' src='http://thesourceurl' alt='marko' title='marko' /></p>",
         emojis
       }
-      expect(ParseUtils.emojifyAccount(account, old_account)).toEqual(expected)
+      expect(ParseUtils.emojifyAccount(account, oldAccount)).toEqual(expected)
     })
   })
   describe('Emojify status', () => {
@@ -64,7 +63,7 @@ describe('ParseUtils', () => {
         emojis,
         account: {
           emojis,
-          display_name: '<p>This is a test :marko:</p>',
+          display_name: '<p>This is a test :marko:</p>'
         }
       }
       const res = "<p>This is a test <img draggable='false' class='custom-emoji' src='http://thesourceurl' alt='marko' title='marko' /></p>"
@@ -79,5 +78,4 @@ describe('ParseUtils', () => {
       expect(ParseUtils.emojifyStatus(status, {})).toEqual(expected)
     })
   })
-  
 })

@@ -10,7 +10,7 @@ describe('User reducers', () => {
         Users.actions.addUser({ user })
       )
 
-      expect(resultState.usersByIds).toEqual({ '1': user })
+      expect(resultState.usersByIds).toEqual({ 1: user })
     })
 
     it('update user', () => {
@@ -26,7 +26,7 @@ describe('User reducers', () => {
         Users.actions.addUser({ user })
       )
 
-      expect(resultState.usersByIds).toEqual({ '1': user })
+      expect(resultState.usersByIds).toEqual({ 1: user })
     })
 
     it('adds new users by id', () => {
@@ -39,8 +39,8 @@ describe('User reducers', () => {
 
       expect(resultState.usersByIds).toEqual(
         {
-          '1': { id: '1' },
-          '2': { id: '2' }
+          1: { id: '1' },
+          2: { id: '2' }
         }
       )
     })
@@ -97,8 +97,7 @@ describe('User reducers', () => {
     })
   })
 
-  
-  describe(`adding a user's statuses`, () => {
+  describe('adding a user\'s statuses', () => {
     it('add statuses no a new user', () => {
       const user = { id: '1' }
       const statuses = [{ id: 2, content: 'b' }, { id: 1, content: 'a' }]
@@ -124,7 +123,7 @@ describe('User reducers', () => {
 
     it('delete user status', () => {
       const statuses = [{ id: 2, content: 'b' }, { id: 1, content: 'a' }]
-      const user = { id: '1', statuses: [ ...statuses ] }
+      const user = { id: '1', statuses: [...statuses] }
 
       const resultState = Users.reducer(
         { usersByIds: { 1: user } },
@@ -135,7 +134,7 @@ describe('User reducers', () => {
     })
   })
 
-  describe(`update user status`, () => {
+  describe('update user status', () => {
     it('should update user status', () => {
       const status = { id: '2', content: 'content', spoiler_text: 'header', avatar: 'nd' }
       const user = {
@@ -144,28 +143,28 @@ describe('User reducers', () => {
       }
 
       const resultState = Users.reducer(
-        { usersByIds: { '1': user } },
+        { usersByIds: { 1: user } },
         Users.actions.updateUserStatus({ userId: '1', status: { ...status, followed_by: [{ id: 'f1' }] } })
       )
 
-      expect(resultState.usersByIds['1']).toEqual({ id: '1', statuses: [{...status, followed_by: [{ id: 'f1' }] }] })
+      expect(resultState.usersByIds['1']).toEqual({ id: '1', statuses: [{ ...status, followed_by: [{ id: 'f1' }] }] })
     })
-    it(`should set status, if it wasn't exist`, () => {
+    it('should set status, if it wasn\'t exist', () => {
       const status = { id: '2', content: 'content', spoiler_text: 'header' }
       const user = {
         id: '1'
       }
 
       const resultState = Users.reducer(
-        { usersByIds: { '1': user } },
+        { usersByIds: { 1: user } },
         Users.actions.updateUserStatus({ userId: '1', status: { ...status, followed_by: [{ id: 'f1' }] } })
       )
 
-      expect(resultState.usersByIds['1']).toEqual({ id: '1', statuses: [{...status, followed_by: [{ id: 'f1' }] }] })
+      expect(resultState.usersByIds['1']).toEqual({ id: '1', statuses: [{ ...status, followed_by: [{ id: 'f1' }] }] })
     })
-  }) 
+  })
 
-  describe(`adding a user's followers`, () => {
+  describe('adding a user\'s followers', () => {
     it('add followersIds no a new user', () => {
       const followers = [{ id: 2, acct: 'b' }, { id: 1, acct: 'a' }]
       const resultState = Users.reducer(
@@ -181,15 +180,14 @@ describe('User reducers', () => {
       const followers = [{ id: 2, acct: 'b' }, { id: 1, acct: 'a' }]
       const resultState = Users.reducer(
         { usersByIds: { 1: user } },
-        Users.actions.addUserFollowers({ userId: user.id, followers  })
+        Users.actions.addUserFollowers({ userId: user.id, followers })
       )
 
       expect(resultState.usersByIds['1']).toEqual({ ...user, followers: [2, 1] })
     })
   })
 
-
-  describe(`adding a user's following`, () => {
+  describe('adding a user\'s following', () => {
     it('add followingIds no a new user', () => {
       const following = [{ id: 2, acct: 'b' }, { id: 1, acct: 'a' }]
       const resultState = Users.reducer(
@@ -205,7 +203,7 @@ describe('User reducers', () => {
       const following = [{ id: 2, acct: 'b' }, { id: 1, acct: 'a' }]
       const resultState = Users.reducer(
         { usersByIds: { 1: user } },
-        Users.actions.addUserFollowing({ userId: user.id, following  })
+        Users.actions.addUserFollowing({ userId: user.id, following })
       )
 
       expect(resultState.usersByIds['1']).toEqual({ ...user, following: [2, 1] })

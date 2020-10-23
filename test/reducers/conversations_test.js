@@ -34,7 +34,7 @@ describe('Conversations reducers', () => {
 
     resultState = Conversations.reducer(resultState, Conversations.actions.addConversation({ conversation: updatedConversation }))
 
-    expect(resultState.conversationsByIds).toEqual({ '123': { id: '123', type: 'follow', pleroma: {} } })
+    expect(resultState.conversationsByIds).toEqual({ 123: { id: '123', type: 'follow', pleroma: {} } })
   })
 
   it('adds conversation ids', async () => {
@@ -51,7 +51,7 @@ describe('Conversations reducers', () => {
     }
     const resultState = Conversations.reducer(undefined, Conversations.actions.updateConversation({ conversation }))
 
-    expect(resultState.conversationsByIds).toEqual({ 1: { id: 1, timeline: [{ id: 2 }], last_status: { id: 2 }} })
+    expect(resultState.conversationsByIds).toEqual({ 1: { id: 1, timeline: [{ id: 2 }], last_status: { id: 2 } } })
   })
 
   it('clear conversations', async () => {

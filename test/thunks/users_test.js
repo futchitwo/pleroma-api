@@ -35,13 +35,13 @@ describe('Users thunks', () => {
     fetch
       .mockImplementationOnce(fetchMocker(
         user,
-        { expectedUrl: `https://pleroma.soykaf.com/api/v1/accounts/1` }
+        { expectedUrl: 'https://pleroma.soykaf.com/api/v1/accounts/1' }
       ))
       .mockImplementationOnce(fetchMocker(
         relationships,
-        { expectedUrl: `https://pleroma.soykaf.com/api/v1/accounts/relationships?id=1` }
+        { expectedUrl: 'https://pleroma.soykaf.com/api/v1/accounts/relationships?id=1' }
       ))
-    let state = await usersThunks.fetchUser({ config, params: { id: '1' } })(dispatch, getState)
+    const state = await usersThunks.fetchUser({ config, params: { id: '1' } })(dispatch, getState)
 
     const expectedResult = {
       id: '1',
@@ -57,7 +57,7 @@ describe('Users thunks', () => {
       .toEqual({ 1: expectedResult })
   })
 
-  it(`fetch user's statuses`, async () => {
+  it('fetch user\'s statuses', async () => {
     const store = { state: undefined }
     const dispatch = (action) => {
       store.state = reducer(store.state, action)
@@ -74,37 +74,37 @@ describe('Users thunks', () => {
     }
     const statuses = [
       { id: 1, content: 'second status', spoiler_text: '', account: user, reblog: { account: account2 } },
-      { id: 0, content: 'test status', spoiler_text: '', account: user },
+      { id: 0, content: 'test status', spoiler_text: '', account: user }
     ]
 
     fetch.mockReset()
     fetch
       .mockImplementationOnce(fetchMocker(
         statuses,
-        { expectedUrl: `https://pleroma.soykaf.com/api/v1/accounts/1/statuses` }
+        { expectedUrl: 'https://pleroma.soykaf.com/api/v1/accounts/1/statuses' }
       ))
-    let state = await usersThunks.fetchUserStatuses({ config, params: { id: '1' } })(dispatch, getState)
+    const state = await usersThunks.fetchUserStatuses({ config, params: { id: '1' } })(dispatch, getState)
 
     const expectedResult = {
-      '1': {
+      1: {
         id: '1',
         username: 'username',
-        display_name: "",
+        display_name: '',
         note: undefined,
         statuses
       },
-      '2': {
+      2: {
         id: '2',
         username: 'username1',
-        display_name: "",
-        note: undefined,
+        display_name: '',
+        note: undefined
       }
     }
     expect(state.users.usersByIds)
       .toEqual(expectedResult)
   })
 
-  it(`fetch user's followers`, async () => {
+  it('fetch user\'s followers', async () => {
     const store = { state: undefined }
     const dispatch = (action) => {
       store.state = reducer(store.state, action)
@@ -112,28 +112,28 @@ describe('Users thunks', () => {
     const getState = () => store.state
     const followers = [
       { id: 1, acct: 'user1' },
-      { id: 0, acct: 'user2' },
+      { id: 0, acct: 'user2' }
     ]
 
     fetch.mockReset()
     fetch
       .mockImplementationOnce(fetchMocker(
         followers,
-        { expectedUrl: `https://pleroma.soykaf.com/api/v1/accounts/2/followers` }
+        { expectedUrl: 'https://pleroma.soykaf.com/api/v1/accounts/2/followers' }
       ))
-    let state = await usersThunks.fetchUserFollowers({ config, params: { id: '2' } })(dispatch, getState)
+    const state = await usersThunks.fetchUserFollowers({ config, params: { id: '2' } })(dispatch, getState)
 
     const expectedResult = {
-      '0': { id: 0, acct: 'user2', display_name: undefined, note: undefined },
-      '1': { id: 1, acct: 'user1', display_name: undefined, note: undefined },
-      '2': { followers: [1, 0], display_name: undefined, note: undefined }
+      0: { id: 0, acct: 'user2', display_name: undefined, note: undefined },
+      1: { id: 1, acct: 'user1', display_name: undefined, note: undefined },
+      2: { followers: [1, 0], display_name: undefined, note: undefined }
     }
 
     expect(state.users.usersByIds)
       .toEqual(expectedResult)
   })
 
-  it(`fetch user's following`, async () => {
+  it('fetch user\'s following', async () => {
     const store = { state: undefined }
     const dispatch = (action) => {
       store.state = reducer(store.state, action)
@@ -141,21 +141,21 @@ describe('Users thunks', () => {
     const getState = () => store.state
     const following = [
       { id: 1, acct: 'user1' },
-      { id: 0, acct: 'user2' },
+      { id: 0, acct: 'user2' }
     ]
 
     fetch.mockReset()
     fetch
       .mockImplementationOnce(fetchMocker(
         following,
-        { expectedUrl: `https://pleroma.soykaf.com/api/v1/accounts/2/following` }
+        { expectedUrl: 'https://pleroma.soykaf.com/api/v1/accounts/2/following' }
       ))
-    let state = await usersThunks.fetchUserFollowing({ config, params: { id: '2' } })(dispatch, getState)
+    const state = await usersThunks.fetchUserFollowing({ config, params: { id: '2' } })(dispatch, getState)
 
     const expectedResult = {
-      '0': { id: 0, acct: 'user2', display_name: undefined, note: undefined },
-      '1': { id: 1, acct: 'user1', display_name: undefined, note: undefined },
-      '2': { following: [1, 0], display_name: undefined, note: undefined }
+      0: { id: 0, acct: 'user2', display_name: undefined, note: undefined },
+      1: { id: 1, acct: 'user1', display_name: undefined, note: undefined },
+      2: { following: [1, 0], display_name: undefined, note: undefined }
     }
 
     expect(state.users.usersByIds)
@@ -163,16 +163,18 @@ describe('Users thunks', () => {
   })
 
   it('follow user', async () => {
-    const store = { state: {
-      users: {
-        usersByIds: {
-          '1': {
-            id: '1',
-            relationships: { following: false }
+    const store = {
+      state: {
+        users: {
+          usersByIds: {
+            1: {
+              id: '1',
+              relationships: { following: false }
+            }
           }
         }
       }
-    } }
+    }
     const dispatch = (action) => {
       store.state = reducer(store.state, action)
     }
@@ -182,9 +184,9 @@ describe('Users thunks', () => {
     fetch
       .mockImplementationOnce(fetchMocker(
         { following: true },
-        { expectedUrl: `https://pleroma.soykaf.com/api/v1/accounts/1/follow` }
+        { expectedUrl: 'https://pleroma.soykaf.com/api/v1/accounts/1/follow' }
       ))
-    let { state } = await usersThunks.toggleFollowState({ config, params: { id: '1', following: false } })(dispatch, getState)
+    const { state } = await usersThunks.toggleFollowState({ config, params: { id: '1', following: false } })(dispatch, getState)
 
     const expectedResult = {
       id: '1',
@@ -196,16 +198,18 @@ describe('Users thunks', () => {
       .toEqual({ 1: expectedResult })
   })
   it('unmute user', async () => {
-    const store = { state: {
-      users: {
-        usersByIds: {
-          '1': {
-            id: '1',
-            relationships: { muting: true }
+    const store = {
+      state: {
+        users: {
+          usersByIds: {
+            1: {
+              id: '1',
+              relationships: { muting: true }
+            }
           }
         }
       }
-    } }
+    }
     const dispatch = (action) => {
       store.state = reducer(store.state, action)
     }
@@ -215,9 +219,9 @@ describe('Users thunks', () => {
     fetch
       .mockImplementationOnce(fetchMocker(
         { muting: false },
-        { expectedUrl: `https://pleroma.soykaf.com/api/v1/accounts/1/unmute` }
+        { expectedUrl: 'https://pleroma.soykaf.com/api/v1/accounts/1/unmute' }
       ))
-    let { state } = await usersThunks.toggleMuteState({ config, params: { id: '1', muting: true } })(dispatch, getState)
+    const { state } = await usersThunks.toggleMuteState({ config, params: { id: '1', muting: true } })(dispatch, getState)
 
     const expectedResult = {
       id: '1',
@@ -229,16 +233,18 @@ describe('Users thunks', () => {
       .toEqual({ 1: expectedResult })
   })
   it('block user', async () => {
-    const store = { state: {
-      users: {
-        usersByIds: {
-          '1': {
-            id: '1',
-            relationships: { blocking: false }
+    const store = {
+      state: {
+        users: {
+          usersByIds: {
+            1: {
+              id: '1',
+              relationships: { blocking: false }
+            }
           }
         }
       }
-    } }
+    }
     const dispatch = (action) => {
       store.state = reducer(store.state, action)
     }
@@ -248,9 +254,9 @@ describe('Users thunks', () => {
     fetch
       .mockImplementationOnce(fetchMocker(
         { blocking: true },
-        { expectedUrl: `https://pleroma.soykaf.com/api/v1/accounts/1/block` }
+        { expectedUrl: 'https://pleroma.soykaf.com/api/v1/accounts/1/block' }
       ))
-    let { state } = await usersThunks.toggleBlockState({ config, params: { id: '1', blocking: false } })(dispatch, getState)
+    const { state } = await usersThunks.toggleBlockState({ config, params: { id: '1', blocking: false } })(dispatch, getState)
 
     const expectedResult = {
       id: '1',

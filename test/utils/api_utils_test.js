@@ -19,7 +19,7 @@ describe('apiErrorCatcher', () => {
   })
 
   it('should return error for array result', () => {
-    const result = [ { state: 'ok', data: {} }, { state: 'error', data: { error: 'server error' } } ]
+    const result = [{ state: 'ok', data: {} }, { state: 'error', data: { error: 'server error' } }]
     expect(() => apiErrorCatcher(result)).toThrowError('server error')
   })
 })

@@ -17,156 +17,187 @@ describe('Reactions thunks', () => {
   }
 
   it('react to a status', async () => {
-    const store = { state: { statuses: { statusesByIds: {
-      '21': {
-        id: '21',
-        content: '',
-        spoiler_text: '',
-      }
-    } } } }
-    const dispatch = (action) => {
-      store.state = reducer(store.state, action)
-    }
-    const getState = () => store.state
-
-    fetch.mockReset()
-    fetch.mockImplementationOnce(fetchMocker(
-      {
-        id: '21',
-        content: '',
-        spoiler_text: '',
-        pleroma: {
-          emoji_reactions: [{count: 1, me: true, name: "😃"}]
-        }
-      },
-      {
-        expectedUrl: `https://pleroma.soykaf.com/api/v1/pleroma/statuses/21/reactions/%F0%9F%98%83`,
-      }
-    ))
-
-    let state = await reactionsThunks.toggleReaction({ config, params: { statusId: '21', emoji: '%F0%9F%98%83' }, reacted: false })(dispatch, getState)
-
-    expect(state.statuses.statusesByIds)
-      .toEqual({ '21': {
-        id: '21',
-        content: '',
-        spoiler_text: '',
-        pleroma: {
-          emoji_reactions: [{ count: 1, me: true, name: "😃", accounts: null }]
-        }
-      }})
-  })
-  it('remove reaction from status', async () => {
-    const store = { state: { statuses: { statusesByIds: {
-      '21': {
-        id: '21',
-        content: '',
-        spoiler_text: '',
-        pleroma: {
-          emoji_reactions: [{count: 1, me: true, name: "😃"}]
-        }
-      }
-    } } } }
-    const dispatch = (action) => {
-      store.state = reducer(store.state, action)
-    }
-    const getState = () => store.state
-
-    fetch.mockReset()
-    fetch.mockImplementationOnce(fetchMocker(
-      {
-        id: '21',
-        content: '',
-        spoiler_text: '',
-        pleroma: {
-          emoji_reactions: []
-        }
-      },
-      {
-        expectedUrl: `https://pleroma.soykaf.com/api/v1/pleroma/statuses/21/reactions/%F0%9F%98%83`,
-      }
-    ))
-
-    let state = await reactionsThunks.toggleReaction({ config, params: { statusId: '21', emoji: '%F0%9F%98%83' }, reacted: true })(dispatch, getState)
-
-    expect(state.statuses.statusesByIds)
-      .toEqual({ '21': {
-        id: '21',
-        content: '',
-        spoiler_text: '',
-        pleroma: {
-          emoji_reactions: []
-        }
-      }})
-  })
-  it('get reactions of status', async () => {
-    const store = { state: { statuses: { statusesByIds: {
-      '21': {
-        id: '21',
-        content: '',
-        spoiler_text: '',
-        pleroma: {
-          emoji_reactions: [{count: 1, me: true, name: "😃"}]
-        }
-      }
-    } } } }
-    const dispatch = (action) => {
-      store.state = reducer(store.state, action)
-    }
-    const getState = () => store.state
-
-    fetch.mockReset()
-    fetch.mockImplementationOnce(fetchMocker(
-      [{count: 1, me: true, name: "😃", accounts: [{ id: 'id1', acct: 'name1' }, { id: 'id2', acct: 'name2' }] }],
-      {
-        expectedUrl: `https://pleroma.soykaf.com/api/v1/pleroma/statuses/21/reactions`,
-      }
-    ))
-
-    let state = await reactionsThunks.getReactions({ config, params: { statusId: '21' } })(dispatch, getState)
-
-    expect(state.statuses.statusesByIds)
-      .toEqual({ '21': {
-        id: '21',
-        content: '',
-        spoiler_text: '',
-        pleroma: {
-          emoji_reactions: [{count: 1, me: true, name: "😃", accounts: [{ id: 'id1', acct: 'name1' }, { id: 'id2', acct: 'name2' }] }]
-        }
-      }})
-  })
-  it(`get reactions of user's status`, async () => {
-    const store = { state: { users: { usersByIds: {
-      '1': {
-        id: '1',
-        acct: 'user',
-        display_name: 'user',
-        statuses: [
-          {
-            id: '21',
-            content: '',
-            spoiler_text: '',
-            pleroma: {
-              emoji_reactions: [{count: 1, me: true, name: "😃"}]
+    const store = {
+      state: {
+        statuses: {
+          statusesByIds: {
+            21: {
+              id: '21',
+              content: '',
+              spoiler_text: ''
             }
           }
-        ]
-      } } } } }
+        }
+      }
+    }
     const dispatch = (action) => {
       store.state = reducer(store.state, action)
     }
     const getState = () => store.state
 
-    const accounts = [{ id: 'id1', acct: 'name1' }, { id: 'id2', acct: 'name2' }] 
     fetch.mockReset()
     fetch.mockImplementationOnce(fetchMocker(
-      [{count: 1, me: true, name: "😃", accounts }],
       {
-        expectedUrl: `https://pleroma.soykaf.com/api/v1/pleroma/statuses/21/reactions`,
+        id: '21',
+        content: '',
+        spoiler_text: '',
+        pleroma: {
+          emoji_reactions: [{ count: 1, me: true, name: '😃' }]
+        }
+      },
+      {
+        expectedUrl: 'https://pleroma.soykaf.com/api/v1/pleroma/statuses/21/reactions/%F0%9F%98%83'
       }
     ))
 
-    let state = await reactionsThunks.getReactions({ config, params: { statusId: '21', userId: '1' } })(dispatch, getState)
+    const state = await reactionsThunks.toggleReaction({ config, params: { statusId: '21', emoji: '%F0%9F%98%83' }, reacted: false })(dispatch, getState)
+
+    expect(state.statuses.statusesByIds)
+      .toEqual({
+        21: {
+          id: '21',
+          content: '',
+          spoiler_text: '',
+          pleroma: {
+            emoji_reactions: [{ count: 1, me: true, name: '😃', accounts: null }]
+          }
+        }
+      })
+  })
+  it('remove reaction from status', async () => {
+    const store = {
+      state: {
+        statuses: {
+          statusesByIds: {
+            21: {
+              id: '21',
+              content: '',
+              spoiler_text: '',
+              pleroma: {
+                emoji_reactions: [{ count: 1, me: true, name: '😃' }]
+              }
+            }
+          }
+        }
+      }
+    }
+    const dispatch = (action) => {
+      store.state = reducer(store.state, action)
+    }
+    const getState = () => store.state
+
+    fetch.mockReset()
+    fetch.mockImplementationOnce(fetchMocker(
+      {
+        id: '21',
+        content: '',
+        spoiler_text: '',
+        pleroma: {
+          emoji_reactions: []
+        }
+      },
+      {
+        expectedUrl: 'https://pleroma.soykaf.com/api/v1/pleroma/statuses/21/reactions/%F0%9F%98%83'
+      }
+    ))
+
+    const state = await reactionsThunks.toggleReaction({ config, params: { statusId: '21', emoji: '%F0%9F%98%83' }, reacted: true })(dispatch, getState)
+
+    expect(state.statuses.statusesByIds)
+      .toEqual({
+        21: {
+          id: '21',
+          content: '',
+          spoiler_text: '',
+          pleroma: {
+            emoji_reactions: []
+          }
+        }
+      })
+  })
+  it('get reactions of status', async () => {
+    const store = {
+      state: {
+        statuses: {
+          statusesByIds: {
+            21: {
+              id: '21',
+              content: '',
+              spoiler_text: '',
+              pleroma: {
+                emoji_reactions: [{ count: 1, me: true, name: '😃' }]
+              }
+            }
+          }
+        }
+      }
+    }
+    const dispatch = (action) => {
+      store.state = reducer(store.state, action)
+    }
+    const getState = () => store.state
+
+    fetch.mockReset()
+    fetch.mockImplementationOnce(fetchMocker(
+      [{ count: 1, me: true, name: '😃', accounts: [{ id: 'id1', acct: 'name1' }, { id: 'id2', acct: 'name2' }] }],
+      {
+        expectedUrl: 'https://pleroma.soykaf.com/api/v1/pleroma/statuses/21/reactions'
+      }
+    ))
+
+    const state = await reactionsThunks.getReactions({ config, params: { statusId: '21' } })(dispatch, getState)
+
+    expect(state.statuses.statusesByIds)
+      .toEqual({
+        21: {
+          id: '21',
+          content: '',
+          spoiler_text: '',
+          pleroma: {
+            emoji_reactions: [{ count: 1, me: true, name: '😃', accounts: [{ id: 'id1', acct: 'name1' }, { id: 'id2', acct: 'name2' }] }]
+          }
+        }
+      })
+  })
+  it('get reactions of user\'s status', async () => {
+    const store = {
+      state: {
+        users: {
+          usersByIds: {
+            1: {
+              id: '1',
+              acct: 'user',
+              display_name: 'user',
+              statuses: [
+                {
+                  id: '21',
+                  content: '',
+                  spoiler_text: '',
+                  pleroma: {
+                    emoji_reactions: [{ count: 1, me: true, name: '😃' }]
+                  }
+                }
+              ]
+            }
+          }
+        }
+      }
+    }
+    const dispatch = (action) => {
+      store.state = reducer(store.state, action)
+    }
+    const getState = () => store.state
+
+    const accounts = [{ id: 'id1', acct: 'name1' }, { id: 'id2', acct: 'name2' }]
+    fetch.mockReset()
+    fetch.mockImplementationOnce(fetchMocker(
+      [{ count: 1, me: true, name: '😃', accounts }],
+      {
+        expectedUrl: 'https://pleroma.soykaf.com/api/v1/pleroma/statuses/21/reactions'
+      }
+    ))
+
+    const state = await reactionsThunks.getReactions({ config, params: { statusId: '21', userId: '1' } })(dispatch, getState)
 
     expect(state.users.usersByIds['1'])
       .toEqual({
@@ -179,42 +210,49 @@ describe('Reactions thunks', () => {
             content: '',
             spoiler_text: '',
             pleroma: {
-              emoji_reactions: [{count: 1, me: true, name: "😃", accounts }]
+              emoji_reactions: [{ count: 1, me: true, name: '😃', accounts }]
             }
           }
         ]
       })
   })
-  it(`get reactions of status with reblog`, async () => {
-    const store = { state: { statuses: { statusesByIds: {
-      '1': {
-        id: '1',
-        content: '',
-        spoiler_text: '',
-        pleroma: {},
-        reblog: {
-          id: '2',
-          content: '',
-          spoiler_text: '',
-          pleroma: {
-            emoji_reactions: [{count: 1, me: true, name: "😃" }]
+  it('get reactions of status with reblog', async () => {
+    const store = {
+      state: {
+        statuses: {
+          statusesByIds: {
+            1: {
+              id: '1',
+              content: '',
+              spoiler_text: '',
+              pleroma: {},
+              reblog: {
+                id: '2',
+                content: '',
+                spoiler_text: '',
+                pleroma: {
+                  emoji_reactions: [{ count: 1, me: true, name: '😃' }]
+                }
+              }
+            }
           }
         }
-      } } } } }
+      }
+    }
     const dispatch = (action) => {
       store.state = reducer(store.state, action)
     }
     const getState = () => store.state
-    const accounts = [{ id: 'id1', acct: 'name1' }] 
+    const accounts = [{ id: 'id1', acct: 'name1' }]
     fetch.mockReset()
     fetch.mockImplementationOnce(fetchMocker(
-      [{count: 1, me: true, name: "😃", accounts }],
+      [{ count: 1, me: true, name: '😃', accounts }],
       {
-        expectedUrl: `https://pleroma.soykaf.com/api/v1/pleroma/statuses/2/reactions`,
+        expectedUrl: 'https://pleroma.soykaf.com/api/v1/pleroma/statuses/2/reactions'
       }
     ))
 
-    let state = await reactionsThunks.getReactions({ config, params: { statusId: '1', reblogStatusId: '2' } })(dispatch, getState)
+    const state = await reactionsThunks.getReactions({ config, params: { statusId: '1', reblogStatusId: '2' } })(dispatch, getState)
 
     expect(state.statuses.statusesByIds['1'])
       .toEqual({
@@ -228,7 +266,7 @@ describe('Reactions thunks', () => {
           spoiler_text: '',
           account: null,
           pleroma: {
-            emoji_reactions: [{count: 1, me: true, name: "😃", accounts }]
+            emoji_reactions: [{ count: 1, me: true, name: '😃', accounts }]
           }
         }
       })

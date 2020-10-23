@@ -13,7 +13,7 @@ describe('Timelines api', () => {
     fetch.mockImplementationOnce(fetchMocker(
       [{ id: 1 }, { id: 2 }],
       {
-        expectedUrl: `https://pleroma.soykaf.com/api/v1/timelines/home?since_id=1`,
+        expectedUrl: 'https://pleroma.soykaf.com/api/v1/timelines/home?since_id=1',
         headers: {
           link: '<https://pleroma.soykaf.com/api/v1/timelines/home?max_id=9gZ5VYhDG8GeCL8Vay>; rel="next", <https://pleroma.soykaf.com/api/v1/timelines/home?since_id=9gZ5g5Q6RlaAaN9Z5M>; rel="prev"'
         }
@@ -31,7 +31,7 @@ describe('Timelines api', () => {
     fetch.mockImplementationOnce(fetchMocker(
       [{ id: 1 }, { id: 2 }],
       {
-        expectedUrl: `https://pleroma.soykaf.com/api/v1/timelines/public`,
+        expectedUrl: 'https://pleroma.soykaf.com/api/v1/timelines/public',
         expectedToken: `Bearer ${accessToken}`,
         headers: {
           link: '<https://pleroma.soykaf.com/api/v1/timelines/public?max_id=9gZ5VYhDG8GeCL8Vay>; rel="next", <https://pleroma.soykaf.com/api/v1/timelines/home?since_id=9gZ5g5Q6RlaAaN9Z5M>; rel="prev"'
@@ -50,7 +50,7 @@ describe('Timelines api', () => {
     fetch.mockImplementationOnce(fetchMocker(
       [{ id: 1 }, { id: 2 }],
       {
-        expectedUrl: `https://pleroma.soykaf.com/api/v1/timelines/tag/tagname`,
+        expectedUrl: 'https://pleroma.soykaf.com/api/v1/timelines/tag/tagname',
         expectedToken: `Bearer ${accessToken}`,
         headers: {
           link: '<https://pleroma.soykaf.com/api/v1/timelines/tag/tagname?max_id=9gZ5VYhDG8GeCL8Vay>; rel="next", <https://pleroma.soykaf.com/api/v1/timelines/tag/tagname?since_id=9gZ5g5Q6RlaAaN9Z5M>; rel="prev"'

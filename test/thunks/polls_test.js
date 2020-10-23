@@ -5,7 +5,7 @@ import pollsThunks from '../../src/thunks/polls_thunks'
 import fetch from 'cross-fetch'
 
 jest.mock('cross-fetch')
- 
+
 const reducer = combineReducers({
   statuses: reducers.statuses.reducer
 })
@@ -16,20 +16,22 @@ describe('Polls thunks', () => {
   }
 
   it('vote poll', async () => {
-    const store = { state: {
-      statuses: {
-        statusesByIds: {
-          1: {
-            id: 1,
-            content: undefined,
-            spoiler_text: undefined,
-            poll: {
-              voted: false
+    const store = {
+      state: {
+        statuses: {
+          statusesByIds: {
+            1: {
+              id: 1,
+              content: undefined,
+              spoiler_text: undefined,
+              poll: {
+                voted: false
+              }
             }
           }
         }
       }
-    } }
+    }
     const dispatch = (action) => {
       store.state = reducer(store.state, action)
     }
@@ -39,29 +41,31 @@ describe('Polls thunks', () => {
     fetch.mockImplementationOnce(fetchMocker(
       { voted: true },
       {
-        expectedUrl: `https://pleroma.soykaf.com/api/v1/polls/2/votes`,
+        expectedUrl: 'https://pleroma.soykaf.com/api/v1/polls/2/votes'
       }
     ))
 
-    let state = await pollsThunks.vote({ config, params: { statusId: 1, id: '2' } })(dispatch, getState)
+    const state = await pollsThunks.vote({ config, params: { statusId: 1, id: '2' } })(dispatch, getState)
 
     expect(state.statuses.statusesByIds)
-      .toEqual({ 1: { id: 1, spoiler_text: undefined, content: undefined, poll: { voted: true }} })
+      .toEqual({ 1: { id: 1, spoiler_text: undefined, content: undefined, poll: { voted: true } } })
   })
 
   it('get poll', async () => {
-    const store = { state: {
-      statuses: {
-        statusesByIds: {
-          1: {
-            id: 1,
-            content: undefined,
-            spoiler_text: undefined,
-            poll: { votes_count: 1 }
+    const store = {
+      state: {
+        statuses: {
+          statusesByIds: {
+            1: {
+              id: 1,
+              content: undefined,
+              spoiler_text: undefined,
+              poll: { votes_count: 1 }
+            }
           }
         }
       }
-    } }
+    }
     const dispatch = (action) => {
       store.state = reducer(store.state, action)
     }
@@ -70,11 +74,11 @@ describe('Polls thunks', () => {
     fetch.mockReset()
     fetch.mockImplementationOnce(fetchMocker(
       { votes_count: 2 },
-      { expectedUrl: `https://pleroma.soykaf.com/api/v1/polls/2` }
+      { expectedUrl: 'https://pleroma.soykaf.com/api/v1/polls/2' }
     ))
-    let state = await pollsThunks.getPoll({ config, params: { statusId: 1, id: '2' } })(dispatch, getState)
+    const state = await pollsThunks.getPoll({ config, params: { statusId: 1, id: '2' } })(dispatch, getState)
 
     expect(state.statuses.statusesByIds)
-      .toEqual({ 1: { id: 1, spoiler_text: undefined, content: undefined, poll: { votes_count: 2 }} })
+      .toEqual({ 1: { id: 1, spoiler_text: undefined, content: undefined, poll: { votes_count: 2 } } })
   })
 })

@@ -27,7 +27,7 @@ describe('Api thunks', () => {
   })
 
   describe('stopAllFetchers', () => {
-    it ('stop all existing fetchers', async () => {
+    it('stop all existing fetchers', async () => {
       const state = defaultState()
       const store = { state: { ...state } }
       const dispatch = (action) => {
@@ -43,7 +43,7 @@ describe('Api thunks', () => {
 
       expect(getState().api.notifications.fetcher).toBeNull()
       expect(getState().api.polls['11'].fetcher).toBeNull()
-      expect(getState().api.timelines['home'].fetcher).toBeNull()
+      expect(getState().api.timelines.home.fetcher).toBeNull()
     })
   })
 
@@ -56,7 +56,7 @@ describe('Api thunks', () => {
         store.state = reducer(store.state, action)
         return store.state
       }
-      
+
       const getState = () => store.state
 
       fetch.mockReset()
@@ -83,7 +83,7 @@ describe('Api thunks', () => {
         store.state = reducer(store.state, action)
         return store.state
       }
-      
+
       const getState = () => store.state
 
       fetch.mockReset()
@@ -129,7 +129,7 @@ describe('Api thunks', () => {
         store.state = reducer(store.state, action)
         return store.state
       }
-      
+
       const getState = () => store.state
 
       fetch.mockReset()
@@ -152,7 +152,7 @@ describe('Api thunks', () => {
         store.state = reducer(store.state, action)
         return store.state
       }
-      
+
       const getState = () => store.state
 
       fetch.mockReset()
@@ -177,7 +177,7 @@ describe('Api thunks', () => {
         store.state = reducer(store.state, action)
         return store.state
       }
-      
+
       const getState = () => store.state
 
       fetch.mockReset()
@@ -266,7 +266,7 @@ describe('Api thunks', () => {
       const dispatch = (action) => {
         store.state = reducer(store.state, action)
         return store.state
-      }      
+      }
       const getState = () => store.state
 
       fetch.mockReset()
@@ -305,14 +305,13 @@ describe('Api thunks', () => {
     })
   })
 
-
   describe('startFetchingTagTimeline', () => {
     it('creates a tagTimeline fetcher', async () => {
       const store = { state: defaultState() }
       const dispatch = (action) => {
         store.state = reducer(store.state, action)
         return store.state
-      }      
+      }
       const getState = () => store.state
 
       fetch.mockReset()
@@ -350,15 +349,18 @@ describe('Api thunks', () => {
       expect(getState().api.tagTimeline.fetcher).toBeNull()
     })
   })
+
   describe('search Users', () => {
     it('should add search result and request to searchCache', async () => {
       const config = {
         instance: 'https://pleroma.soykaf.com'
       }
-      const store = { state: {
-        users: { usersByIds: {} },
-        api: { searchCache: [] }
-      } }
+      const store = {
+        state: {
+          users: { usersByIds: {} },
+          api: { searchCache: [] }
+        }
+      }
       const dispatch = (action) => {
         store.state = reducer(store.state, action)
       }
@@ -371,24 +373,27 @@ describe('Api thunks', () => {
       fetch
         .mockImplementationOnce(fetchMocker(
           { accounts: [account] },
-          { expectedUrl: `https://pleroma.soykaf.com/api/v2/search?q=nd` }
+          { expectedUrl: 'https://pleroma.soykaf.com/api/v2/search?q=nd' }
         ))
-      let res = await apiThunks.search({ config, queries: { q: 'nd' } })(dispatch, getState)
+      const res = await apiThunks.search({ config, queries: { q: 'nd' } })(dispatch, getState)
 
       expect(res.state.users.usersByIds)
         .toEqual({ 1: account })
       expect(res.state.api.searchCache)
         .toEqual(['nd'])
-    }),
+    })
+
     it('repeated search request', async () => {
       const config = {
         instance: 'https://pleroma.soykaf.com'
       }
-      const store = { state: {
-        api: {
-          searchCache: ['nd']
+      const store = {
+        state: {
+          api: {
+            searchCache: ['nd']
+          }
         }
-      } }
+      }
       const account = {
         acct: 'nd',
         id: 1
@@ -401,13 +406,14 @@ describe('Api thunks', () => {
       fetch
         .mockImplementationOnce(fetchMocker(
           { accounts: [account] },
-          { expectedUrl: `https://pleroma.soykaf.com/api/v2/search?q=nd` }
+          { expectedUrl: 'https://pleroma.soykaf.com/api/v2/search?q=nd' }
         ))
-      let res = await apiThunks.search({ config, queries: { q: 'nd' } })(dispatch, getState)
+      const res = await apiThunks.search({ config, queries: { q: 'nd' } })(dispatch, getState)
 
       expect(res.state.api.searchCache)
         .toEqual(['nd'])
-    }),
+    })
+
     it('should prevent request if muteRequest: true', async () => {
       const config = {
         instance: 'https://pleroma.soykaf.com'
@@ -416,16 +422,18 @@ describe('Api thunks', () => {
         acct: 'nd',
         id: 1
       }
-      const store = { state: {
-        users: { usersByIds: { 1 : account } },
-        api: { searchCache: ['nd'] }
-      } }
+      const store = {
+        state: {
+          users: { usersByIds: { 1: account } },
+          api: { searchCache: ['nd'] }
+        }
+      }
       const dispatch = (action) => {
         store.state = reducer(store.state, action)
       }
       const getState = () => store.state
-      
-      let res = await apiThunks.search({
+
+      const res = await apiThunks.search({
         config,
         queries: { q: 'nd' },
         options: { muteRequest: true }
