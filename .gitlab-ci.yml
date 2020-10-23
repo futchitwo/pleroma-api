@@ -6,7 +6,7 @@ stages:
   - test
 
 before_script:
-  - yarn
+  - npm install
 
 lint:
   stage: lint
