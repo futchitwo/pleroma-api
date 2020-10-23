@@ -19,7 +19,7 @@ const Configs = {
   async getNodeinfoSchemes ({ config }) {
     return utils.request({
       config,
-      url: `/.well-known/nodeinfo`
+      url: '/.well-known/nodeinfo'
     })
   },
   async getInstanceNodeinfo ({ config, params, fullUrl }) {
@@ -47,7 +47,7 @@ const Configs = {
   async getConfig ({ config }) {
     return utils.request({
       config,
-      url: `/static/config.json`
+      url: '/static/config.json'
     })
   },
   async getStatusnetConfig ({ config }) {
@@ -59,7 +59,7 @@ const Configs = {
   async getCustomEmojis ({ config }) {
     return utils.request({
       config,
-      url: `/api/v1/custom_emojis`
+      url: '/api/v1/custom_emojis'
     })
   },
   async getRemoteInstances ({ config }) {

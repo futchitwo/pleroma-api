@@ -1,20 +1,26 @@
 {
   "name": "pleroma-api",
   "version": "1.0.0",
-  "main": "build/index.js",
+  "private": "true",
   "license": "MIT",
   "scripts": {
-    "build": "neutrino build",
-    "lint": "neutrino lint",
-    "test": "neutrino test",
-    "tdd": "neutrino test --watchAll"
+    "build": "webpack --mode production",
+    "lint": "eslint --cache --format codeframe --ext js src test",
+    "lint-fix": "eslint --format codeframe --ext js src --fix",
+    "test": "jest",
+    "tdd": "jest --watch"
   },
   "devDependencies": {
-    "@neutrinojs/jest": "^8.3.0",
-    "@neutrinojs/library": "^8.3.0",
-    "@neutrinojs/standardjs": "^8.3.0",
-    "neutrino": "^8.3.0",
-    "redux": "^4.0.1"
+    "@neutrinojs/jest": "^9.4.0",
+    "@neutrinojs/library": "^9.4.0",
+    "@neutrinojs/standardjs": "^9.4.0",
+    "eslint": "^7.11.0",
+    "jest": "^26.6.1",
+    "neutrino": "^9.4.0",
+    "redux": "^4.0.1",
+    "regenerator-runtime": "^0.13.7",
+    "webpack": "^4.44.2",
+    "webpack-cli": "^4.1.0"
   },
   "dependencies": {
     "cross-fetch": "^3.0.1",
