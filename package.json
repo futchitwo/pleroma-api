@@ -8,13 +8,19 @@
     "lint": "eslint --cache --format codeframe --ext js src test",
     "lint-fix": "eslint --format codeframe --ext js src test --fix",
     "test": "jest",
-    "tdd": "jest --watch"
+    "tdd": "jest --watchAll"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "npm run lint-fix"
+    }
   },
   "devDependencies": {
     "@neutrinojs/jest": "^9.4.0",
     "@neutrinojs/library": "^9.4.0",
     "@neutrinojs/standardjs": "^9.4.0",
     "eslint": "^7.11.0",
+    "husky": "^4.3.0",
     "jest": "^26.6.1",
     "neutrino": "^9.4.0",
     "redux": "^4.0.1",
