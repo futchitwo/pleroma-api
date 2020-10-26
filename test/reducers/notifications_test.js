@@ -34,7 +34,7 @@ describe('Notifications reducers', () => {
 
     resultState = Notifications.reducer(resultState, Notifications.actions.addNotification({ notification: updatedNotification }))
 
-    expect(resultState.notificationsByIds).toEqual({ '123': { id: '123', type: 'follow', pleroma: {}, account: null } })
+    expect(resultState.notificationsByIds).toEqual({ 123: { id: '123', type: 'follow', pleroma: {}, account: null } })
   })
 
   it('adds notification ids', async () => {
@@ -85,6 +85,7 @@ describe('Notifications reducers', () => {
     expect(resultState.list).toEqual(['1', '2'])
     expect(resultState.notificationsByIds).toEqual({
       1: { id: '1', pleroma: { is_seen: true } },
-      2: { id: '2', pleroma: { is_seen: true } } })
+      2: { id: '2', pleroma: { is_seen: true } }
+    })
   })
 })

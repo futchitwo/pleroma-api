@@ -13,12 +13,12 @@ describe('search api', () => {
     it('return search results', async () => {
       fetch.mockImplementationOnce(fetchMocker(
         { accounts: [], statuses: [{ id: '1', content: 'HI!' }], hashtags: [] },
-        { expectedUrl: "https://pleroma.soykaf.com/api/v2/search?q=HI" }
+        { expectedUrl: 'https://pleroma.soykaf.com/api/v2/search?q=HI' }
       ))
       const res = await api.search({ config, queries: { q: 'HI' } })
 
       expect(res.state).toBe('ok')
-      expect(res.data).toEqual({ accounts: [], hashtags: [], statuses: [{ id: '1', content: 'HI!' }]})
+      expect(res.data).toEqual({ accounts: [], hashtags: [], statuses: [{ id: '1', content: 'HI!' }] })
     })
   })
 })

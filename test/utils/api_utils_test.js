@@ -5,6 +5,7 @@ describe('apiErrorCatcher', () => {
     const result = { state: 'ok', data: { a: 1 } }
     expect(apiErrorCatcher(result)).toEqual(result)
   })
+
   it('should return array result', () => {
     const result = apiErrorCatcher([
       { state: 'ok', data: { a: 1 } },
@@ -12,11 +13,13 @@ describe('apiErrorCatcher', () => {
     ])
     expect(result).toEqual([{ state: 'ok', data: { a: 1 } }, { state: 'ok', data: { a: 1 } }])
   })
+
   it('should return error', () => {
     expect(() => apiErrorCatcher({ state: 'error', data: { error: 'server error' } })).toThrowError('server error')
   })
+
   it('should return error for array result', () => {
-    const result = [ { state: 'ok', data: {} }, { state: 'error', data: { error: 'server error' } } ]
+    const result = [{ state: 'ok', data: {} }, { state: 'error', data: { error: 'server error' } }]
     expect(() => apiErrorCatcher(result)).toThrowError('server error')
   })
 })
@@ -34,12 +37,13 @@ describe('createFormData', () => {
 
     expect(createFormData(params)).toEqual(result)
   })
-  it ('create FormData from nested object', () => {
+
+  it('create FormData from nested object', () => {
     const params = {
       poll: {
         multiple: true,
         expires_in: 10000,
-        options: ['1', '2'],
+        options: ['1', '2']
       }
     }
     const result = new FormData()

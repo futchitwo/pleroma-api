@@ -40,14 +40,14 @@ describe('Conversations thunks', () => {
     fetch.mockImplementationOnce(fetchMocker(
       conversations,
       {
-        expectedUrl: `https://pleroma.soykaf.com/api/v1/conversations`,
+        expectedUrl: 'https://pleroma.soykaf.com/api/v1/conversations',
         headers: {
-          link: `<https://pleroma.soykaf.com/api/v1/conversations?max_id=15>; rel="next", <https://pleroma.soykaf.com/api/v1/conversations?min_id=16>; rel="prev"`
+          link: '<https://pleroma.soykaf.com/api/v1/conversations?max_id=15>; rel="next", <https://pleroma.soykaf.com/api/v1/conversations?min_id=16>; rel="prev"'
         }
       }
     ))
 
-    let state = await conversationsThunks.fetch({ config })(dispatch, getState)
+    const state = await conversationsThunks.fetch({ config })(dispatch, getState)
 
     expect(state.conversations.conversationsByIds)
       .toEqual({ 21: conversations[0], 23: conversations[1] })
@@ -88,16 +88,16 @@ describe('Conversations thunks', () => {
     fetch.mockImplementationOnce(fetchMocker(
       conversations,
       {
-        expectedUrl: `https://pleroma.soykaf.com/api/v1/conversations`,
+        expectedUrl: 'https://pleroma.soykaf.com/api/v1/conversations',
         headers: {
-          link: `<https://pleroma.soykaf.com/api/v1/conversations?max_id=15>; rel="next", <https://pleroma.soykaf.com/api/v1/conversations?min_id=16>; rel="prev"`
+          link: '<https://pleroma.soykaf.com/api/v1/conversations?max_id=15>; rel="next", <https://pleroma.soykaf.com/api/v1/conversations?min_id=16>; rel="prev"'
         }
       }
     ))
 
     const fullUrl = 'https://pleroma.soykaf.com/api/v1/conversations'
 
-    let state = await conversationsThunks.fetch({ config, fullUrl })(dispatch, getState)
+    const state = await conversationsThunks.fetch({ config, fullUrl })(dispatch, getState)
     expect(state.conversations.conversationsByIds)
       .toEqual({ 21: conversations[0], 23: conversations[1] })
 
@@ -126,30 +126,32 @@ describe('Conversations thunks', () => {
 
     fetch.mockReset()
     fetch.mockImplementationOnce(fetchMocker(
-        statuses,
-        {
-          expectedUrl: `https://pleroma.soykaf.com/api/v1/pleroma/conversations/22/statuses`
-        }
-      ))
+      statuses,
+      {
+        expectedUrl: 'https://pleroma.soykaf.com/api/v1/pleroma/conversations/22/statuses'
+      }
+    ))
 
-    let state = await conversationsThunks.fetchConversationTimeline({ config, params: { id: 22 } })(dispatch, getState)
+    const state = await conversationsThunks.fetchConversationTimeline({ config, params: { id: 22 } })(dispatch, getState)
 
     expect(state.conversations.conversationsByIds)
-      .toEqual({ 22: { id: 22, last_status: { id: 2, content: 'test message' },timeline: statuses } })
+      .toEqual({ 22: { id: 22, last_status: { id: 2, content: 'test message' }, timeline: statuses } })
   })
 
   it('update conversation timeline', async () => {
-    const store = { state: {
-      conversations: {
-        conversationsByIds: {
-          22: {
-            id: 22,
-            last_status: { id: '1' },
-            timeline: [{ id: 1, content: 'hi' }]
+    const store = {
+      state: {
+        conversations: {
+          conversationsByIds: {
+            22: {
+              id: 22,
+              last_status: { id: '1' },
+              timeline: [{ id: 1, content: 'hi' }]
+            }
           }
         }
       }
-    } }
+    }
     const dispatch = (action) => {
       store.state = reducer(store.state, action)
     }
@@ -163,14 +165,14 @@ describe('Conversations thunks', () => {
     fetch.mockImplementationOnce(fetchMocker(
       statuses,
       {
-        expectedUrl: `https://pleroma.soykaf.com/api/v1/pleroma/conversations/22/statuses`
+        expectedUrl: 'https://pleroma.soykaf.com/api/v1/pleroma/conversations/22/statuses'
       }
     ))
 
-    let state = await conversationsThunks.fetchConversationTimeline({ config, params: { id: 22 } })(dispatch, getState)
+    const state = await conversationsThunks.fetchConversationTimeline({ config, params: { id: 22 } })(dispatch, getState)
 
     expect(state.conversations.conversationsByIds)
-      .toEqual({ 22: { id: 22, timeline: [{ id: 1, content: 'hi' },{ id: 2, content: 'test message' }] , last_status: { id: 2, content: 'test message' } } })
+      .toEqual({ 22: { id: 22, timeline: [{ id: 1, content: 'hi' }, { id: 2, content: 'test message' }], last_status: { id: 2, content: 'test message' } } })
   })
 
   it('change conversation recipients', async () => {
@@ -193,11 +195,11 @@ describe('Conversations thunks', () => {
     fetch.mockImplementationOnce(fetchMocker(
       statuses,
       {
-        expectedUrl: `https://pleroma.soykaf.com/api/v1/pleroma/conversations/22`
+        expectedUrl: 'https://pleroma.soykaf.com/api/v1/pleroma/conversations/22'
       }
     ))
 
-    let state = await conversationsThunks.changeConversationRecipients({ config, params: { id: 22, recipients: [1, 2] } })(dispatch, getState)
+    const state = await conversationsThunks.changeConversationRecipients({ config, params: { id: 22, recipients: [1, 2] } })(dispatch, getState)
 
     expect(state.conversations.conversationsByIds)
       .toEqual({ 22: { ...conversation, timeline: statuses, pleroma: { recipients } } })
@@ -206,12 +208,16 @@ describe('Conversations thunks', () => {
       .toEqual([22])
   })
   it('read conversations', async () => {
-    const store = { state: { conversations: {
-      list: [1],
-      conversationsByIds: {
-        1: { id: 1, unread: true }
+    const store = {
+      state: {
+        conversations: {
+          list: [1],
+          conversationsByIds: {
+            1: { id: 1, unread: true }
+          }
+        }
       }
-    }} }
+    }
     const dispatch = (action) => {
       store.state = reducer(store.state, action)
     }
@@ -226,11 +232,11 @@ describe('Conversations thunks', () => {
     fetch.mockImplementationOnce(fetchMocker(
       conversations,
       {
-        expectedUrl: `https://pleroma.soykaf.com/api/v1/pleroma/conversations/read`
+        expectedUrl: 'https://pleroma.soykaf.com/api/v1/pleroma/conversations/read'
       }
     ))
 
-    let state = await conversationsThunks.readConversations({ config })(dispatch, getState)
+    const state = await conversationsThunks.readConversations({ config })(dispatch, getState)
 
     expect(state.conversations.conversationsByIds)
       .toEqual({ 1: { id: 1, unread: false } })

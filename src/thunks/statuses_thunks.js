@@ -59,10 +59,10 @@ const statusesThunks = {
   fetchAndAddTimeline: ({ config, timelineName, type, older, queries, fullUrl }) =>
     async (dispatch, getState) => {
       // If there's no "next" url, use the oldest status as max_id in query
-      if (older && !fullUrl && (!queries || !queries['max_id'])) {
+      if (older && !fullUrl && (!queries || !queries.max_id)) {
         const timelineStatusIds = (getState().statuses.timelines[timelineName] || {}).statusIds || []
         queries = queries || {}
-        queries['max_id'] = last(timelineStatusIds)
+        queries.max_id = last(timelineStatusIds)
       }
       startLoading(dispatch, timelineName, older)
       const result = await fetchTimeline({ type, config, queries, fullUrl })

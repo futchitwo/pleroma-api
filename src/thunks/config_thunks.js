@@ -10,9 +10,11 @@ const configThunks = {
         configsApi.getConfig({ config: computedConfig }),
         configsApi.getStatusnetConfig({ config: computedConfig })
       ])
-      await dispatch(Config.actions.addConfig({ config: {
-        [appId]: result.reduce((acc, curr) => curr.state === 'ok' ? Object.assign(acc, curr.data) : acc, {})
-      } }))
+      await dispatch(Config.actions.addConfig({
+        config: {
+          [appId]: result.reduce((acc, curr) => curr.state === 'ok' ? Object.assign(acc, curr.data) : acc, {})
+        }
+      }))
       return getState()
     }
   },

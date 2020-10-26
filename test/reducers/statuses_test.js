@@ -5,7 +5,7 @@ describe('Status reducers', () => {
     it('adds a new status by id', () => {
       const status = { id: '123' }
       const resultState = Statuses.reducer(undefined, Statuses.actions.addStatus({ status }))
-      expect(resultState.statusesByIds).toEqual({ '123': status })
+      expect(resultState.statusesByIds).toEqual({ 123: status })
     })
 
     it('merges new information in', () => {
@@ -13,7 +13,7 @@ describe('Status reducers', () => {
       let resultState = Statuses.reducer(undefined, Statuses.actions.addStatus({ status }))
       const updatedStatus = { id: '123', info: 'someinfo' }
       resultState = Statuses.reducer(resultState, Statuses.actions.addStatus({ status: updatedStatus }))
-      expect(resultState.statusesByIds).toEqual({ '123': { id: '123', info: 'someinfo', other: 'info' } })
+      expect(resultState.statusesByIds).toEqual({ 123: { id: '123', info: 'someinfo', other: 'info' } })
     })
 
     it('should emojify status correctly', () => {
@@ -23,19 +23,31 @@ describe('Status reducers', () => {
           url: 'http://thesourceurl'
         }
       ]
-      const status = { id: '123', pleroma: { emoji_reactions: [{ count: 1, name: '🤔'}] } }
+      const status = { id: '123', pleroma: { emoji_reactions: [{ count: 1, name: '🤔' }] } }
       let resultState = Statuses.reducer(undefined, Statuses.actions.addStatus({ status }))
-      const updatedStatus = { id: '123', pleroma: {
-        emoji_reactions: [{ count: 1, name: '🤔', accounts: [{ id: 'acc1', emojis, display_name: 'user :marko:' }]}]
-      } }
+      const updatedStatus = {
+        id: '123',
+        pleroma: {
+          emoji_reactions: [{ count: 1, name: '🤔', accounts: [{ id: 'acc1', emojis, display_name: 'user :marko:' }] }]
+        }
+      }
       resultState = Statuses.reducer(resultState, Statuses.actions.addStatus({ status: updatedStatus }))
-      expect(resultState.statusesByIds).toEqual({ '123': { id: '123', pleroma: {
-        emoji_reactions: [{ count: 1, name: '🤔', accounts: [{
-          id: 'acc1',
-          emojis,
-          display_name: "user <img draggable='false' class='custom-emoji' src='http://thesourceurl' alt='marko' title='marko' />"
-        }]}]
-      } } })
+      expect(resultState.statusesByIds).toEqual({
+        123: {
+          id: '123',
+          pleroma: {
+            emoji_reactions: [{
+              count: 1,
+              name: '🤔',
+              accounts: [{
+                id: 'acc1',
+                emojis,
+                display_name: "user <img draggable='false' class='custom-emoji' src='http://thesourceurl' alt='marko' title='marko' />"
+              }]
+            }]
+          }
+        }
+      })
     })
   })
 
@@ -66,8 +78,8 @@ describe('Status reducers', () => {
       const statuses = [{ id: '123', info: 'oneinfo', other: 'info' }]
       const timelineName = 'test'
 
-      let resultState = Statuses.reducer(undefined, Statuses.actions.addStatusesToTimeline({ statuses, timelineName }))
-      expect(resultState.statusesByIds).toEqual({ '123': statuses[0] })
+      const resultState = Statuses.reducer(undefined, Statuses.actions.addStatusesToTimeline({ statuses, timelineName }))
+      expect(resultState.statusesByIds).toEqual({ 123: statuses[0] })
       expect(resultState.timelines[timelineName].statusIds).toEqual(['123'])
     })
   })
@@ -75,38 +87,37 @@ describe('Status reducers', () => {
     it('should add statuses to tagTimeline', () => {
       const statuses = [{ id: '123', info: 'oneinfo', other: 'info' }]
 
-      let resultState = Statuses.reducer(undefined, Statuses.actions.addTagTimeline({ statuses }))
-      expect(resultState.statusesByIds).toEqual({ '123': statuses[0] })
+      const resultState = Statuses.reducer(undefined, Statuses.actions.addTagTimeline({ statuses }))
+      expect(resultState.statusesByIds).toEqual({ 123: statuses[0] })
       expect(resultState.tag).toEqual(['123'])
     })
     it('should add statuses to existing tagTimeline', () => {
       const state = {
         statusesByIds: {
-          '1': { id: '1' }
+          1: { id: '1' }
         },
         tag: ['1']
       }
-      const newState ={ 
+      const newState = {
         statusesByIds: {
-          '1': { id: '1' },
-          '2': { id: '2', content: '2', spoiler_text: '2' }
+          1: { id: '1' },
+          2: { id: '2', content: '2', spoiler_text: '2' }
         },
-        tag: [ '2', '1']
+        tag: ['2', '1']
       }
       const statuses = [{ id: '2', content: '2', spoiler_text: '2' }]
-      let resultState = Statuses.reducer(state, Statuses.actions.addTagTimeline({ statuses }))
+      const resultState = Statuses.reducer(state, Statuses.actions.addTagTimeline({ statuses }))
       expect(resultState.statusesByIds).toEqual(newState.statusesByIds)
       expect(resultState.tag).toEqual(newState.tag)
     })
     it('should clear tagTimeline', () => {
       const state = {
         statusesByIds: {
-          '1': { id: '1' }
+          1: { id: '1' }
         },
         tag: ['1']
       }
-      const statuses = [{ id: '2', content: '2', spoiler_text: '2' }]
-      let resultState = Statuses.reducer(state, Statuses.actions.clearTagTimeline())
+      const resultState = Statuses.reducer(state, Statuses.actions.clearTagTimeline())
       expect(resultState.statusesByIds).toEqual(state.statusesByIds)
       expect(resultState.tag).toEqual([])
     })

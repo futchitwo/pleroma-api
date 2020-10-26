@@ -6,11 +6,11 @@ import { startLoading, stopLoading, updateLinks } from './api_thunks'
 const tagsThunks = {
   fetch: ({ config, fullUrl, queries, params, older }) => {
     return async (dispatch, getState) => {
-      if (older && !fullUrl && (!queries || !queries['max_id'])) {
+      if (older && !fullUrl && (!queries || !queries.max_id)) {
         const tagTimeline = getState().statuses.tag || []
 
         queries = queries || {}
-        queries['max_id'] = tagTimeline[tagTimeline.length - 1]
+        queries.max_id = tagTimeline[tagTimeline.length - 1]
       }
       startLoading({ dispatch, entity: 'tags', older })
       const result = await timelineApi.tag({ config: getConfig(getState, config), fullUrl, queries, params })
