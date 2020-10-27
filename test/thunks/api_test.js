@@ -19,6 +19,7 @@ describe('Api thunks', () => {
         home: {}
       },
       notifications: {},
+      followRequests: {},
       conversations: {},
       userStatuses: {},
       polls: {},
@@ -142,6 +143,29 @@ describe('Api thunks', () => {
       await apiThunks.stopFetchingNotifications()(dispatch, getState)
 
       expect(getState().api.notifications.fetcher).toBeNull()
+    })
+  })
+
+  describe('startFetchingFollowRequests', () => {
+    it('create a follow requests fetcher', async () => {
+      const store = { state: defaultState() }
+      const dispatch = (action) => {
+        store.state = reducer(store.state, action)
+        return store.state
+      }
+      const getState = () => store.state
+
+      fetch.mockReset()
+      fetch.mockImplementationOnce(fetchMocker([], {}))
+
+      await apiThunks.startFetchingFollowRequests({})(dispatch, getState)
+
+      expect(getState().api.followRequests.fetcher).toBeDefined()
+
+      expect(typeof getState().api.followRequests.fetcher.stop)
+        .toEqual('function')
+
+      getState().api.followRequests.fetcher.stop()
     })
   })
 
