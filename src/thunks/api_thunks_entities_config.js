@@ -7,6 +7,10 @@ export const ENTITIES = {
     name: 'notifications',
     thunk: 'fetch'
   },
+  followRequests: {
+    name: 'followRequests',
+    thunk: 'fetch'
+  },
   userStatuses: {
     name: 'users',
     thunk: 'fetchUserStatuses',
