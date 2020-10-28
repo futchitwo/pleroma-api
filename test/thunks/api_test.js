@@ -374,7 +374,7 @@ describe('Api thunks', () => {
     })
   })
 
-  describe('search Users', () => {
+  describe('search', () => {
     it('should add search result and request to searchCache', async () => {
       const config = {
         instance: 'https://pleroma.soykaf.com'
@@ -462,6 +462,40 @@ describe('Api thunks', () => {
         queries: { q: 'nd' },
         options: { muteRequest: true }
       })(dispatch, getState)
+
+      expect(res.state.users.usersByIds)
+        .toEqual({ 1: account })
+      expect(res.state.api.searchCache)
+        .toEqual(['nd'])
+    })
+  })
+
+  describe('users search', () => {
+    it('should search users and add request to searchCache', async () => {
+      const config = {
+        instance: 'https://pleroma.soykaf.com'
+      }
+      const store = {
+        state: {
+          users: { usersByIds: {} },
+          api: { searchCache: [] }
+        }
+      }
+      const dispatch = (action) => {
+        store.state = reducer(store.state, action)
+      }
+      const getState = () => store.state
+      const account = {
+        acct: 'nd',
+        id: 1
+      }
+      fetch.mockReset()
+      fetch
+        .mockImplementationOnce(fetchMocker(
+          [account],
+          { expectedUrl: 'https://pleroma.soykaf.com/api/v1/accounts/search?q=nd' }
+        ))
+      const res = await apiThunks.usersSearch({ config, queries: { q: 'nd' } })(dispatch, getState)
 
       expect(res.state.users.usersByIds)
         .toEqual({ 1: account })

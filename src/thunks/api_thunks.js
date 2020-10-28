@@ -272,13 +272,33 @@ const generateApiThunks = () => {
           await dispatch(Api.actions.addSearchCache({ request: queries.q }))
           return { q: queries.q, state: getState() }
         } else {
-          const result = await searchApi({ config: getConfig(getState, config), queries })
+          const result = await searchApi.base({ config: getConfig(getState, config), queries })
             .then(res => apiErrorCatcher(res))
           const dispatchedActions = [Api.actions.addSearchCache({ request: result.search })]
 
           if (result.data) {
             dispatchedActions.push(reducers.users.actions.addUsers({ users: result.data.accounts }))
             dispatchedActions.push(reducers.statuses.actions.addStatuses({ statuses: result.data.statuses }))
+          }
+          await Promise.all(dispatchedActions.map(action => dispatch(action)))
+          return { q: queries.q, results: result.data, state: getState() }
+        }
+      }
+    },
+    usersSearch: ({ config, queries, options }) => {
+      return async (dispatch, getState) => {
+        const searchCache = getState().api.searchCache
+
+        if (searchCache.includes(queries.q) && options && options.muteRequest) {
+          await dispatch(Api.actions.addSearchCache({ request: queries.q }))
+          return { q: queries.q, state: getState() }
+        } else {
+          const result = await searchApi.users({ config: getConfig(getState, config), queries })
+            .then(res => apiErrorCatcher(res))
+          const dispatchedActions = [Api.actions.addSearchCache({ request: result.search })]
+
+          if (result.data) {
+            dispatchedActions.push(reducers.users.actions.addUsers({ users: result.data }))
           }
           await Promise.all(dispatchedActions.map(action => dispatch(action)))
           return { q: queries.q, results: result.data, state: getState() }
