@@ -405,7 +405,12 @@ describe('Status thunks', () => {
     const store = {
       state: {
         statuses:
-      { statusesByIds: { 1: { id: '1', content: '', reblogged: true } } }
+      {
+        statusesByIds: {
+          1: { id: '1', content: 'content', reblogged: true },
+          2: { id: '2', reblog: { id: '1', content: 'content' } }
+        }
+      }
       }
     }
     const id = '1'

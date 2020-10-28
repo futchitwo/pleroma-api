@@ -120,6 +120,19 @@ const statusesThunks = {
       const result = reblogged
         ? await statusesApi.unreblog({ config: getConfig(getState, config), params }).then(res => apiErrorCatcher(res))
         : await statusesApi.reblog({ config: getConfig(getState, config), params }).then(res => apiErrorCatcher(res))
+      const { statuses: { statusesByIds } } = getState()
+      if (reblogged) {
+        const promises = Object.keys(statusesByIds).reduce((acc, id) => {
+          if (statusesByIds[id].reblog && statusesByIds[id].reblog.id === params.id) {
+            acc.push(dispatch(Statuses.actions.deleteStatus({ statusId: id })))
+          }
+          return acc
+        }, [])
+        await Promise.all(promises)
+      } else {
+        const status = { ...statusesByIds[params.id], reblogged: true }
+        await dispatch(Statuses.actions.addStatus({ status }))
+      }
       await dispatch(Statuses.actions.addStatus({ status: result.data }))
       return getState()
     }
