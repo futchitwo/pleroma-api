@@ -407,8 +407,8 @@ describe('Status thunks', () => {
         statuses:
       {
         statusesByIds: {
-          1: { id: '1', content: 'content', reblogged: true },
-          2: { id: '2', reblog: { id: '1', content: 'content' } }
+          1: { id: '1', content: 'content', reblogged: true, account: { id: 'user1' } },
+          2: { id: '2', reblog: { id: '1', content: 'content', account: { id: 'user1' } }, account: { id: 'user2' } }
         }
       }
       }
@@ -417,7 +417,8 @@ describe('Status thunks', () => {
     const status = {
       content: 'test text',
       id,
-      reblogged: false
+      reblogged: false,
+      account: { id: 'user1' }
     }
 
     fetch.mockReset()
@@ -427,7 +428,7 @@ describe('Status thunks', () => {
         expectedUrl: 'https://pleroma.soykaf.com/api/v1/statuses/1/unreblog'
       }))
 
-    const state = await statusesThunks.toggleRebloggedStatus({ config, params: { id }, reblogged: true })(dispatch(store), getState(store))
+    const state = await statusesThunks.toggleRebloggedStatus({ config, params: { id }, reblogged: true, currentUserId: 'user2' })(dispatch(store), getState(store))
 
     expect(state.statuses.statusesByIds)
       .toEqual({ 1: { ...status, reblogged: false } })

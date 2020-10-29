@@ -115,7 +115,7 @@ const statusesThunks = {
     }
   },
 
-  toggleRebloggedStatus: ({ config, params, reblogged }) => {
+  toggleRebloggedStatus: ({ config, params, reblogged, currentUserId }) => {
     return async (dispatch, getState) => {
       const result = reblogged
         ? await statusesApi.unreblog({ config: getConfig(getState, config), params }).then(res => apiErrorCatcher(res))
@@ -123,7 +123,8 @@ const statusesThunks = {
       const { statuses: { statusesByIds } } = getState()
       if (reblogged) {
         const promises = Object.keys(statusesByIds).reduce((acc, id) => {
-          if (statusesByIds[id].reblog && statusesByIds[id].reblog.id === params.id) {
+          const status = statusesByIds[id]
+          if (status.reblog && status.reblog.id === params.id && status.account.id === currentUserId) {
             acc.push(dispatch(Statuses.actions.deleteStatus({ statusId: id })))
           }
           return acc
