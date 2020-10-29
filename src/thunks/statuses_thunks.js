@@ -8,6 +8,7 @@ import Conversations from '../thunks/conversations_thunks'
 import { apiErrorCatcher, getConfig } from '../utils/api_utils'
 import last from 'lodash/last'
 import has from 'lodash/has'
+import findIndex from 'lodash/findIndex'
 import { getUsersFromStatusesList } from '../utils/users_utils.js'
 
 const fetchTimeline = async ({ type, config, queries, fullUrl }) => {
@@ -115,26 +116,48 @@ const statusesThunks = {
     }
   },
 
-  toggleRebloggedStatus: ({ config, params, reblogged, currentUserId }) => {
+  toggleRebloggedStatus: ({ config, params, reblogged, user }) => {
     return async (dispatch, getState) => {
-      const result = reblogged
+      reblogged
         ? await statusesApi.unreblog({ config: getConfig(getState, config), params }).then(res => apiErrorCatcher(res))
         : await statusesApi.reblog({ config: getConfig(getState, config), params }).then(res => apiErrorCatcher(res))
+
       const { statuses: { statusesByIds } } = getState()
+      const oldStatus = { ...statusesByIds[params.id] }
+
+      oldStatus.reblogs_count = oldStatus.reblogs_count || 0
+      oldStatus.reblogged_by = oldStatus.reblogged_by || []
+      const index = findIndex(oldStatus.reblogged_by, { id: user.id })
+      if (index === -1) {
+        oldStatus.reblogged_by.push(user)
+      } else {
+        oldStatus.reblogged_by.splice(index, 1)
+      }
+
       if (reblogged) {
         const promises = Object.keys(statusesByIds).reduce((acc, id) => {
           const status = statusesByIds[id]
-          if (status.reblog && status.reblog.id === params.id && status.account.id === currentUserId) {
+          if (status.reblog && status.reblog.id === params.id && status.account.id === user.id) {
             acc.push(dispatch(Statuses.actions.deleteStatus({ statusId: id })))
           }
           return acc
         }, [])
         await Promise.all(promises)
+
+        const status = {
+          ...oldStatus,
+          reblogged: false,
+          reblogs_count: oldStatus.reblogs_count - 1
+        }
+        await dispatch(Statuses.actions.addStatus({ status }))
       } else {
-        const status = { ...statusesByIds[params.id], reblogged: true }
+        const status = {
+          ...oldStatus,
+          reblogged: true,
+          reblogs_count: oldStatus.reblogs_count + 1
+        }
         await dispatch(Statuses.actions.addStatus({ status }))
       }
-      await dispatch(Statuses.actions.addStatus({ status: result.data }))
       return getState()
     }
   },

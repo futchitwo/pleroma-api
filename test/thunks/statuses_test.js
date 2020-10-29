@@ -374,64 +374,63 @@ describe('Status thunks', () => {
   })
 
   it('reblog status', async () => {
-    const store = {
-      state: {
-        statuses: {
-          statusesByIds: { 1: { id: '1', content: '', reblogged: false } }
-        }
-      }
-    }
     const id = '1'
     const status = {
       content: 'test text',
       id,
-      reblogged: true
+      reblogged: false
+    }
+    const user = {
+      id: 'user1'
+    }
+    const store = {
+      state: {
+        statuses: {
+          statusesByIds: { 1: status }
+        }
+      }
     }
 
     fetch.mockReset()
     fetch.mockImplementationOnce(fetchMocker(
-      status,
+      { content: 'test text', id: '2', reblog: status },
       {
         expectedUrl: 'https://pleroma.soykaf.com/api/v1/statuses/1/reblog'
       }))
 
-    const state = await statusesThunks.toggleRebloggedStatus({ config, params: { id }, reblogged: false })(dispatch(store), getState(store))
+    const state = await statusesThunks.toggleRebloggedStatus({ config, params: { id }, reblogged: false, user })(dispatch(store), getState(store))
 
     expect(state.statuses.statusesByIds)
-      .toEqual({ 1: { ...status, reblogged: true } })
+      .toEqual({ 1: { ...status, reblogged: true, reblogs_count: 1, reblogged_by: [user] } })
   })
 
   it('unreblog status', async () => {
+    const id = '1'
+    const user = { id: 'user2' }
+    const status = { id: '1', content: 'content', reblogged: true, reblogs_count: 1, reblogged_by: [user], account: { id: 'user1' } }
     const store = {
       state: {
         statuses:
       {
         statusesByIds: {
-          1: { id: '1', content: 'content', reblogged: true, account: { id: 'user1' } },
-          2: { id: '2', reblog: { id: '1', content: 'content', account: { id: 'user1' } }, account: { id: 'user2' } }
+          1: status,
+          2: { id: '2', reblog: status, account: user }
         }
       }
       }
     }
-    const id = '1'
-    const status = {
-      content: 'test text',
-      id,
-      reblogged: false,
-      account: { id: 'user1' }
-    }
 
     fetch.mockReset()
     fetch.mockImplementationOnce(fetchMocker(
-      status,
+      {},
       {
         expectedUrl: 'https://pleroma.soykaf.com/api/v1/statuses/1/unreblog'
       }))
 
-    const state = await statusesThunks.toggleRebloggedStatus({ config, params: { id }, reblogged: true, currentUserId: 'user2' })(dispatch(store), getState(store))
+    const state = await statusesThunks.toggleRebloggedStatus({ config, params: { id }, reblogged: true, user })(dispatch(store), getState(store))
 
     expect(state.statuses.statusesByIds)
-      .toEqual({ 1: { ...status, reblogged: false } })
+      .toEqual({ 1: { ...status, reblogged: false, reblogs_count: 0 } })
   })
 
   it('mute status', async () => {
