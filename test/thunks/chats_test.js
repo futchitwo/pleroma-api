@@ -7,29 +7,29 @@ import fetch from 'cross-fetch'
 jest.mock('cross-fetch')
 
 const createMessage = (chatId, id) => ({
-  'id': `${id}`,
-  'chat_id': `${chatId}`,
-  'account_id': '123',
-  'content': 'hey you',
-  'created_at': '2020-04-21T15:11:46.000Z',
-  'emojis': [
+  id: `${id}`,
+  chat_id: `${chatId}`,
+  account_id: '123',
+  content: 'hey you',
+  created_at: '2020-04-21T15:11:46.000Z',
+  emojis: [
     {
-      'shortcode': 'firefox',
-      'static_url': 'https://dontbulling.me/emoji/Firefox.gif',
-      'url': 'https://dontbulling.me/emoji/Firefox.gif',
-      'visible_in_picker': true
+      shortcode: 'firefox',
+      static_url: 'https://dontbulling.me/emoji/Firefox.gif',
+      url: 'https://dontbulling.me/emoji/Firefox.gif',
+      visible_in_picker: true
     }
   ]
 })
 
 const createChat = (chatId) => ({
-  'id': `${chatId}`,
-  'account': {
-    'id': '123',
-    'username': 'cofe',
-    'acct': 'cofe@cofe.club'
+  id: `${chatId}`,
+  account: {
+    id: '123',
+    username: 'cofe',
+    acct: 'cofe@cofe.club'
   },
-  'unread': 2
+  unread: 2
 })
 
 const reducer = combineReducers({
@@ -42,7 +42,7 @@ describe('Chats thunks', () => {
     instance: 'https://pleroma.soykaf.com'
   }
 
-  it('fetch chats', async () => {
+  it('fetchChat', async () => {
     const store = { state: undefined }
     const dispatch = (action) => {
       store.state = reducer(store.state, action)
@@ -58,32 +58,23 @@ describe('Chats thunks', () => {
     fetch.mockImplementationOnce(fetchMocker(
       chats,
       {
-        expectedUrl: `https://pleroma.soykaf.com/api/v1/pleroma/chats`,
+        expectedUrl: 'https://pleroma.soykaf.com/api/v1/pleroma/chats',
         headers: {
-          link: `<https://pleroma.soykaf.com/api/v1/pleroma/chats?max_id=15>; rel="next", <https://pleroma.soykaf.com/api/v1/pleroma/chats?min_id=16>; rel="prev"`
+          link: '<https://pleroma.soykaf.com/api/v1/pleroma/chats?max_id=15>; rel="next", <https://pleroma.soykaf.com/api/v1/pleroma/chats?min_id=16>; rel="prev"'
         }
       }
     ))
 
-    let state = await chatsThunks.fetch({ config })(dispatch, getState)
+    const state = await chatsThunks.fetch({ config })(dispatch, getState)
 
     expect(state.chats.chatsByIds)
-      .toEqual({ '1': chats[0], '2': chats[1] })
+      .toEqual({ 1: chats[0], 2: chats[1] })
 
     expect(state.chats.list)
       .toEqual(['1', '2'])
-
-    /*
-    expect(state.api.chats.prev)
-      .toEqual({
-        rel: 'prev',
-        min_id: '16',
-        url: 'https://pleroma.soykaf.com/api/v1/pleroma/chats?min_id=16'
-      })
-    */
   })
 
-  it('fetcher a chats by a full url', async () => {
+  it('fetchChat fullUrl', async () => {
     const store = { state: undefined }
 
     const dispatch = (action) => {
@@ -100,33 +91,24 @@ describe('Chats thunks', () => {
     fetch.mockImplementationOnce(fetchMocker(
       chats,
       {
-        expectedUrl: `https://pleroma.soykaf.com/api/v1/pleroma/chats`,
+        expectedUrl: 'https://pleroma.soykaf.com/api/v1/pleroma/chats',
         headers: {
-          link: `<https://pleroma.soykaf.com/api/v1/pleroma/chats?max_id=15>; rel="next", <https://pleroma.soykaf.com/api/v1/pleroma/chats/?min_id=16>; rel="prev"`
+          link: '<https://pleroma.soykaf.com/api/v1/pleroma/chats?max_id=15>; rel="next", <https://pleroma.soykaf.com/api/v1/pleroma/chats/?min_id=16>; rel="prev"'
         }
       }
     ))
 
     const fullUrl = 'https://pleroma.soykaf.com/api/v1/pleroma/chats'
 
-    let state = await chatsThunks.fetch({ config, fullUrl })(dispatch, getState)
+    const state = await chatsThunks.fetch({ config, fullUrl })(dispatch, getState)
     expect(state.chats.chatsByIds)
-      .toEqual({ '1': chats[0], '2': chats[1] })
+      .toEqual({ 1: chats[0], 2: chats[1] })
 
     expect(state.chats.list)
       .toEqual(['1', '2'])
-
-    /*
-    expect(state.api.chats.prev)
-      .toEqual({
-        rel: 'prev',
-        min_id: '16',
-        url: 'https://pleroma.soykaf.com/api/v1/chats?min_id=16'
-      })
-    */
   })
 
-  it('post a message to chat', async () => {
+  it('postChatMessage', async () => {
     const store = { state: undefined }
 
     const dispatch = (action) => {
@@ -139,7 +121,7 @@ describe('Chats thunks', () => {
       ...store.state,
       chats: {
         chatsByIds: {
-          '1': {
+          1: {
             ...createChat(1),
             messages: [],
             last_message: undefined
@@ -152,13 +134,13 @@ describe('Chats thunks', () => {
     fetch.mockImplementationOnce(fetchMocker(
       createMessage(1, 2),
       {
-        expectedUrl: `https://pleroma.soykaf.com/api/v1/pleroma/chats/1/messages`
+        expectedUrl: 'https://pleroma.soykaf.com/api/v1/pleroma/chats/1/messages'
       }
     ))
 
     const params = { id: '1', content: 'hey you' }
 
-    await chatsThunks.postChatMessage({ config, params })(dispatch, getState)
+    await chatsThunks.postChatMessage({ config, params, chatId: '1' })(dispatch, getState)
 
     expect(getState().chats.chatsByIds['1'].last_message)
       .toEqual(createMessage(1, 2))
@@ -167,66 +149,28 @@ describe('Chats thunks', () => {
       .toEqual([createMessage(1, 2)])
   })
 
-  /*
-  it('fetch chat timeline', async () => {
+  it('fetchChatMessages', async () => {
     const store = { state: undefined }
+
     const dispatch = (action) => {
       store.state = reducer(store.state, action)
     }
-    const getState = () => store.state
 
-    const statuses = [
-      { id: 1, content: 'hi' },
-      { id: 2, content: 'test message' }
-    ]
+    const getState = () => store.state
 
     fetch.mockReset()
     fetch.mockImplementationOnce(fetchMocker(
-      statuses,
+      [createMessage('1', '2'), createMessage('1', '3')],
       {
-        expectedUrl: `https://pleroma.soykaf.com/api/v1/pleroma/chats/22/statuses`
+        expectedUrl: 'https://pleroma.soykaf.com/api/v1/pleroma/chats/1/messages'
       }
     ))
 
-    let state = await chatsThunks.fetchChatTimeline({ config, params: { id: 22 } })(dispatch, getState)
+    await chatsThunks.fetchChatMessages({ config, params: { id: '1' }, older: true })(dispatch, getState)
 
-    expect(state.chats.chatsByIds)
-      .toEqual({ 22: { id: 22, last_status: { id: 2, content: 'test message' },timeline: statuses } })
+    expect(getState().chats.chatsByIds['1'].last_message)
+      .toEqual(createMessage('1', '3'))
+
+    expect(getState().chats.chatsByIds['1'].messages.length).toEqual(2)
   })
-
-  it('update chat timeline', async () => {
-    const store = { state: {
-      chats: {
-        chatsByIds: {
-          22: {
-            id: 22,
-            last_status: { id: '1' },
-            timeline: [{ id: 1, content: 'hi' }]
-          }
-        }
-      }
-    } }
-    const dispatch = (action) => {
-      store.state = reducer(store.state, action)
-    }
-    const getState = () => store.state
-
-    const statuses = [
-      { id: 2, content: 'test message' }
-    ]
-
-    fetch.mockReset()
-    fetch.mockImplementationOnce(fetchMocker(
-      statuses,
-      {
-        expectedUrl: `https://pleroma.soykaf.com/api/v1/pleroma/chats/22/statuses`
-      }
-    ))
-
-    let state = await chatsThunks.fetchChatTimeline({ config, params: { id: 22 } })(dispatch, getState)
-
-    expect(state.chats.chatsByIds)
-      .toEqual({ 22: { id: 22, timeline: [{ id: 1, content: 'hi' },{ id: 2, content: 'test message' }] , last_status: { id: 2, content: 'test message' } } })
-  })
-  */
 })

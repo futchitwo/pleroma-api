@@ -13,12 +13,12 @@ const reducer = combineReducers({
   api: reducers.api.reducer
 })
 
-export const dispatch = (store = { state: undefined }) => (action) => {
+const dispatch = (store = { state: undefined }) => (action) => {
   store.state = reducer(store.state, action)
   return store.state
 }
 
-export const getState = (store) => () => store.state
+const getState = (store) => () => store.state
 
 describe('Status thunks', () => {
   const config = {
@@ -42,13 +42,13 @@ describe('Status thunks', () => {
     fetch.mockImplementationOnce(fetchMocker(
       statuses,
       {
-        expectedUrl: `https://pleroma.soykaf.com/api/v1/timelines/home`,
+        expectedUrl: 'https://pleroma.soykaf.com/api/v1/timelines/home',
         headers: {
           link: '<https://pleroma.soykaf.com/api/v1/timelines/home?max_id=9gZ5VYhDG8GeCL8Vay>; rel="next", <https://pleroma.soykaf.com/api/v1/timelines/home?since_id=9gZ5g5Q6RlaAaN9Z5M>; rel="prev"'
         }
       }))
 
-    let state = await statusesThunks.fetchAndAddTimeline({ config, timelineName, type })(dispatch(store), getState(store))
+    const state = await statusesThunks.fetchAndAddTimeline({ config, timelineName, type })(dispatch(store), getState(store))
 
     expect(state.statuses.statusesByIds)
       .toEqual({ 1: statuses[0], 2: statuses[1] })
@@ -58,9 +58,9 @@ describe('Status thunks', () => {
 
     expect(state.api.timelines.home.prev)
       .toEqual({
-        'rel': 'prev',
-        'since_id': '9gZ5g5Q6RlaAaN9Z5M',
-        'url': 'https://pleroma.soykaf.com/api/v1/timelines/home?since_id=9gZ5g5Q6RlaAaN9Z5M'
+        rel: 'prev',
+        since_id: '9gZ5g5Q6RlaAaN9Z5M',
+        url: 'https://pleroma.soykaf.com/api/v1/timelines/home?since_id=9gZ5g5Q6RlaAaN9Z5M'
       })
 
     expect(state.users.usersByIds)
@@ -84,13 +84,13 @@ describe('Status thunks', () => {
     fetch.mockImplementationOnce(fetchMocker(
       statuses,
       {
-        expectedUrl: `https://pleroma.soykaf.com/api/v1/timelines/public`,
+        expectedUrl: 'https://pleroma.soykaf.com/api/v1/timelines/public',
         headers: {
           link: '<https://pleroma.soykaf.com/api/v1/timelines/public?max_id=9gZ5VYhDG8GeCL8Vay>; rel="next", <https://pleroma.soykaf.com/api/v1/timelines/home?since_id=9gZ5g5Q6RlaAaN9Z5M>; rel="prev"'
         }
       }))
 
-    let state = await statusesThunks.fetchAndAddTimeline({ config, timelineName, type })(dispatch(store), getState(store))
+    const state = await statusesThunks.fetchAndAddTimeline({ config, timelineName, type })(dispatch(store), getState(store))
 
     expect(state.statuses.statusesByIds)
       .toEqual({ 1: statuses[0], 2: statuses[1] })
@@ -100,9 +100,9 @@ describe('Status thunks', () => {
 
     expect(state.api.timelines.public.prev)
       .toEqual({
-        'rel': 'prev',
-        'since_id': '9gZ5g5Q6RlaAaN9Z5M',
-        'url': 'https://pleroma.soykaf.com/api/v1/timelines/home?since_id=9gZ5g5Q6RlaAaN9Z5M'
+        rel: 'prev',
+        since_id: '9gZ5g5Q6RlaAaN9Z5M',
+        url: 'https://pleroma.soykaf.com/api/v1/timelines/home?since_id=9gZ5g5Q6RlaAaN9Z5M'
       })
 
     expect(state.users.usersByIds)
@@ -127,14 +127,14 @@ describe('Status thunks', () => {
     fetch.mockImplementationOnce(fetchMocker(
       statuses,
       {
-        expectedUrl: `https://pleroma.soykaf.com/api/v1/timelines/doesntexist`,
+        expectedUrl: 'https://pleroma.soykaf.com/api/v1/timelines/doesntexist',
         headers: {
           link: '<https://pleroma.soykaf.com/api/v1/timelines/public?max_id=9gZ5VYhDG8GeCL8Vay>; rel="next", <https://pleroma.soykaf.com/api/v1/timelines/home?since_id=9gZ5g5Q6RlaAaN9Z5M>; rel="prev"'
         }
       }))
 
     const fullUrl = 'https://pleroma.soykaf.com/api/v1/timelines/doesntexist'
-    let state = await statusesThunks.fetchAndAddTimeline({ config, timelineName, type, fullUrl })(dispatch(store), getState(store))
+    const state = await statusesThunks.fetchAndAddTimeline({ config, timelineName, type, fullUrl })(dispatch(store), getState(store))
 
     expect(state.statuses.statusesByIds)
       .toEqual({ 1: statuses[0], 2: statuses[1] })
@@ -144,9 +144,9 @@ describe('Status thunks', () => {
 
     expect(state.api.timelines.public.prev)
       .toEqual({
-        'rel': 'prev',
-        'since_id': '9gZ5g5Q6RlaAaN9Z5M',
-        'url': 'https://pleroma.soykaf.com/api/v1/timelines/home?since_id=9gZ5g5Q6RlaAaN9Z5M'
+        rel: 'prev',
+        since_id: '9gZ5g5Q6RlaAaN9Z5M',
+        url: 'https://pleroma.soykaf.com/api/v1/timelines/home?since_id=9gZ5g5Q6RlaAaN9Z5M'
       })
 
     expect(state.users.usersByIds)
@@ -181,20 +181,20 @@ describe('Status thunks', () => {
     fetch.mockImplementationOnce(fetchMocker(
       statuses,
       {
-        expectedUrl: `https://pleroma.soykaf.com/api/v1/timelines/doesntexist`,
+        expectedUrl: 'https://pleroma.soykaf.com/api/v1/timelines/doesntexist',
         headers: {
           link: '<https://pleroma.soykaf.com/api/v1/timelines/public?max_id=9gZ5VYhDG8GeCL8Vay>; rel="next", <https://pleroma.soykaf.com/api/v1/timelines/home?since_id=9gZ5g5Q6RlaAaN9Z5M>; rel="prev"'
         }
       }))
 
     const fullUrl = 'https://pleroma.soykaf.com/api/v1/timelines/doesntexist'
-    let state = await statusesThunks.fetchAndAddTimeline({ config, timelineName, type, fullUrl, older: true })(dispatch(store), getState(store))
+    const state = await statusesThunks.fetchAndAddTimeline({ config, timelineName, type, fullUrl, older: true })(dispatch(store), getState(store))
 
     expect(state.api.timelines.public.prev).toEqual({})
     expect(state.api.timelines.public.next).toEqual({
-      'rel': 'next',
-      'max_id': '9gZ5VYhDG8GeCL8Vay',
-      'url': 'https://pleroma.soykaf.com/api/v1/timelines/public?max_id=9gZ5VYhDG8GeCL8Vay'
+      rel: 'next',
+      max_id: '9gZ5VYhDG8GeCL8Vay',
+      url: 'https://pleroma.soykaf.com/api/v1/timelines/public?max_id=9gZ5VYhDG8GeCL8Vay'
     })
   })
 
@@ -226,7 +226,7 @@ describe('Status thunks', () => {
     }
     const timelineName = 'public'
 
-    let state = await statusesThunks.cropOlderStatusesFromTimeline({ timelineName, length: 3 })(dispatch(store), getState(store))
+    const state = await statusesThunks.cropOlderStatusesFromTimeline({ timelineName, length: 3 })(dispatch(store), getState(store))
 
     expect(state.statuses.timelines.public.statusIds).toEqual(['4', '3', '2'])
     expect(state.api.timelines.public.next).toEqual(null)
@@ -256,7 +256,7 @@ describe('Status thunks', () => {
     }
     const timelineName = 'public'
 
-    let state = await statusesThunks.cropOlderStatusesFromTimeline({ timelineName, length: 3 })(dispatch(store), getState(store))
+    const state = await statusesThunks.cropOlderStatusesFromTimeline({ timelineName, length: 3 })(dispatch(store), getState(store))
 
     expect(state.statuses.timelines.public.statusIds).toEqual(['4'])
     expect(state.api.timelines.public.next).toEqual(null)
@@ -280,10 +280,10 @@ describe('Status thunks', () => {
     fetch.mockImplementationOnce(fetchMocker(
       status,
       {
-        expectedUrl: `https://pleroma.soykaf.com/api/v1/statuses`
+        expectedUrl: 'https://pleroma.soykaf.com/api/v1/statuses'
       }))
 
-    let state = await statusesThunks.postStatus({ config, params: status })(dispatch(store), getState(store))
+    const state = await statusesThunks.postStatus({ config, params: status })(dispatch(store), getState(store))
 
     expect(state.statuses.statusesByIds)
       .toEqual({ 1: statuses[0] })
@@ -304,26 +304,29 @@ describe('Status thunks', () => {
     fetch.mockImplementationOnce(fetchMocker(
       status,
       {
-        expectedUrl: `https://pleroma.soykaf.com/api/v1/statuses`
+        expectedUrl: 'https://pleroma.soykaf.com/api/v1/statuses'
       }))
       .mockImplementationOnce(fetchMocker(
-      [status],
-      {
-        expectedUrl: `https://pleroma.soykaf.com/api/v1/pleroma/conversations/id/statuses`
-      }
+        [status],
+        {
+          expectedUrl: 'https://pleroma.soykaf.com/api/v1/pleroma/conversations/id/statuses'
+        }
       ))
 
-    let state = await statusesThunks.postStatus({ config, params: status, conversationId: 'id' })(dispatch(store), getState(store))
+    const state = await statusesThunks.postStatus({ config, params: status, conversationId: 'id' })(dispatch(store), getState(store))
 
     expect(state.conversations.conversationsByIds)
       .toEqual({ id: { ...conversation, last_status: status, timeline: [{ id: '1', status: 'aaa' }] } })
   })
 
   it('favourite status', async () => {
-    const store = { state: {
-      statuses: {
-        statusesByIds: { 1: { id: '1', content: '', favourited: false } }
-      } } }
+    const store = {
+      state: {
+        statuses: {
+          statusesByIds: { 1: { id: '1', content: '', favourited: false } }
+        }
+      }
+    }
     const id = '1'
     const status = {
       content: 'test text',
@@ -335,19 +338,21 @@ describe('Status thunks', () => {
     fetch.mockImplementationOnce(fetchMocker(
       status,
       {
-        expectedUrl: `https://pleroma.soykaf.com/api/v1/statuses/1/favourite`
+        expectedUrl: 'https://pleroma.soykaf.com/api/v1/statuses/1/favourite'
       }))
 
-    let state = await statusesThunks.toggleFavouritedStatus({ config, params: { id }, favourited: false })(dispatch(store), getState(store))
+    const state = await statusesThunks.toggleFavouritedStatus({ config, params: { id }, favourited: false })(dispatch(store), getState(store))
 
     expect(state.statuses.statusesByIds)
       .toEqual({ 1: { ...status, favourited: true } })
   })
 
   it('unfavourite status', async () => {
-    const store = { state: {
-      statuses: { statusesByIds: { 1: { id: '1', content: '', favourited: true } } }
-    } }
+    const store = {
+      state: {
+        statuses: { statusesByIds: { 1: { id: '1', content: '', favourited: true } } }
+      }
+    }
     const id = '1'
     const status = {
       content: 'test text',
@@ -359,67 +364,83 @@ describe('Status thunks', () => {
     fetch.mockImplementationOnce(fetchMocker(
       status,
       {
-        expectedUrl: `https://pleroma.soykaf.com/api/v1/statuses/1/unfavourite`
+        expectedUrl: 'https://pleroma.soykaf.com/api/v1/statuses/1/unfavourite'
       }))
 
-    let state = await statusesThunks.toggleFavouritedStatus({ config, params: { id }, favourited: true })(dispatch(store), getState(store))
+    const state = await statusesThunks.toggleFavouritedStatus({ config, params: { id }, favourited: true })(dispatch(store), getState(store))
 
     expect(state.statuses.statusesByIds)
       .toEqual({ 1: { ...status, favourited: false } })
   })
 
   it('reblog status', async () => {
-    const store = { state: { statuses: {
-      statusesByIds: { 1: { id: '1', content: '', reblogged: false } }
-    } } }
-    const id = '1'
-    const status = {
-      content: 'test text',
-      id,
-      reblogged: true
-    }
-
-    fetch.mockReset()
-    fetch.mockImplementationOnce(fetchMocker(
-      status,
-      {
-        expectedUrl: `https://pleroma.soykaf.com/api/v1/statuses/1/reblog`
-      }))
-
-    let state = await statusesThunks.toggleRebloggedStatus({ config, params: { id }, reblogged: false })(dispatch(store), getState(store))
-
-    expect(state.statuses.statusesByIds)
-      .toEqual({ 1: { ...status, reblogged: true } })
-  })
-
-  it('unreblog status', async () => {
-    const store = { state: { statuses:
-      { statusesByIds: { 1: { id: '1', content: '', reblogged: true } } }
-    } }
     const id = '1'
     const status = {
       content: 'test text',
       id,
       reblogged: false
     }
+    const user = {
+      id: 'user1'
+    }
+    const store = {
+      state: {
+        statuses: {
+          statusesByIds: { 1: status }
+        }
+      }
+    }
 
     fetch.mockReset()
     fetch.mockImplementationOnce(fetchMocker(
-      status,
+      { content: 'test text', id: '2', reblog: status },
       {
-        expectedUrl: `https://pleroma.soykaf.com/api/v1/statuses/1/unreblog`
+        expectedUrl: 'https://pleroma.soykaf.com/api/v1/statuses/1/reblog'
       }))
 
-    let state = await statusesThunks.toggleRebloggedStatus({ config, params: { id }, reblogged: true })(dispatch(store), getState(store))
+    const state = await statusesThunks.toggleRebloggedStatus({ config, params: { id }, reblogged: false, user })(dispatch(store), getState(store))
 
     expect(state.statuses.statusesByIds)
-      .toEqual({ 1: { ...status, reblogged: false } })
+      .toEqual({ 1: { ...status, reblogged: true, reblogs_count: 1, reblogged_by: [user] } })
+  })
+
+  it('unreblog status', async () => {
+    const id = '1'
+    const user = { id: 'user2' }
+    const status = { id: '1', content: 'content', reblogged: true, reblogs_count: 1, reblogged_by: [user], account: { id: 'user1' } }
+    const store = {
+      state: {
+        statuses:
+      {
+        statusesByIds: {
+          1: status,
+          2: { id: '2', reblog: status, account: user }
+        }
+      }
+      }
+    }
+
+    fetch.mockReset()
+    fetch.mockImplementationOnce(fetchMocker(
+      {},
+      {
+        expectedUrl: 'https://pleroma.soykaf.com/api/v1/statuses/1/unreblog'
+      }))
+
+    const state = await statusesThunks.toggleRebloggedStatus({ config, params: { id }, reblogged: true, user })(dispatch(store), getState(store))
+
+    expect(state.statuses.statusesByIds)
+      .toEqual({ 1: { ...status, reblogged: false, reblogs_count: 0 } })
   })
 
   it('mute status', async () => {
-    const store = { state: { statuses: {
-      statusesByIds: { 1: { id: '1', content: '', muted: false } }
-    } } }
+    const store = {
+      state: {
+        statuses: {
+          statusesByIds: { 1: { id: '1', content: '', muted: false } }
+        }
+      }
+    }
     const id = '1'
     const status = {
       content: 'test text',
@@ -431,19 +452,22 @@ describe('Status thunks', () => {
     fetch.mockImplementationOnce(fetchMocker(
       status,
       {
-        expectedUrl: `https://pleroma.soykaf.com/api/v1/statuses/1/mute`
+        expectedUrl: 'https://pleroma.soykaf.com/api/v1/statuses/1/mute'
       }))
 
-    let state = await statusesThunks.toggleMutedStatus({ config, params: { id }, muted: false })(dispatch(store), getState(store))
+    const state = await statusesThunks.toggleMutedStatus({ config, params: { id }, muted: false })(dispatch(store), getState(store))
 
     expect(state.statuses.statusesByIds)
       .toEqual({ 1: { ...status, muted: true } })
   })
 
   it('unmute status', async () => {
-    const store = { state: { statuses:
+    const store = {
+      state: {
+        statuses:
         { statusesByIds: { 1: { id: '1', content: '', muted: true } } }
-    } }
+      }
+    }
     const id = '1'
     const status = {
       content: 'test text',
@@ -455,10 +479,10 @@ describe('Status thunks', () => {
     fetch.mockImplementationOnce(fetchMocker(
       status,
       {
-        expectedUrl: `https://pleroma.soykaf.com/api/v1/statuses/1/unmute`
+        expectedUrl: 'https://pleroma.soykaf.com/api/v1/statuses/1/unmute'
       }))
 
-    let state = await statusesThunks.toggleMutedStatus({ config, params: { id }, muted: true })(dispatch(store), getState(store))
+    const state = await statusesThunks.toggleMutedStatus({ config, params: { id }, muted: true })(dispatch(store), getState(store))
 
     expect(state.statuses.statusesByIds)
       .toEqual({ 1: { ...status, muted: false } })
@@ -481,18 +505,18 @@ describe('Status thunks', () => {
         fetchMocker(
           status,
           {
-            expectedUrl: `https://pleroma.soykaf.com/api/v1/statuses/1`
+            expectedUrl: 'https://pleroma.soykaf.com/api/v1/statuses/1'
           })
       )
       .mockImplementationOnce(
         fetchMocker(
           context,
           {
-            expectedUrl: `https://pleroma.soykaf.com/api/v1/statuses/1/context`
+            expectedUrl: 'https://pleroma.soykaf.com/api/v1/statuses/1/context'
           })
       )
 
-    let state = await statusesThunks.getStatusWithContext({ config, params: { id: '1' } })(dispatch(store), getState(store))
+    const state = await statusesThunks.getStatusWithContext({ config, params: { id: '1' } })(dispatch(store), getState(store))
 
     const result = {
       id: '1',
@@ -508,14 +532,21 @@ describe('Status thunks', () => {
       .toEqual({ 1: result })
   })
 
-  it(`fetches a status' lists`, async () => {
-    const store = { state: { statuses:
-      { statusesByIds: { 1: {
-        id: '1', 
-        content: 'Status content',
-        spoiler_text: ''
-      } } }
-  } }
+  it('fetches a status\' lists', async () => {
+    const store = {
+      state: {
+        statuses:
+      {
+        statusesByIds: {
+          1: {
+            id: '1',
+            content: 'Status content',
+            spoiler_text: ''
+          }
+        }
+      }
+      }
+    }
     const favouritedByList = [{ id: 1 }, { id: 2 }]
     const rebloggedByList = [{ id: 3 }, { id: 4 }]
     fetch.mockReset()
@@ -524,18 +555,18 @@ describe('Status thunks', () => {
         fetchMocker(
           favouritedByList,
           {
-            expectedUrl: `https://pleroma.soykaf.com/api/v1/statuses/1/favourited_by`
+            expectedUrl: 'https://pleroma.soykaf.com/api/v1/statuses/1/favourited_by'
           })
       )
       .mockImplementationOnce(
         fetchMocker(
           rebloggedByList,
           {
-            expectedUrl: `https://pleroma.soykaf.com/api/v1/statuses/1/reblogged_by`
+            expectedUrl: 'https://pleroma.soykaf.com/api/v1/statuses/1/reblogged_by'
           })
       )
 
-    let state = await statusesThunks.getStatusLists({ config, params: { id: '1' } })(dispatch(store), getState(store))
+    const state = await statusesThunks.getStatusLists({ config, params: { id: '1' } })(dispatch(store), getState(store))
 
     const result = {
       id: '1',
@@ -550,19 +581,22 @@ describe('Status thunks', () => {
     expect(state.statuses.statusesByIds)
       .toEqual({ 1: result })
   })
-  it(`fetches a status' lists in user timeline`, async () => {
-    const store = { state: { users: {
-      usersByIds: {
-        '1': {
-          id: '1',
-          acct: 'nd',
-          statuses: [
-            { id: '1', content: 'Status content', spoiler_text: '', reblogged: false }
-          ]
+  it('fetches a status\' lists in user timeline', async () => {
+    const store = {
+      state: {
+        users: {
+          usersByIds: {
+            1: {
+              id: '1',
+              acct: 'nd',
+              statuses: [
+                { id: '1', content: 'Status content', spoiler_text: '', reblogged: false }
+              ]
+            }
+          }
         }
-      }}
+      }
     }
-  }
     const favouritedByList = [{ id: 1 }, { id: 2 }]
     const rebloggedByList = [{ id: 3 }, { id: 4 }]
     fetch.mockReset()
@@ -571,18 +605,18 @@ describe('Status thunks', () => {
         fetchMocker(
           favouritedByList,
           {
-            expectedUrl: `https://pleroma.soykaf.com/api/v1/statuses/1/favourited_by`
+            expectedUrl: 'https://pleroma.soykaf.com/api/v1/statuses/1/favourited_by'
           })
       )
       .mockImplementationOnce(
         fetchMocker(
           rebloggedByList,
           {
-            expectedUrl: `https://pleroma.soykaf.com/api/v1/statuses/1/reblogged_by`
+            expectedUrl: 'https://pleroma.soykaf.com/api/v1/statuses/1/reblogged_by'
           })
       )
 
-    let state = await statusesThunks.getStatusLists({ config, params: { id: '1', userId: 1 } })(dispatch(store), getState(store))
+    const state = await statusesThunks.getStatusLists({ config, params: { id: '1', userId: 1 } })(dispatch(store), getState(store))
 
     const result = {
       id: '1',
@@ -610,7 +644,7 @@ describe('Status thunks', () => {
       id: '1',
       content: 'Status content'
     }
-    const store = { state: { statuses: { statusesByIds: { 1: status } } }}
+    const store = { state: { statuses: { statusesByIds: { 1: status } } } }
 
     fetch.mockReset()
     fetch
@@ -618,41 +652,14 @@ describe('Status thunks', () => {
         fetchMocker(
           status,
           {
-            expectedUrl: `https://pleroma.soykaf.com/api/v1/statuses/1`
+            expectedUrl: 'https://pleroma.soykaf.com/api/v1/statuses/1'
           })
       )
 
-    let state = await statusesThunks.deleteStatus({ config, params: { id: '1' } })(dispatch(store), getState(store))
+    const state = await statusesThunks.deleteStatus({ config, params: { id: '1' } })(dispatch(store), getState(store))
 
     expect(state.statuses.statusesByIds)
       .toEqual({})
-  })
-
-  it('delete reblog', async () => {
-    const status = {
-      id: '1',
-      content: 'Status content'
-    }
-    const statusesByIds = {
-      '1': status,
-      '2': {
-        id: '2',
-        reblog: status
-      }
-    }
-    const store = { state: { statuses: { statusesByIds } }}
-
-    fetch.mockReset()
-    fetch
-      .mockImplementationOnce(
-        fetchMocker(
-          status, { expectedUrl: `https://pleroma.soykaf.com/api/v1/statuses/1/unreblog` })
-      )
-
-    let state = await statusesThunks.deleteStatus({ config, params: { id: '1', reblogId: '2' } })(dispatch(store), getState(store))
-
-    expect(state.statuses.statusesByIds)
-      .toEqual({ '1': status })
   })
 
   it('delete status from user profile', async () => {
@@ -663,12 +670,14 @@ describe('Status thunks', () => {
     const user = {
       id: '2',
       acct: 'nd',
-      statuses: [ status ]
+      statuses: [status]
     }
-    const store = { state: {
-      statuses: { statusesByIds: { 1: status } },
-      users: { usersByIds: { 2: user } }
-    }}
+    const store = {
+      state: {
+        statuses: { statusesByIds: { 1: status } },
+        users: { usersByIds: { 2: user } }
+      }
+    }
 
     fetch.mockReset()
     fetch
@@ -676,11 +685,11 @@ describe('Status thunks', () => {
         fetchMocker(
           status,
           {
-            expectedUrl: `https://pleroma.soykaf.com/api/v1/statuses/1`
+            expectedUrl: 'https://pleroma.soykaf.com/api/v1/statuses/1'
           })
       )
 
-    let state = await statusesThunks.deleteStatus({ config, params: { id: '1', userId: '2' } })(dispatch(store), getState(store))
+    const state = await statusesThunks.deleteStatus({ config, params: { id: '1', userId: '2' } })(dispatch(store), getState(store))
 
     expect(state.statuses.statusesByIds)
       .toEqual({})

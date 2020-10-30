@@ -57,7 +57,6 @@ describe('User api', () => {
     })
   })
 
-
   describe('/api/v1/accounts/update_credentials', () => {
     it('returns updated user data', async () => {
       const accessToken = 'qNhQPCb-_lRjt_K6mXkwcrle_AoHWBkOmWjWhn9H6EQ='
@@ -113,7 +112,6 @@ describe('User api', () => {
     })
   })
 
-
   describe('/api/v1/accounts/:id/following', () => {
     it('returns the following and the links', async () => {
       const id = 1
@@ -140,7 +138,7 @@ describe('User api', () => {
 
       fetch.mockImplementationOnce(fetchMocker(
         { id: 1, username: 'nastassiad' },
-        { expectedUrl: `https://pleroma.soykaf.com/api/v1/accounts` }
+        { expectedUrl: 'https://pleroma.soykaf.com/api/v1/accounts' }
       ))
       const res = await api.users.register({ config, params: { id } })
 
@@ -155,7 +153,7 @@ describe('User api', () => {
 
       fetch.mockImplementationOnce(fetchMocker(
         [{ id: '1', blocked_by: false, followed_by: true }],
-        { expectedUrl: `https://pleroma.soykaf.com/api/v1/accounts/relationships?id=1` }
+        { expectedUrl: 'https://pleroma.soykaf.com/api/v1/accounts/relationships?id=1' }
       ))
       const res = await api.users.relationships({ config, queries: { id } })
       expect(res.state).toBe('ok')
@@ -164,24 +162,24 @@ describe('User api', () => {
   })
 
   describe('/api/v1/accounts/:id/follow|unfollow', () => {
-    it(`follow`, async () => {
+    it('follow', async () => {
       const id = 1
 
       fetch.mockImplementationOnce(fetchMocker(
         { id: '1', following: true },
-        { expectedUrl: `https://pleroma.soykaf.com/api/v1/accounts/1/follow` }
+        { expectedUrl: 'https://pleroma.soykaf.com/api/v1/accounts/1/follow' }
       ))
       const res = await api.users.toggleFollow({ config, params: { id, following: false } })
 
       expect(res.state).toBe('ok')
       expect(res.data).toEqual({ id: '1', following: true })
     })
-    it(`unfollow`, async () => {
+    it('unfollow', async () => {
       const id = 1
 
       fetch.mockImplementationOnce(fetchMocker(
         { id: '1', following: false },
-        { expectedUrl: `https://pleroma.soykaf.com/api/v1/accounts/1/unfollow` }
+        { expectedUrl: 'https://pleroma.soykaf.com/api/v1/accounts/1/unfollow' }
       ))
       const res = await api.users.toggleFollow({ config, params: { id, following: true } })
 
@@ -190,24 +188,24 @@ describe('User api', () => {
     })
   })
   describe('/api/v1/accounts/:id/mute|unmute', () => {
-    it(`mute`, async () => {
+    it('mute', async () => {
       const id = 1
 
       fetch.mockImplementationOnce(fetchMocker(
         { id: '1', muting: true },
-        { expectedUrl: `https://pleroma.soykaf.com/api/v1/accounts/1/mute` }
+        { expectedUrl: 'https://pleroma.soykaf.com/api/v1/accounts/1/mute' }
       ))
       const res = await api.users.toggleMute({ config, params: { id, muting: false } })
 
       expect(res.state).toBe('ok')
       expect(res.data).toEqual({ id: '1', muting: true })
     })
-    it(`unmute`, async () => {
+    it('unmute', async () => {
       const id = 1
 
       fetch.mockImplementationOnce(fetchMocker(
         { id: '1', muting: false },
-        { expectedUrl: `https://pleroma.soykaf.com/api/v1/accounts/1/unmute` }
+        { expectedUrl: 'https://pleroma.soykaf.com/api/v1/accounts/1/unmute' }
       ))
       const res = await api.users.toggleMute({ config, params: { id, muting: true } })
 
@@ -216,24 +214,24 @@ describe('User api', () => {
     })
   })
   describe('/api/v1/accounts/:id/block|unblock', () => {
-    it(`block`, async () => {
+    it('block', async () => {
       const id = 1
 
       fetch.mockImplementationOnce(fetchMocker(
         { id: '1', blocking: true },
-        { expectedUrl: `https://pleroma.soykaf.com/api/v1/accounts/1/block` }
+        { expectedUrl: 'https://pleroma.soykaf.com/api/v1/accounts/1/block' }
       ))
       const res = await api.users.toggleBlock({ config, params: { id, blocking: false } })
 
       expect(res.state).toBe('ok')
       expect(res.data).toEqual({ id: '1', blocking: true })
     })
-    it(`unblock`, async () => {
+    it('unblock', async () => {
       const id = 1
 
       fetch.mockImplementationOnce(fetchMocker(
         { id: '1', blocking: false },
-        { expectedUrl: `https://pleroma.soykaf.com/api/v1/accounts/1/unblock` }
+        { expectedUrl: 'https://pleroma.soykaf.com/api/v1/accounts/1/unblock' }
       ))
       const res = await api.users.toggleBlock({ config, params: { id, blocking: true } })
 

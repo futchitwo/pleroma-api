@@ -1,12 +1,15 @@
+const library = require('@neutrinojs/library')
+const standardjs = require('@neutrinojs/standardjs');
+const jest = require('@neutrinojs/jest');
+
 module.exports = {
   use: [
-    '@neutrinojs/standardjs',
-    [
-      '@neutrinojs/library',
-      {
-        name: 'pleroma-api'
-      }
-    ],
-    '@neutrinojs/jest'
-  ]
-};
+    standardjs(),
+    library({
+      name: 'pleroma-api',
+    }),
+    jest({
+      setupFilesAfterEnv: ["./test/jest.init.js"]
+    })
+  ],
+}

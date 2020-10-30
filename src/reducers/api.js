@@ -12,6 +12,7 @@ const initialState = {
     home: emptyTimeline()
   },
   notifications: {},
+  followRequests: {},
   conversations: {},
   chats: {},
   chat: {},

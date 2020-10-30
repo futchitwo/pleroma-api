@@ -14,11 +14,11 @@ describe('Config reducers', () => {
     }
     const emojis = [
       {
-        "shortcode": "blobaww",
-        "url": "https://files.mastodon.social/custom_emojis/images/000/011/739/original/blobaww.png",
-        "static_url": "https://files.mastodon.social/custom_emojis/images/000/011/739/static/blobaww.png",
-        "visible_in_picker": true,
-        "category": "Blobs"
+        shortcode: 'blobaww',
+        url: 'https://files.mastodon.social/custom_emojis/images/000/011/739/original/blobaww.png',
+        static_url: 'https://files.mastodon.social/custom_emojis/images/000/011/739/static/blobaww.png',
+        visible_in_picker: true,
+        category: 'Blobs'
       }
     ]
     const resultState = Config.reducer(config, Config.actions.addEmojis({ emojis }))

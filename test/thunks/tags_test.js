@@ -40,14 +40,14 @@ describe('Tags thunks', () => {
     fetch.mockImplementationOnce(fetchMocker(
       statuses,
       {
-        expectedUrl: `https://pleroma.soykaf.com/api/v1/timelines/tag/tagname`,
+        expectedUrl: 'https://pleroma.soykaf.com/api/v1/timelines/tag/tagname',
         headers: {
-          link: `<https://pleroma.soykaf.com/api/v1/timelines/tag/tagname?max_id=15>; rel="next", <https://pleroma.soykaf.com/api/v1/timelines/tag/tagname?min_id=16>; rel="prev"`
+          link: '<https://pleroma.soykaf.com/api/v1/timelines/tag/tagname?max_id=15>; rel="next", <https://pleroma.soykaf.com/api/v1/timelines/tag/tagname?min_id=16>; rel="prev"'
         }
       }
     ))
 
-    let state = await tagsThunks.fetch({ config, params: { tag: 'tagname' } })(dispatch, getState)
+    const state = await tagsThunks.fetch({ config, params: { tag: 'tagname' } })(dispatch, getState)
 
     expect(state.statuses.statusesByIds)
       .toEqual({ 21: statuses[0], 23: statuses[1] })
@@ -88,16 +88,16 @@ describe('Tags thunks', () => {
     fetch.mockImplementationOnce(fetchMocker(
       statuses,
       {
-        expectedUrl: `https://pleroma.soykaf.com/api/v1/timelines/tag/tagname`,
+        expectedUrl: 'https://pleroma.soykaf.com/api/v1/timelines/tag/tagname',
         headers: {
-          link: `<https://pleroma.soykaf.com/api/v1/timelines/tag/tagname?max_id=15>; rel="next", <https://pleroma.soykaf.com/api/v1/timelines/tag/tagname?min_id=16>; rel="prev"`
+          link: '<https://pleroma.soykaf.com/api/v1/timelines/tag/tagname?max_id=15>; rel="next", <https://pleroma.soykaf.com/api/v1/timelines/tag/tagname?min_id=16>; rel="prev"'
         }
       }
     ))
 
     const fullUrl = 'https://pleroma.soykaf.com/api/v1/timelines/tag/tagname'
 
-    let state = await tagsThunks.fetch({ config, fullUrl })(dispatch, getState)
+    const state = await tagsThunks.fetch({ config, fullUrl })(dispatch, getState)
     expect(state.statuses.statusesByIds)
       .toEqual({ 21: statuses[0], 23: statuses[1] })
 

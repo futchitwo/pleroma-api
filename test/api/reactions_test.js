@@ -37,8 +37,8 @@ describe('Emoji reactions api', () => {
     it('should return list of accounts that reacted to status', async () => {
       const id = '1'
       const reactions = [
-        {"name": "😀", "count": 2, "me": true, "accounts": [{ id: 'u1' }, { id: 'u2' }]},
-        {"name": "☕", "count": 1, "me": false, "accounts": [{ id: 'u3' }]}
+        { name: '😀', count: 2, me: true, accounts: [{ id: 'u1' }, { id: 'u2' }] },
+        { name: '☕', count: 1, me: false, accounts: [{ id: 'u3' }] }
       ]
       fetch.mockImplementationOnce(fetchMocker(reactions, {
         expectedUrl: 'https://pleroma.soykaf.com/api/v1/pleroma/statuses/1/reactions'
@@ -53,7 +53,7 @@ describe('Emoji reactions api', () => {
     it('should return a list of account that reacted with particular emoji', async () => {
       const id = '1'
       const reactions = [
-        {"name": "😀", "count": 2, "me": true, "accounts": [{ id: 'u1' }, { id: 'u2' }]},
+        { name: '😀', count: 2, me: true, accounts: [{ id: 'u1' }, { id: 'u2' }] }
       ]
       fetch.mockImplementationOnce(fetchMocker(reactions, {
         expectedUrl: 'https://pleroma.soykaf.com/api/v1/pleroma/statuses/1/reactions/%F0%9F%98%80'

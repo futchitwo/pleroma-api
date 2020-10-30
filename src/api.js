@@ -12,6 +12,7 @@ import configs from './api/configs'
 import reactions from './api/reactions'
 import mutes from './api/mutes'
 import blocks from './api/blocks'
+import followRequests from './api/follow_requests'
 
 export default {
   users,
@@ -27,5 +28,6 @@ export default {
   configs,
   reactions,
   mutes,
-  blocks
+  blocks,
+  followRequests
 }

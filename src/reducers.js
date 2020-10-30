@@ -5,6 +5,7 @@ import api from './reducers/api.js'
 import conversations from './reducers/conversations'
 import chats from './reducers/chats'
 import config from './reducers/config'
+import followRequests from './reducers/follow_requests'
 
 const reducers = {
   statuses,
@@ -13,7 +14,8 @@ const reducers = {
   api,
   conversations,
   chats,
-  config
+  config,
+  followRequests
 }
 
 export default reducers

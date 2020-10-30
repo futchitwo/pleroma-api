@@ -51,7 +51,7 @@ describe('Configs api', () => {
       fetch.mockImplementationOnce(fetchMocker({ invitesEnabled: true, nodeName: 'pleroma.site' }, {
         expectedUrl: 'https://pleroma.soykaf.com/nodeinfo/2.1.json'
       }))
-      const res = await api.configs.getInstanceNodeinfo({ config, fullUrl: `https://pleroma.soykaf.com/nodeinfo/2.1.json` })
+      const res = await api.configs.getInstanceNodeinfo({ config, fullUrl: 'https://pleroma.soykaf.com/nodeinfo/2.1.json' })
 
       expect(res.data).toEqual({ invitesEnabled: true, nodeName: 'pleroma.site' })
     })
@@ -77,12 +77,14 @@ describe('Configs api', () => {
   describe('/api/v1/custom_emojis', () => {
     it('returns list of custom emoji', async () => {
       const emojis = [
-        { "girlpower": {
-          "tags": [
-            "Finmoji"
-          ],
-          "image_url": "/finmoji/128px/girlpower-128.png"
-        } }
+        {
+          girlpower: {
+            tags: [
+              'Finmoji'
+            ],
+            image_url: '/finmoji/128px/girlpower-128.png'
+          }
+        }
       ]
       fetch.mockImplementationOnce(fetchMocker(emojis, {
         expectedUrl: 'https://pleroma.soykaf.com/api/v1/custom_emojis'

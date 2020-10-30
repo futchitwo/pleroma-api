@@ -19,7 +19,7 @@ export const queryParams = (params) => {
 
 const authHeaders = ({ accessToken }) => {
   if (accessToken) {
-    return { 'Authorization': `Bearer ${accessToken}` }
+    return { Authorization: `Bearer ${accessToken}` }
   } else {
     return {}
   }

@@ -8,6 +8,7 @@ import Conversations from '../thunks/conversations_thunks'
 import { apiErrorCatcher, getConfig } from '../utils/api_utils'
 import last from 'lodash/last'
 import has from 'lodash/has'
+import findIndex from 'lodash/findIndex'
 import { getUsersFromStatusesList } from '../utils/users_utils.js'
 
 const fetchTimeline = async ({ type, config, queries, fullUrl }) => {
@@ -59,10 +60,10 @@ const statusesThunks = {
   fetchAndAddTimeline: ({ config, timelineName, type, older, queries, fullUrl }) =>
     async (dispatch, getState) => {
       // If there's no "next" url, use the oldest status as max_id in query
-      if (older && !fullUrl && (!queries || !queries['max_id'])) {
+      if (older && !fullUrl && (!queries || !queries.max_id)) {
         const timelineStatusIds = (getState().statuses.timelines[timelineName] || {}).statusIds || []
         queries = queries || {}
-        queries['max_id'] = last(timelineStatusIds)
+        queries.max_id = last(timelineStatusIds)
       }
       startLoading(dispatch, timelineName, older)
       const result = await fetchTimeline({ type, config, queries, fullUrl })
@@ -115,12 +116,48 @@ const statusesThunks = {
     }
   },
 
-  toggleRebloggedStatus: ({ config, params, reblogged }) => {
+  toggleRebloggedStatus: ({ config, params, reblogged, user }) => {
     return async (dispatch, getState) => {
-      const result = reblogged
+      reblogged
         ? await statusesApi.unreblog({ config: getConfig(getState, config), params }).then(res => apiErrorCatcher(res))
         : await statusesApi.reblog({ config: getConfig(getState, config), params }).then(res => apiErrorCatcher(res))
-      await dispatch(Statuses.actions.addStatus({ status: result.data }))
+
+      const { statuses: { statusesByIds } } = getState()
+      const oldStatus = { ...statusesByIds[params.id] }
+
+      oldStatus.reblogs_count = oldStatus.reblogs_count || 0
+      oldStatus.reblogged_by = oldStatus.reblogged_by || []
+      const index = findIndex(oldStatus.reblogged_by, { id: user.id })
+      if (index === -1) {
+        oldStatus.reblogged_by.push(user)
+      } else {
+        oldStatus.reblogged_by.splice(index, 1)
+      }
+
+      if (reblogged) {
+        const promises = Object.keys(statusesByIds).reduce((acc, id) => {
+          const status = statusesByIds[id]
+          if (status.reblog && status.reblog.id === params.id && status.account.id === user.id) {
+            acc.push(dispatch(Statuses.actions.deleteStatus({ statusId: id })))
+          }
+          return acc
+        }, [])
+        await Promise.all(promises)
+
+        const status = {
+          ...oldStatus,
+          reblogged: false,
+          reblogs_count: oldStatus.reblogs_count - 1
+        }
+        await dispatch(Statuses.actions.addStatus({ status }))
+      } else {
+        const status = {
+          ...oldStatus,
+          reblogged: true,
+          reblogs_count: oldStatus.reblogs_count + 1
+        }
+        await dispatch(Statuses.actions.addStatus({ status }))
+      }
       return getState()
     }
   },
@@ -177,20 +214,15 @@ const statusesThunks = {
 
   deleteStatus: ({ config, params }) => {
     return async (dispatch, getState) => {
-      const computedConfig = getConfig(getState, config)
-      if (params.reblogId) {
-        await statusesApi.unreblog({ config: computedConfig, params }).then(res => apiErrorCatcher(res))
-      } else {
-        await statusesApi.delete({ config: computedConfig, params }).then(res => apiErrorCatcher(res))
-      }
-      const status = getState().statuses.statusesByIds[params.reblogId || params.id]
+      await statusesApi.delete({ config: getConfig(getState, config), params }).then(res => apiErrorCatcher(res))
+      const status = getState().statuses.statusesByIds[params.id]
 
       if (status.poll) {
         const poll = getState().api.polls[params.id] || {}
 
         poll.fetcher && poll.fetcher.stop()
       }
-      dispatch(Statuses.actions.deleteStatus({ statusId: params.reblogId || params.id }))
+      dispatch(Statuses.actions.deleteStatus({ statusId: params.id }))
       if (params.userId) {
         dispatch(Users.actions.deleteUserStatus({ statusId: params.id, userId: params.userId }))
       }
