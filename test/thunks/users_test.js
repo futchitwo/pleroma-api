@@ -267,4 +267,42 @@ describe('Users thunks', () => {
     expect(state.users.usersByIds)
       .toEqual({ 1: expectedResult })
   })
+
+  it('add permission group', async () => {
+    const store = {
+      state: {
+        users: {
+          usersByIds: {
+            1: {
+              id: '1',
+              acct: 'nd',
+              pleroma: { is_admin: false }
+            }
+          }
+        }
+      }
+    }
+    const dispatch = (action) => {
+      store.state = reducer(store.state, action)
+    }
+    const getState = () => store.state
+
+    fetch.mockReset()
+    fetch
+      .mockImplementationOnce(fetchMocker(
+        { is_admin: true },
+        { expectedUrl: 'https://pleroma.soykaf.com/api/pleroma/admin/users/nd/permission_group/admin' }
+      ))
+    const state = await usersThunks.togglePermissionGroup({ config, params: { user: { id: '1', acct: 'nd' }, permission_group: 'admin' } })(dispatch, getState)
+
+    const expectedResult = {
+      id: '1',
+      acct: 'nd',
+      pleroma: {
+        is_admin: true
+      }
+    }
+    expect(state.users.usersByIds)
+      .toEqual({ 1: expectedResult })
+  })
 })

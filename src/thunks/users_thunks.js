@@ -1,4 +1,5 @@
 import usersApi from '../api/users'
+import adminApi from '../api/admin'
 import Users from '../reducers/users'
 import Statuses from '../reducers/statuses'
 import ApiReducer from '../reducers/api'
@@ -139,6 +140,21 @@ const usersThunks = {
 
       await dispatch(Users.actions.addUser({ user }))
       return { state: getState(), result }
+    }
+  },
+
+  togglePermissionGroup: ({ config, params, isPermissionGroupOn }) => {
+    return async (dispatch, getState) => {
+      const computedConfig = getConfig(getState, config)
+      let result = isPermissionGroupOn
+        ? await adminApi.deletePermissionGroup({ config: computedConfig, params })
+        : await adminApi.addPermissionGroup({ config: computedConfig, params })
+      result = apiErrorCatcher(result)
+      const user = { ...getState().users.usersByIds[params.user.id] }
+      user.pleroma = { ...user.pleroma, ...result.data }
+
+      await dispatch(Users.actions.addUser({ user }))
+      return getState()
     }
   }
 }
